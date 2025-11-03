@@ -1,0 +1,22 @@
+# Byte-compiled / optimized / compiled files
+__pycache__/
+*.py[cod]
+*$py.class
+
+#file pdf
+*.pdf
+
+#file .md
+*.md
+
+test_placeholders.html
+
+#image files except inlet_logo.png
+*.png
+*.jpg
+*.jpeg
+*.gif
+*.bmp
+*.tiff
+!inlet_logo.png
+

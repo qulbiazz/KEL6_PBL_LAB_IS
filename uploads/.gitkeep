@@ -1,0 +1,11 @@
+# Folder untuk menyimpan file upload
+# Struktur folder akan dibuat otomatis saat upload pertama kali
+
+uploads/
+├── banners/      # Carousel banner images
+├── products/     # Product images
+├── partners/     # Partner logos
+├── team/         # Team member photos
+├── news/         # News images
+├── gallery/      # Gallery images
+└── research/     # Research activity images

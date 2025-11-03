@@ -1,0 +1,300 @@
+/* Custom styles for InLet website */
+
+.carousel-slide {
+    opacity: 0;
+    transition: opacity 0.5s ease-in-out;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+}
+
+.carousel-slide.active {
+    opacity: 1;
+}
+
+/* Smooth transitions */
+* {
+    transition: all 0.3s ease;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+    width: 10px;
+}
+
+::-webkit-scrollbar-track {
+    background: #f1f1f1;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #888;
+    border-radius: 5px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #555;
+}
+
+/* Loading animation */
+.loading {
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    border: 3px solid rgba(255,255,255,.3);
+    border-radius: 50%;
+    border-top-color: #fff;
+    animation: spin 1s ease-in-out infinite;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+/* Hover effects */
+.hover-scale {
+    transition: transform 0.3s ease;
+}
+
+.hover-scale:hover {
+    transform: scale(1.05);
+}
+
+/* Image loading */
+img {
+    image-rendering: -webkit-optimize-contrast;
+}
+
+/* Image placeholder styles */
+.img-placeholder {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 3rem;
+    position: relative;
+    min-height: 200px;
+}
+
+.img-placeholder::before {
+    content: '\f03e';
+    font-family: 'Font Awesome 5 Free';
+    font-weight: 900;
+    font-size: 4rem;
+    opacity: 0.3;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+.img-placeholder::after {
+    content: attr(data-placeholder);
+    position: absolute;
+    font-size: 0.875rem;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    bottom: 1rem;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(0, 0, 0, 0.6);
+    padding: 0.5rem 1rem;
+    border-radius: 1rem;
+    white-space: nowrap;
+    max-width: 90%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.img-error {
+    background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+}
+
+/* Placeholder for different image types */
+.banner-placeholder {
+    min-height: 400px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+.product-placeholder {
+    min-height: 200px;
+    background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+}
+
+.team-placeholder {
+    min-height: 300px;
+    background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+}
+
+.news-placeholder {
+    min-height: 200px;
+    background: linear-gradient(135deg, #30cfd0 0%, #330867 100%);
+}
+
+.gallery-placeholder {
+    min-height: 250px;
+    background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
+}
+
+.research-placeholder {
+    min-height: 200px;
+    background: linear-gradient(135deg, #ff9a56 0%, #ff6a88 100%);
+}
+
+/* Image loading state */
+img.loading {
+    background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+    background-size: 200% 100%;
+    animation: loading 1.5s infinite;
+}
+
+@keyframes loading {
+    0% { background-position: 200% 0; }
+    100% { background-position: -200% 0; }
+}
+
+
+/* Navbar Logo */
+nav img {
+    max-height: 60px;
+    height: auto;
+    width: auto;
+    object-fit: contain;
+    transition: transform 0.3s ease;
+}
+
+nav a:hover img {
+    transform: scale(1.05);
+}
+
+@media (max-width: 768px) {
+    nav img {
+        max-height: 64px;
+    }
+}
+
+/* Form styles */
+input[type="text"],
+input[type="email"],
+input[type="password"],
+textarea,
+select {
+    transition: border-color 0.3s ease;
+}
+
+input[type="text"]:focus,
+input[type="email"]:focus,
+input[type="password"]:focus,
+textarea:focus,
+select:focus {
+    outline: none;
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+/* Button animations */
+button,
+.btn {
+    position: relative;
+    overflow: hidden;
+}
+
+button:before,
+.btn:before {
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.3);
+    transform: translate(-50%, -50%);
+    transition: width 0.6s, height 0.6s;
+}
+
+button:hover:before,
+.btn:hover:before {
+    width: 300px;
+    height: 300px;
+}
+
+/* Card hover effects */
+.card-hover {
+    transition: all 0.3s ease;
+}
+
+.card-hover:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+}
+
+/* Team Slider Styles */
+.teamSwiper {
+    padding: 20px 0 60px 0;
+}
+
+.teamSwiper .swiper-slide {
+    height: auto;
+    display: flex;
+}
+
+.teamSwiper .swiper-slide > div {
+    width: 100%;
+    flex: 1;
+}
+
+.teamSwiper .swiper-button-next,
+.teamSwiper .swiper-button-prev {
+    color: #2563eb;
+    background: white;
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+}
+
+.teamSwiper .swiper-button-next:after,
+.teamSwiper .swiper-button-prev:after {
+    font-size: 20px;
+    font-weight: bold;
+}
+
+.teamSwiper .swiper-button-next:hover,
+.teamSwiper .swiper-button-prev:hover {
+    background: #2563eb;
+    color: white;
+    box-shadow: 0 6px 15px rgba(37, 99, 235, 0.3);
+}
+
+.teamSwiper .swiper-pagination {
+    bottom: 10px;
+}
+
+.teamSwiper .swiper-pagination-bullet {
+    width: 12px;
+    height: 12px;
+    background: #d1d5db;
+    opacity: 1;
+    transition: all 0.3s ease;
+}
+
+.teamSwiper .swiper-pagination-bullet-active {
+    background: #2563eb;
+    width: 30px;
+    border-radius: 6px;
+}
+
+/* Responsive adjustments */
+@media (max-width: 1024px) {
+    .teamSwiper .swiper-button-next,
+    .teamSwiper .swiper-button-prev {
+        width: 40px;
+        height: 40px;
+    }
+    
+    .teamSwiper .swiper-button-next:after,
+    .teamSwiper .swiper-button-prev:after {
+        font-size: 16px;
+    }
+}
