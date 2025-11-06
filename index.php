@@ -101,12 +101,12 @@ $research = $conn->query("SELECT * FROM research_activities WHERE is_active = tr
             </div>
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                 <?php foreach ($products as $product): ?>
-                <div class="bg-white rounded-lg overflow-hidden shadow-md hover:shadow-xl transition">
+                <div class="bg-white rounded-lg overflow-hidden shadow-md hover:shadow-xl transition flex flex-col h-full">
                     <img src="uploads/products/<?php echo htmlspecialchars($product['image']); ?>" alt="<?php echo htmlspecialchars($product['name']); ?>" class="w-full h-48 object-cover">
-                    <div class="p-6">
+                    <div class="p-6 flex flex-col flex-grow">
                         <h3 class="text-xl font-bold mb-2 text-gray-800"><?php echo htmlspecialchars($product['name']); ?></h3>
-                        <p class="text-gray-600 mb-4"><?php echo htmlspecialchars($product['description']); ?></p>
-                        <a href="product-detail.php?id=<?php echo $product['id']; ?>" class="text-blue-600 hover:text-blue-700 font-semibold">
+                        <p class="text-gray-600 mb-4 flex-grow"><?php echo htmlspecialchars($product['description']); ?></p>
+                        <a href="product-detail.php?id=<?php echo $product['id']; ?>" class="text-blue-600 hover:text-blue-700 font-semibold mt-auto">
                             Learn More <i class="fas fa-arrow-right ml-1"></i>
                         </a>
                     </div>
@@ -123,10 +123,13 @@ $research = $conn->query("SELECT * FROM research_activities WHERE is_active = tr
                 <h2 class="text-4xl font-bold text-gray-800 mb-4">Our Partners</h2>
                 <p class="text-gray-600">Trusted by leading organizations</p>
             </div>
-            <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-8 items-center">
+            <div class="flex flex-wrap justify-center items-center gap-8">
                 <?php foreach ($partners as $partner): ?>
                 <div class="flex items-center justify-center p-4">
-                    <img src="uploads/partners/<?php echo htmlspecialchars($partner['logo']); ?>" alt="<?php echo htmlspecialchars($partner['name']); ?>" class="max-h-20 w-auto grayscale hover:grayscale-0 transition">
+                    <img src="uploads/partners/<?php echo htmlspecialchars($partner['logo']); ?>" 
+                         alt="<?php echo htmlspecialchars($partner['name']); ?>" 
+                         class="max-h-20 w-auto grayscale hover:grayscale-0 transition"
+                         onerror="handleImageError(this)">
                 </div>
                 <?php endforeach; ?>
             </div>
@@ -190,15 +193,15 @@ $research = $conn->query("SELECT * FROM research_activities WHERE is_active = tr
             </div>
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                 <?php foreach ($news as $item): ?>
-                <div class="bg-white rounded-lg overflow-hidden shadow-md hover:shadow-xl transition">
+                <div class="bg-white rounded-lg overflow-hidden shadow-md hover:shadow-xl transition flex flex-col h-full">
                     <img src="uploads/news/<?php echo htmlspecialchars($item['image']); ?>" alt="<?php echo htmlspecialchars($item['title']); ?>" class="w-full h-48 object-cover">
-                    <div class="p-6">
+                    <div class="p-6 flex flex-col flex-grow">
                         <div class="text-sm text-gray-500 mb-2">
                             <i class="far fa-calendar"></i> <?php echo date('F d, Y', strtotime($item['published_at'])); ?>
                         </div>
                         <h3 class="text-xl font-bold mb-2 text-gray-800"><?php echo htmlspecialchars($item['title']); ?></h3>
-                        <p class="text-gray-600 mb-4"><?php echo substr(htmlspecialchars($item['content']), 0, 100); ?>...</p>
-                        <a href="news-detail.php?id=<?php echo $item['id']; ?>" class="text-blue-600 hover:text-blue-700 font-semibold">
+                        <p class="text-gray-600 mb-4 flex-grow"><?php echo substr(htmlspecialchars($item['content']), 0, 100); ?>...</p>
+                        <a href="news-detail.php?id=<?php echo $item['id']; ?>" class="text-blue-600 hover:text-blue-700 font-semibold mt-auto">
                             Read More <i class="fas fa-arrow-right ml-1"></i>
                         </a>
                     </div>
@@ -217,10 +220,18 @@ $research = $conn->query("SELECT * FROM research_activities WHERE is_active = tr
             </div>
             <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
                 <?php foreach ($gallery as $item): ?>
-                <div class="relative overflow-hidden rounded-lg group cursor-pointer" onclick="openGalleryModal('<?php echo htmlspecialchars($item['image']); ?>', '<?php echo htmlspecialchars($item['caption']); ?>')">
-                    <img src="uploads/gallery/<?php echo htmlspecialchars($item['image']); ?>" alt="<?php echo htmlspecialchars($item['caption']); ?>" class="w-full h-64 object-cover group-hover:scale-110 transition duration-300">
-                    <div class="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-50 transition flex items-center justify-center">
-                        <i class="fas fa-search-plus text-white text-3xl opacity-0 group-hover:opacity-100 transition"></i>
+                <div class="relative overflow-hidden rounded-lg group cursor-pointer gallery-item" 
+                     data-image="<?php echo htmlspecialchars($item['image']); ?>" 
+                     data-caption="<?php echo htmlspecialchars($item['caption']); ?>">
+                    <img src="uploads/gallery/<?php echo htmlspecialchars($item['image']); ?>" 
+                         alt="<?php echo htmlspecialchars($item['caption']); ?>" 
+                         class="w-full h-64 object-cover group-hover:scale-110 transition duration-300"
+                         onerror="handleImageError(this)">
+                    <div class="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-70 transition flex flex-col items-center justify-center p-4">
+                        <i class="fas fa-search-plus text-white text-3xl opacity-0 group-hover:opacity-100 transition mb-2"></i>
+                        <p class="text-white text-center text-sm opacity-0 group-hover:opacity-100 transition font-semibold">
+                            <?php echo htmlspecialchars($item['caption']); ?>
+                        </p>
                     </div>
                 </div>
                 <?php endforeach; ?>
@@ -237,14 +248,17 @@ $research = $conn->query("SELECT * FROM research_activities WHERE is_active = tr
             </div>
             <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
                 <?php foreach ($research as $activity): ?>
-                <div class="bg-white rounded-lg overflow-hidden shadow-md hover:shadow-xl transition">
+                <div class="bg-white rounded-lg overflow-hidden shadow-md hover:shadow-xl transition flex flex-col h-full">
                     <img src="uploads/research/<?php echo htmlspecialchars($activity['image']); ?>" alt="<?php echo htmlspecialchars($activity['title']); ?>" class="w-full h-48 object-cover">
-                    <div class="p-6">
+                    <div class="p-6 flex flex-col flex-grow">
                         <h3 class="text-xl font-bold mb-2 text-gray-800"><?php echo htmlspecialchars($activity['title']); ?></h3>
-                        <p class="text-gray-600 mb-4"><?php echo htmlspecialchars($activity['description']); ?></p>
-                        <div class="text-sm text-gray-500">
+                        <p class="text-gray-600 mb-4 flex-grow"><?php echo htmlspecialchars($activity['description']); ?></p>
+                        <div class="text-sm text-gray-500 mb-4">
                             <i class="far fa-calendar"></i> <?php echo date('F Y', strtotime($activity['created_at'])); ?>
                         </div>
+                        <a href="research-detail.php?id=<?php echo $activity['id']; ?>" class="text-blue-600 hover:text-blue-700 font-semibold mt-auto">
+                            Read More <i class="fas fa-arrow-right ml-1"></i>
+                        </a>
                     </div>
                 </div>
                 <?php endforeach; ?>
@@ -252,19 +266,21 @@ $research = $conn->query("SELECT * FROM research_activities WHERE is_active = tr
         </div>
     </section>
 
-    <!-- Footer -->
-    <?php include 'includes/footer.php'; ?>
-
     <!-- Gallery Modal -->
-    <div id="galleryModal" class="hidden fixed inset-0 bg-black bg-opacity-75 z-50 flex items-center justify-center p-4">
+    <div id="galleryModal" style="display: none;" class="fixed inset-0 bg-black bg-opacity-75 z-50 flex items-center justify-center p-4">
         <div class="relative max-w-4xl w-full">
-            <button onclick="closeGalleryModal()" class="absolute top-4 right-4 text-white text-3xl z-10">
+            <button onclick="closeGalleryModal()" class="absolute top-4 right-4 text-white text-3xl z-10 hover:text-gray-300">
                 <i class="fas fa-times"></i>
             </button>
-            <img id="galleryModalImage" src="" alt="" class="w-full h-auto rounded-lg">
-            <p id="galleryModalCaption" class="text-white text-center mt-4"></p>
+            <div class="bg-white p-2 rounded-lg">
+                <img id="galleryModalImage" src="" alt="" class="w-full h-auto rounded-lg">
+                <p id="galleryModalCaption" class="text-gray-800 text-center mt-4 font-semibold"></p>
+            </div>
         </div>
     </div>
+
+    <!-- Footer -->
+    <?php include 'includes/footer.php'; ?>
 
     <script src="assets/js/carousel.js"></script>
     <script src="assets/js/main.js"></script>

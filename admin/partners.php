@@ -10,11 +10,21 @@ $db = new Database();
 $conn = $db->getConnection();
 
 $success = '';
+$error = '';
 
 if (isset($_GET['delete'])) {
-    $stmt = $conn->prepare("DELETE FROM partners WHERE id = :id");
-    if ($stmt->execute(['id' => $_GET['delete']])) {
-        $success = 'Partner deleted successfully';
+    // Check partner count before deletion
+    $count_stmt = $conn->prepare("SELECT COUNT(*) FROM partners");
+    $count_stmt->execute();
+    $partner_count = $count_stmt->fetchColumn();
+    
+    if ($partner_count <= 1) {
+        $error = 'Cannot delete the last partner. At least 1 partner must remain.';
+    } else {
+        $stmt = $conn->prepare("DELETE FROM partners WHERE id = :id");
+        if ($stmt->execute(['id' => $_GET['delete']])) {
+            $success = 'Partner deleted successfully';
+        }
     }
 }
 
@@ -50,6 +60,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 
 $partners = $conn->query("SELECT * FROM partners ORDER BY display_order")->fetchAll();
+$total_partners = count($partners);
 $edit_item = null;
 if (isset($_GET['edit'])) {
     $stmt = $conn->prepare("SELECT * FROM partners WHERE id = :id");
@@ -75,6 +86,10 @@ if (isset($_GET['edit'])) {
             
             <?php if ($success): ?>
             <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-4"><?php echo $success; ?></div>
+            <?php endif; ?>
+            
+            <?php if ($error): ?>
+            <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4"><?php echo $error; ?></div>
             <?php endif; ?>
             
             <div class="bg-white rounded-lg shadow-md p-6 mb-8">
@@ -105,8 +120,15 @@ if (isset($_GET['edit'])) {
                         </div>
                         <div>
                             <label class="block text-gray-700 font-semibold mb-2">Display Order</label>
-                            <input type="number" name="display_order" value="<?php echo $edit_item ? $edit_item['display_order'] : 0; ?>"
-                                class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:border-blue-500">
+                            <select name="display_order" class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:border-blue-500">
+                                <?php 
+                                $max_order = $edit_item ? $total_partners : $total_partners + 1;
+                                for ($i = 1; $i <= $max_order; $i++): 
+                                    $selected = ($edit_item && $edit_item['display_order'] == $i) ? 'selected' : (!$edit_item && $i == $max_order ? 'selected' : '');
+                                ?>
+                                    <option value="<?php echo $i; ?>" <?php echo $selected; ?>><?php echo $i; ?></option>
+                                <?php endfor; ?>
+                            </select>
                         </div>
                     </div>
                     
@@ -146,9 +168,15 @@ if (isset($_GET['edit'])) {
                             <a href="?edit=<?php echo $partner['id']; ?>" class="text-blue-600 hover:text-blue-800 mr-2">
                                 <i class="fas fa-edit"></i>
                             </a>
+                            <?php if (count($partners) > 1): ?>
                             <a href="?delete=<?php echo $partner['id']; ?>" onclick="return confirm('Are you sure?')" class="text-red-600 hover:text-red-800">
                                 <i class="fas fa-trash"></i>
                             </a>
+                            <?php else: ?>
+                            <span class="text-gray-400 cursor-not-allowed" title="Cannot delete the last partner">
+                                <i class="fas fa-trash"></i>
+                            </span>
+                            <?php endif; ?>
                         </div>
                     </div>
                     <?php endforeach; ?>

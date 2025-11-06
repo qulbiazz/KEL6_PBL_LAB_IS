@@ -4,6 +4,7 @@ require_once 'config/database.php';
 ?>
 <!DOCTYPE html>
 <html lang="id">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -12,7 +13,11 @@ require_once 'config/database.php';
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="assets/css/style.css">
 </head>
+
 <body class="bg-gray-50">
+    <!-- Abstract Background Pattern -->
+    <div class="abstract-pattern"></div>
+    
     <!-- Navigation -->
     <?php include 'includes/navbar.php'; ?>
 
@@ -36,7 +41,7 @@ require_once 'config/database.php';
                     </div>
                     <h2 class="text-3xl font-bold text-gray-800 mb-4">Our Vision</h2>
                     <p class="text-gray-600 leading-relaxed">
-                        To become a leading research and development center in information and learning engineering technology, 
+                        To become a leading research and development center in information and learning engineering technology,
                         driving innovation and excellence in education technology solutions that transform the way people learn and interact with information.
                     </p>
                 </div>
@@ -75,17 +80,17 @@ require_once 'config/database.php';
                 <div class="bg-white rounded-lg shadow-md p-8 mb-8">
                     <h2 class="text-3xl font-bold text-gray-800 mb-6">Who We Are</h2>
                     <p class="text-gray-600 leading-relaxed mb-4">
-                        InLet (Information and Learning Engineering Technology) is a dynamic research laboratory dedicated to advancing 
-                        the field of educational technology and information systems. Founded with the vision of transforming learning 
+                        InLet (Information and Learning Engineering Technology) is a dynamic research laboratory dedicated to advancing
+                        the field of educational technology and information systems. Founded with the vision of transforming learning
                         experiences through technology, we bring together researchers, developers, and educators to create innovative solutions.
                     </p>
                     <p class="text-gray-600 leading-relaxed mb-4">
-                        Our team consists of experienced professionals with diverse backgrounds in computer science, education, 
-                        and engineering. We work on various projects ranging from learning management systems to artificial intelligence 
+                        Our team consists of experienced professionals with diverse backgrounds in computer science, education,
+                        and engineering. We work on various projects ranging from learning management systems to artificial intelligence
                         applications in education.
                     </p>
                     <p class="text-gray-600 leading-relaxed">
-                        Through our research activities, product development, and industry partnerships, we aim to make a significant 
+                        Through our research activities, product development, and industry partnerships, we aim to make a significant
                         impact on how technology is used in education and information management.
                     </p>
                 </div>
@@ -164,4 +169,5 @@ require_once 'config/database.php';
 
     <script src="assets/js/main.js"></script>
 </body>
+
 </html>

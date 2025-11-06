@@ -9,6 +9,8 @@ __pycache__/
 #file .md
 *.md
 
+/instruction
+
 test_placeholders.html
 
 #image files except inlet_logo.png

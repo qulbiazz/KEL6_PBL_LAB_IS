@@ -1,5 +1,17 @@
 /* Custom styles for InLet website */
 
+@import url('https://fonts.googleapis.com/css2?family=Outfit&family=Roboto&display=swap');
+
+/* Global CSS */
+
+body {
+    margin: 0;
+    font-family: "Outfit", sans-serif;
+    -webkit-font-smoothing: "Outfit", sans-serif;
+    -moz-osx-font-smoothing: "Outfit", sans-serif;
+    font-style: normal;
+}
+
 .carousel-slide {
     opacity: 0;
     transition: opacity 0.5s ease-in-out;
@@ -9,6 +21,18 @@
 }
 
 .carousel-slide.active {
+    opacity: 1;
+}
+
+/* Carousel controls - hide by default, show on hover */
+.carousel-container .carousel-prev,
+.carousel-container .carousel-next {
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.carousel-container:hover .carousel-prev,
+.carousel-container:hover .carousel-next {
     opacity: 1;
 }
 
@@ -40,14 +64,16 @@
     display: inline-block;
     width: 20px;
     height: 20px;
-    border: 3px solid rgba(255,255,255,.3);
+    border: 3px solid rgba(255, 255, 255, .3);
     border-radius: 50%;
     border-top-color: #fff;
     animation: spin 1s ease-in-out infinite;
 }
 
 @keyframes spin {
-    to { transform: rotate(360deg); }
+    to {
+        transform: rotate(360deg);
+    }
 }
 
 /* Hover effects */
@@ -148,8 +174,13 @@ img.loading {
 }
 
 @keyframes loading {
-    0% { background-position: 200% 0; }
-    100% { background-position: -200% 0; }
+    0% {
+        background-position: 200% 0;
+    }
+
+    100% {
+        background-position: -200% 0;
+    }
 }
 
 
@@ -168,7 +199,7 @@ nav a:hover img {
 
 @media (max-width: 768px) {
     nav img {
-        max-height: 64px;
+        max-height: 48px;
     }
 }
 
@@ -238,7 +269,7 @@ button:hover:before,
     display: flex;
 }
 
-.teamSwiper .swiper-slide > div {
+.teamSwiper .swiper-slide>div {
     width: 100%;
     flex: 1;
 }
@@ -287,12 +318,13 @@ button:hover:before,
 
 /* Responsive adjustments */
 @media (max-width: 1024px) {
+
     .teamSwiper .swiper-button-next,
     .teamSwiper .swiper-button-prev {
         width: 40px;
         height: 40px;
     }
-    
+
     .teamSwiper .swiper-button-next:after,
     .teamSwiper .swiper-button-prev:after {
         font-size: 16px;

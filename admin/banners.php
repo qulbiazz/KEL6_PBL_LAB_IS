@@ -15,11 +15,20 @@ $error = '';
 // Handle delete
 if (isset($_GET['delete'])) {
     $id = $_GET['delete'];
-    $stmt = $conn->prepare("DELETE FROM carousel_banners WHERE id = :id");
-    if ($stmt->execute(['id' => $id])) {
-        $success = 'Banner deleted successfully';
+    
+    // Check if this is the last banner
+    $count_stmt = $conn->query("SELECT COUNT(*) FROM carousel_banners");
+    $banner_count = $count_stmt->fetchColumn();
+    
+    if ($banner_count <= 1) {
+        $error = 'Cannot delete the last banner. At least one banner must remain.';
     } else {
-        $error = 'Error deleting banner';
+        $stmt = $conn->prepare("DELETE FROM carousel_banners WHERE id = :id");
+        if ($stmt->execute(['id' => $id])) {
+            $success = 'Banner deleted successfully';
+        } else {
+            $error = 'Error deleting banner';
+        }
     }
 }
 
@@ -147,9 +156,16 @@ if (isset($_GET['edit'])) {
                         
                         <div>
                             <label class="block text-gray-700 font-semibold mb-2">Button Link</label>
-                            <input type="text" name="button_link"
-                                value="<?php echo $edit_banner ? htmlspecialchars($edit_banner['button_link']) : ''; ?>"
-                                class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:border-blue-500">
+                            <select name="button_link" class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:border-blue-500">
+                                <option value="">-- Select Page --</option>
+                                <option value="index.php" <?php echo ($edit_banner && $edit_banner['button_link'] == 'index.php') ? 'selected' : ''; ?>>Home</option>
+                                <option value="about.php" <?php echo ($edit_banner && $edit_banner['button_link'] == 'about.php') ? 'selected' : ''; ?>>About</option>
+                                <option value="index.php#products" <?php echo ($edit_banner && $edit_banner['button_link'] == 'index.php#products') ? 'selected' : ''; ?>>Products</option>
+                                <option value="index.php#team" <?php echo ($edit_banner && $edit_banner['button_link'] == 'index.php#team') ? 'selected' : ''; ?>>Team</option>
+                                <option value="index.php#news" <?php echo ($edit_banner && $edit_banner['button_link'] == 'index.php#news') ? 'selected' : ''; ?>>News</option>
+                                <option value="index.php#gallery" <?php echo ($edit_banner && $edit_banner['button_link'] == 'index.php#gallery') ? 'selected' : ''; ?>>Gallery</option>
+                                <option value="index.php#research" <?php echo ($edit_banner && $edit_banner['button_link'] == 'index.php#research') ? 'selected' : ''; ?>>Research</option>
+                            </select>
                         </div>
                     </div>
                     
@@ -213,9 +229,15 @@ if (isset($_GET['edit'])) {
                                     <a href="?edit=<?php echo $banner['id']; ?>" class="text-blue-600 hover:text-blue-800 mr-3">
                                         <i class="fas fa-edit"></i>
                                     </a>
-                                    <a href="?delete=<?php echo $banner['id']; ?>" onclick="return confirm('Are you sure?')" class="text-red-600 hover:text-red-800">
+                                    <?php if (count($banners) > 1): ?>
+                                    <a href="?delete=<?php echo $banner['id']; ?>" onclick="return confirm('Are you sure you want to delete this banner?')" class="text-red-600 hover:text-red-800">
                                         <i class="fas fa-trash"></i>
                                     </a>
+                                    <?php else: ?>
+                                    <span class="text-gray-400 cursor-not-allowed" title="Cannot delete the last banner">
+                                        <i class="fas fa-trash"></i>
+                                    </span>
+                                    <?php endif; ?>
                                 </td>
                             </tr>
                             <?php endforeach; ?>
