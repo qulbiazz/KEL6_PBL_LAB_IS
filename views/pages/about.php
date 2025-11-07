@@ -1,25 +1,5 @@
-<?php
-session_start();
-require_once 'config/database.php';
-?>
-<!DOCTYPE html>
-<html lang="id">
-
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>About Us - InLet</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="assets/css/style.css">
-</head>
-
-<body class="bg-gray-50">
     <!-- Abstract Background Pattern -->
     <div class="abstract-pattern"></div>
-    
-    <!-- Navigation -->
-    <?php include 'includes/navbar.php'; ?>
 
     <!-- Hero Section -->
     <section class="bg-gradient-to-r from-blue-600 to-blue-800 text-white py-20">
@@ -163,11 +143,3 @@ require_once 'config/database.php';
             </div>
         </div>
     </section>
-
-    <!-- Footer -->
-    <?php include 'includes/footer.php'; ?>
-
-    <script src="assets/js/main.js"></script>
-</body>
-
-</html>

@@ -97,14 +97,17 @@ document.addEventListener('DOMContentLoaded', function() {
             if (href.includes('#')) {
                 const hashParts = href.split('#');
                 const targetId = hashParts[1];
-                const targetPage = hashParts[0];
+                const basePart = hashParts[0];
                 
-                // Check current page
-                const currentPage = window.location.pathname.split('/').pop();
+                // Get current page parameter
+                const urlParams = new URLSearchParams(window.location.search);
+                const currentPage = urlParams.get('page') || 'home';
                 
-                // If it's same page or just hash or target is index.php and we're on index
-                if (targetPage === '' || targetPage === currentPage || 
-                    (targetPage === 'index.php' && (currentPage === 'index.php' || currentPage === ''))) {
+                // Check if link is to index.php or same page
+                const isIndexLink = basePart === 'index.php' || basePart === '';
+                
+                // If on home page and clicking section link, scroll smoothly
+                if (currentPage === 'home' && isIndexLink) {
                     e.preventDefault();
                     const target = document.getElementById(targetId);
                     if (target) {
@@ -122,39 +125,45 @@ document.addEventListener('DOMContentLoaded', function() {
                         });
                         
                         // Update URL hash
-                        history.pushState(null, null, '#' + targetId);
+                        history.pushState(null, null, href);
                     }
                 }
-                // If different page, let it navigate normally (will be handled by index.php)
+                // If different page, let it navigate normally
             }
         });
     });
     
     // Handle hash in URL on page load
     if (window.location.hash) {
-        setTimeout(() => {
-            const targetId = window.location.hash.substring(1);
-            const target = document.getElementById(targetId);
-            if (target) {
-                const navbar = document.querySelector('nav');
-                const navbarHeight = navbar ? navbar.offsetHeight : 0;
-                const targetPosition = target.getBoundingClientRect().top + window.pageYOffset - navbarHeight - 20;
-                
-                window.scrollTo({
-                    top: targetPosition,
-                    behavior: 'smooth'
-                });
-            }
-        }, 100);
+        const urlParams = new URLSearchParams(window.location.search);
+        const currentPage = urlParams.get('page') || 'home';
+        
+        if (currentPage === 'home') {
+            setTimeout(() => {
+                const targetId = window.location.hash.substring(1);
+                const target = document.getElementById(targetId);
+                if (target) {
+                    const navbar = document.querySelector('nav');
+                    const navbarHeight = navbar ? navbar.offsetHeight : 0;
+                    const targetPosition = target.getBoundingClientRect().top + window.pageYOffset - navbarHeight - 20;
+                    
+                    window.scrollTo({
+                        top: targetPosition,
+                        behavior: 'smooth'
+                    });
+                }
+            }, 100);
+        }
     }
     
-    // Update active navbar based on scroll position (only on index.php)
-    const currentPage = window.location.pathname.split('/').pop();
-    if (currentPage === 'index.php' || currentPage === '') {
+    // Update active navbar based on scroll position (only on home page)
+    const urlParams = new URLSearchParams(window.location.search);
+    const currentPage = urlParams.get('page') || 'home';
+    
+    if (currentPage === 'home') {
         const sections = ['products', 'team', 'news', 'gallery', 'research'];
         const navLinks = document.querySelectorAll('.nav-section-link');
-        const homeLink = document.getElementById('nav-home');
-        const homeLinkMobile = document.getElementById('nav-home-mobile');
+        const homeLinks = document.querySelectorAll('.nav-home-link');
         
         function updateActiveNav() {
             const navbar = document.querySelector('nav');
@@ -188,25 +197,17 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
             });
             
-            // Update home link - only active if no section is active and near top
-            if (!currentSection && scrollPosition < 300) {
-                if (homeLink) {
-                    homeLink.classList.remove('text-gray-700');
-                    homeLink.classList.add('text-blue-600', 'font-semibold');
-                }
-                if (homeLinkMobile) {
-                    homeLinkMobile.classList.remove('text-gray-700');
-                    homeLinkMobile.classList.add('text-blue-600', 'font-semibold');
-                }
+            // Update home links - only active if no section is active and near top
+            if (!currentSection && scrollPosition < 500) {
+                homeLinks.forEach(link => {
+                    link.classList.remove('text-gray-700');
+                    link.classList.add('text-blue-600', 'font-semibold');
+                });
             } else {
-                if (homeLink) {
-                    homeLink.classList.remove('text-blue-600', 'font-semibold');
-                    homeLink.classList.add('text-gray-700');
-                }
-                if (homeLinkMobile) {
-                    homeLinkMobile.classList.remove('text-blue-600', 'font-semibold');
-                    homeLinkMobile.classList.add('text-gray-700');
-                }
+                homeLinks.forEach(link => {
+                    link.classList.remove('text-blue-600', 'font-semibold');
+                    link.classList.add('text-gray-700');
+                });
             }
         }
         
@@ -265,7 +266,7 @@ document.addEventListener('DOMContentLoaded', function() {
             const testImg = new Image();
             testImg.onerror = function() {
                 // Set placeholder background
-                slide.style.backgroundImage = 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)';
+                slide.style.backgroundImage = 'linear-gradient(135deg, #9ca3af 0%, #6b7280 100%)';
                 
                 // Add placeholder icon
                 const contentDiv = slide.querySelector('.relative.z-10');

@@ -1,0 +1,16 @@
+-- -- Create visitors table for tracking website visitors (PostgreSQL)
+-- CREATE TABLE IF NOT EXISTS visitors (
+--   id SERIAL PRIMARY KEY,
+--   ip_address VARCHAR(45) NOT NULL,
+--   user_agent TEXT,
+--   country VARCHAR(100),
+--   country_code VARCHAR(5),
+--   page_url VARCHAR(255),
+--   visited_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+-- );
+
+-- -- Add indexes for better performance on queries
+-- CREATE INDEX IF NOT EXISTS idx_ip_address ON visitors(ip_address);
+-- CREATE INDEX IF NOT EXISTS idx_visited_at ON visitors(visited_at);
+-- CREATE INDEX IF NOT EXISTS idx_country ON visitors(country_code);
+-- CREATE INDEX IF NOT EXISTS idx_ip_date ON visitors(ip_address, visited_at);

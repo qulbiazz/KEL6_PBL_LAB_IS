@@ -159,7 +159,7 @@ if (isset($_GET['edit'])) {
                             <select name="button_link" class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:border-blue-500">
                                 <option value="">-- Select Page --</option>
                                 <option value="index.php" <?php echo ($edit_banner && $edit_banner['button_link'] == 'index.php') ? 'selected' : ''; ?>>Home</option>
-                                <option value="about.php" <?php echo ($edit_banner && $edit_banner['button_link'] == 'about.php') ? 'selected' : ''; ?>>About</option>
+                                <option value="index.php?page=about" <?php echo ($edit_banner && $edit_banner['button_link'] == 'index.php?page=about') ? 'selected' : ''; ?>>About</option>
                                 <option value="index.php#products" <?php echo ($edit_banner && $edit_banner['button_link'] == 'index.php#products') ? 'selected' : ''; ?>>Products</option>
                                 <option value="index.php#team" <?php echo ($edit_banner && $edit_banner['button_link'] == 'index.php#team') ? 'selected' : ''; ?>>Team</option>
                                 <option value="index.php#news" <?php echo ($edit_banner && $edit_banner['button_link'] == 'index.php#news') ? 'selected' : ''; ?>>News</option>
