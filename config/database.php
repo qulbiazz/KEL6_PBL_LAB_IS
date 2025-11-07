@@ -3,7 +3,7 @@ class Database {
     private $host = "localhost";
     private $db_name = "inlet_db";
     private $username = "postgres";
-    private $password = "111205"; // Change this to your PostgreSQL password
+    private $password = "12345678"; // Change this to your PostgreSQL password
     private $port = "5432";
     public $conn;
 
