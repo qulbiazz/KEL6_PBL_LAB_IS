@@ -1,3 +1,13 @@
+# Environment & Configuration
+.env
+.env.local
+.env.*.local
+config/database.php.backup
+
+# Uploads Directory
+uploads/*
+!uploads/.gitkeep
+
 # Byte-compiled / optimized / compiled files
 __pycache__/
 *.py[cod]
@@ -13,7 +23,7 @@ __pycache__/
 
 test_placeholders.html
 
-#image files except inlet_logo.png
+#image files except inlet_logo.png and placeholders
 *.png
 *.jpg
 *.jpeg
@@ -21,4 +31,24 @@ test_placeholders.html
 *.bmp
 *.tiff
 !inlet_logo.png
+!placeholder*.png
+!placeholder*.jpg
+
+# IDE & Editor
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Logs
+*.log
+error_log
+debug.log
+
+# Cache
+cache/
+tmp/
+temp/
 

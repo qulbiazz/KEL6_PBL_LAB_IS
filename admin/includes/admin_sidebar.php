@@ -20,6 +20,9 @@
             <a href="team.php" class="block px-4 py-2 rounded hover:bg-gray-700 <?php echo basename($_SERVER['PHP_SELF']) == 'team.php' ? 'bg-gray-700' : ''; ?>">
                 <i class="fas fa-users mr-2"></i> Team Members
             </a>
+            <a href="lecturer_details.php" class="block px-4 py-2 rounded hover:bg-gray-700 <?php echo basename($_SERVER['PHP_SELF']) == 'lecturer_details.php' ? 'bg-gray-700' : ''; ?>">
+                <i class="fas fa-user-tie mr-2"></i> Lecturer Details
+            </a>
             <a href="news.php" class="block px-4 py-2 rounded hover:bg-gray-700 <?php echo basename($_SERVER['PHP_SELF']) == 'news.php' ? 'bg-gray-700' : ''; ?>">
                 <i class="fas fa-newspaper mr-2"></i> News
             </a>

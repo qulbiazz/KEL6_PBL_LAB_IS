@@ -25,18 +25,18 @@
                 </div>
                 <div>
                     <h4 class="text-lg font-semibold mb-4">Follow Us</h4>
-                    <div class="flex space-x-4">
+                    <div class="flex space-x-4 mb-4">
                         <a href="#" class="text-gray-400 hover:text-white text-2xl"><i class="fab fa-facebook"></i></a>
                         <a href="#" class="text-gray-400 hover:text-white text-2xl"><i class="fab fa-twitter"></i></a>
                         <a href="#" class="text-gray-400 hover:text-white text-2xl"><i class="fab fa-instagram"></i></a>
                         <a href="#" class="text-gray-400 hover:text-white text-2xl"><i class="fab fa-linkedin"></i></a>
                     </div>
+                    <!-- Simple Visitor Counter -->
+                    <div class="text-gray-400 text-sm">
+                        <i class="fas fa-eye mr-1"></i>
+                            Total Page Views: <span class="font-semibold"><?php echo number_format($visitorStats['total_views'] ?? 0); ?></span>
+                    </div>
                 </div>
-            </div>
-            
-            <!-- Visitor Counter Widget -->
-            <div class="mb-8">
-                <?php include 'views/components/visitor-stats.php'; ?>
             </div>
             
             <div class="border-t border-gray-700 mt-8 pt-8 text-center text-gray-400">

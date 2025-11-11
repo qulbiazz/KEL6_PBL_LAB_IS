@@ -1,0 +1,21 @@
+{
+    "name": "inlet-web",
+    "description": "InLet Laboratory Website - Information and Learning Engineering Technology",
+    "version": "1.0.0",
+    "require": {
+        "php": "^8.0",
+        "ext-pdo": "*",
+        "ext-pdo_pgsql": "*",
+        "ext-mbstring": "*",
+        "ext-curl": "*",
+        "ext-fileinfo": "*"
+    },
+    "require-dev": {
+        "php": "^8.0"
+    },
+    "scripts": {
+        "post-install-cmd": [
+            "php -r \"file_exists('.env') || copy('.env.example', '.env');\""
+        ]
+    }
+}

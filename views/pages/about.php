@@ -120,7 +120,7 @@
         </div>
     </section>
 
-    <!-- Stats Section -->
+    <!-- Stats Section
     <section class="py-16 bg-blue-600 text-white">
         <div class="container mx-auto px-6 md:px-8 lg:px-12">
             <div class="grid grid-cols-1 md:grid-cols-4 gap-8 text-center">
@@ -141,5 +141,5 @@
                     <p class="text-blue-100">Industry Partners</p>
                 </div>
             </div>
-        </div>
+        </div> -->
     </section>

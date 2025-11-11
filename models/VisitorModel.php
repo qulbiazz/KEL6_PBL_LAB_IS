@@ -24,15 +24,25 @@ class VisitorModel
         $page_url = $_SERVER['REQUEST_URI'] ?? '/';
         
         // Check if visitor exists in current session (within last 30 minutes)
-        $check_query = "SELECT id FROM visitors WHERE ip_address = :ip 
+        $check_query = "SELECT id, visited_at FROM visitors WHERE ip_address = :ip 
                        AND visited_at > NOW() - INTERVAL '30 minutes' 
                        ORDER BY visited_at DESC LIMIT 1";
         $check_stmt = $this->conn->prepare($check_query);
         $check_stmt->bindParam(':ip', $ip);
         $check_stmt->execute();
         
-        // Only insert if not found (unique visit per 30 min session)
-        if ($check_stmt->rowCount() == 0) {
+        $existing = $check_stmt->fetch(PDO::FETCH_ASSOC);
+        
+        if ($existing) {
+            // Update existing record to keep visitor "online"
+            $update_query = "UPDATE visitors SET visited_at = NOW(), page_url = :page_url 
+                           WHERE id = :id";
+            $update_stmt = $this->conn->prepare($update_query);
+            $update_stmt->bindParam(':page_url', $page_url);
+            $update_stmt->bindParam(':id', $existing['id']);
+            $update_stmt->execute();
+        } else {
+            // Insert new visitor record
             $insert_query = "INSERT INTO visitors (ip_address, user_agent, country, country_code, page_url, visited_at) 
                             VALUES (:ip, :user_agent, :country, :country_code, :page_url, NOW())";
             $insert_stmt = $this->conn->prepare($insert_query);
@@ -68,10 +78,14 @@ class VisitorModel
         $today_stmt->execute();
         $stats['today'] = $today_stmt->fetch(PDO::FETCH_ASSOC)['today'];
         
-        // Online now (last 5 minutes)
+        // Online now (last 5 minutes) - count most recent activity per IP
         $online_query = "SELECT COUNT(DISTINCT ip_address) as online 
-                        FROM visitors 
-                        WHERE visited_at > NOW() - INTERVAL '5 minutes'";
+                        FROM (
+                            SELECT ip_address, MAX(visited_at) as last_visit
+                            FROM visitors 
+                            GROUP BY ip_address
+                        ) as latest_visits
+                        WHERE last_visit > NOW() - INTERVAL '5 minutes'";
         $online_stmt = $this->conn->prepare($online_query);
         $online_stmt->execute();
         $stats['online'] = $online_stmt->fetch(PDO::FETCH_ASSOC)['online'];

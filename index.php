@@ -1,8 +1,16 @@
 <?php
+// Load configuration
+require_once 'config/config.php';
+
+// Start session with custom lifetime
+ini_set('session.gc_maxlifetime', Config::sessionLifetime());
 session_start();
-require_once 'config/database.php';
+
+// Ensure upload directories exist
+Config::ensureUploadDirectories();
 
 // Initialize database connection
+require_once 'config/database.php';
 $db = new Database();
 $conn = $db->getConnection();
 
@@ -111,6 +119,29 @@ switch ($page) {
         
         $pageTitle = htmlspecialchars($research['title']) . ' - InLet';
         $view = 'pages/research-detail';
+        break;
+        
+    case 'lecturer-detail':
+        // Get lecturer ID
+        $lecturer_id = isset($_GET['id']) ? (int)$_GET['id'] : 0;
+        
+        if (!$lecturer_id) {
+            header('Location: index.php#team');
+            exit();
+        }
+        
+        // Load LecturerDetailModel
+        require_once 'models/LecturerDetailModel.php';
+        $lecturerModel = new LecturerDetailModel($conn);
+        $lecturer = $lecturerModel->getLecturerProfile($lecturer_id);
+        
+        if (!$lecturer) {
+            header('Location: index.php#team');
+            exit();
+        }
+        
+        $pageTitle = htmlspecialchars($lecturer['name']) . ' - InLet';
+        $view = 'pages/lecturer-detail';
         break;
         
     default:

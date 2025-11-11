@@ -11,6 +11,11 @@ require_once '../config/database.php';
 $db = new Database();
 $conn = $db->getConnection();
 
+// Get visitor statistics
+require_once '../models/VisitorModel.php';
+$visitorModel = new VisitorModel($conn);
+$visitorStats = $visitorModel->getVisitorStats();
+
 // Get statistics
 $stats = [];
 
@@ -23,14 +28,6 @@ $stats['news'] = $conn->query("SELECT COUNT(*) FROM news")->fetchColumn();
 $stats['gallery'] = $conn->query("SELECT COUNT(*) FROM gallery")->fetchColumn();
 $stats['research'] = $conn->query("SELECT COUNT(*) FROM research_activities")->fetchColumn();
 
-// Page visits (last 7 days)
-$visits_query = "SELECT visit_date, SUM(visit_count) as total 
-                 FROM page_visits 
-                 WHERE visit_date >= CURRENT_DATE - INTERVAL '7 days' 
-                 GROUP BY visit_date 
-                 ORDER BY visit_date";
-$visits = $conn->query($visits_query)->fetchAll();
-
 // Recent news
 $recent_news = $conn->query("SELECT * FROM news ORDER BY created_at DESC LIMIT 5")->fetchAll();
 ?>
@@ -42,7 +39,6 @@ $recent_news = $conn->query("SELECT * FROM news ORDER BY created_at DESC LIMIT 5
     <title>Dashboard - InLet Admin</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body class="bg-gray-100">
     <?php include 'includes/admin_navbar.php'; ?>
@@ -109,10 +105,76 @@ $recent_news = $conn->query("SELECT * FROM news ORDER BY created_at DESC LIMIT 5
             
             <!-- Charts and Tables -->
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                <!-- Visits Chart -->
+                <!-- Visitor Statistics -->
                 <div class="bg-white rounded-lg shadow-md p-6">
-                    <h2 class="text-xl font-bold text-gray-800 mb-4">Page Visits (Last 7 Days)</h2>
-                    <canvas id="visitsChart"></canvas>
+                    <h2 class="text-xl font-bold text-gray-800 mb-6">
+                        <i class="fas fa-chart-line mr-2 text-blue-600"></i>
+                        Visitor Statistics
+                    </h2>
+                    
+                    <!-- Main Stats Grid -->
+                    <div class="grid grid-cols-3 gap-4 mb-6">
+                        <div class="text-center p-4 bg-blue-50 rounded-lg">
+                            <div class="text-3xl font-bold text-blue-600">
+                                <?php echo number_format($visitorStats['total'] ?? 0); ?>
+                            </div>
+                            <div class="text-xs text-gray-600 mt-1">Total Visitors</div>
+                        </div>
+                        <div class="text-center p-4 bg-green-50 rounded-lg">
+                            <div class="text-3xl font-bold text-green-600">
+                                <?php echo number_format($visitorStats['today'] ?? 0); ?>
+                            </div>
+                            <div class="text-xs text-gray-600 mt-1">Today</div>
+                        </div>
+                        <div class="text-center p-4 bg-yellow-50 rounded-lg">
+                            <div class="text-3xl font-bold text-yellow-600">
+                                <?php echo number_format($visitorStats['online'] ?? 0); ?>
+                            </div>
+                            <div class="text-xs text-gray-600 mt-1">Online Now</div>
+                        </div>
+                    </div>
+                    
+                    <!-- Page Views -->
+                    <div class="text-center mb-6 pb-4 border-b">
+                        <div class="text-sm text-gray-600">
+                            <i class="fas fa-eye mr-1"></i>
+                            Total Page Views: <span class="font-semibold text-gray-800"><?php echo number_format($visitorStats['total_views'] ?? 0); ?></span>
+                        </div>
+                    </div>
+                    
+                    <!-- Top Countries -->
+                    <?php if (!empty($visitorStats['countries'])): ?>
+                    <div>
+                        <h3 class="text-sm font-semibold text-gray-700 mb-3">Top Countries</h3>
+                        <div class="space-y-2 max-h-64 overflow-y-auto">
+                            <?php foreach ($visitorStats['countries'] as $country): ?>
+                            <div class="flex items-center justify-between bg-gray-50 rounded px-3 py-2 hover:bg-gray-100 transition">
+                                <div class="flex items-center space-x-2 flex-1">
+                                    <span class="text-xl">
+                                        <?php echo VisitorModel::getCountryFlag($country['country_code']); ?>
+                                    </span>
+                                    <span class="text-sm text-gray-700 truncate">
+                                        <?php echo htmlspecialchars($country['country']); ?>
+                                    </span>
+                                </div>
+                                <div class="flex items-center space-x-2">
+                                    <div class="text-xs font-semibold text-blue-600">
+                                        <?php echo number_format($country['count']); ?>
+                                    </div>
+                                    <div class="w-16 bg-gray-200 rounded-full h-2">
+                                        <?php 
+                                        $maxCount = $visitorStats['countries'][0]['count'] ?? 1;
+                                        $percentage = ($country['count'] / $maxCount) * 100;
+                                        ?>
+                                        <div class="bg-blue-500 h-2 rounded-full transition-all duration-300" 
+                                             style="width: <?php echo $percentage; ?>%"></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <?php endforeach; ?>
+                        </div>
+                    </div>
+                    <?php endif; ?>
                 </div>
                 
                 <!-- Recent News -->
@@ -133,33 +195,5 @@ $recent_news = $conn->query("SELECT * FROM news ORDER BY created_at DESC LIMIT 5
             </div>
         </main>
     </div>
-    
-    <script>
-        // Visits Chart
-        const ctx = document.getElementById('visitsChart').getContext('2d');
-        const visitsData = <?php echo json_encode($visits); ?>;
-        
-        new Chart(ctx, {
-            type: 'line',
-            data: {
-                labels: visitsData.map(v => v.visit_date),
-                datasets: [{
-                    label: 'Page Visits',
-                    data: visitsData.map(v => v.total),
-                    borderColor: 'rgb(59, 130, 246)',
-                    backgroundColor: 'rgba(59, 130, 246, 0.1)',
-                    tension: 0.4
-                }]
-            },
-            options: {
-                responsive: true,
-                plugins: {
-                    legend: {
-                        display: false
-                    }
-                }
-            }
-        });
-    </script>
 </body>
 </html>
