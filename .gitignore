@@ -52,3 +52,6 @@ cache/
 tmp/
 temp/
 
+#Database initialization files
+database/*.sql
+
