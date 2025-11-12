@@ -34,16 +34,55 @@
                     <!-- Simple Visitor Counter -->
                     <div class="text-gray-400 text-sm">
                         <i class="fas fa-eye mr-1"></i>
-                            Total Page Views: <span class="font-semibold"><?php echo number_format($visitorStats['total_views'] ?? 0); ?></span>
+                        Total Page Views: <span class="font-semibold"><?php echo number_format($visitorStats['total_views'] ?? 0); ?></span>
                     </div>
                 </div>
             </div>
-            
+
             <div class="border-t border-gray-700 mt-8 pt-8 text-center text-gray-400">
                 <p>&copy; 2025 InLet Laboratory. All rights reserved.</p>
             </div>
         </div>
     </footer>
+
+    <!-- Gallery Modal -->
+    <div id="galleryModal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black bg-opacity-90 transition-opacity duration-300" style="display: none; opacity: 0;">
+        <div class="relative w-full h-full flex items-center justify-center p-4">
+            <!-- Close Button -->
+            <button onclick="closeGalleryModal()"
+                class="absolute top-4 right-4 text-white hover:text-gray-300 text-4xl font-bold z-50 transition-colors"
+                aria-label="Close gallery">
+                <i class="fas fa-times"></i>
+            </button>
+
+            <!-- Previous Button -->
+            <button onclick="previousGalleryImage()"
+                class="absolute left-4 top-1/2 transform -translate-y-1/2 bg-white bg-opacity-30 hover:bg-opacity-50 text-white p-4 rounded-full z-50 transition-all"
+                aria-label="Previous image">
+                <i class="fas fa-chevron-left text-2xl"></i>
+            </button>
+
+            <!-- Image Container -->
+            <div class="max-w-5xl max-h-full flex flex-col items-center">
+                <img id="galleryModalImage"
+                    src=""
+                    alt=""
+                    class="max-w-full max-h-[80vh] object-contain rounded-lg shadow-2xl">
+                <p id="galleryModalCaption"
+                    class="text-white text-xl mt-4 text-center font-medium"></p>
+                <p id="galleryCounter"
+                    class="text-white text-sm mt-2 bg-black bg-opacity-50 px-3 py-1 rounded-full"></p>
+            </div>
+
+            <!-- Next Button -->
+            <button onclick="nextGalleryImage()"
+                class="absolute right-4 top-1/2 transform -translate-y-1/2 bg-white bg-opacity-30 hover:bg-opacity-50 text-white p-4 rounded-full z-50 transition-all"
+                aria-label="Next image">
+                <i class="fas fa-chevron-right text-2xl"></i>
+            </button>
+        </div>
+    </div>
+
 
 
     <script src="assets/js/carousel.js"></script>

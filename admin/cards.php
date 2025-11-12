@@ -38,6 +38,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 
 $cards = $conn->query("SELECT * FROM card_data ORDER BY display_order")->fetchAll();
+$total_cards = count($cards);
 $edit_item = null;
 if (isset($_GET['edit'])) {
     $stmt = $conn->prepare("SELECT * FROM card_data WHERE id = :id");
@@ -51,15 +52,15 @@ if (isset($_GET['edit'])) {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Manage Cards - InLet Admin</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="../assets/css/tailwind.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body class="bg-gray-100">
     <?php include 'includes/admin_navbar.php'; ?>
     <div class="flex">
         <?php include 'includes/admin_sidebar.php'; ?>
-        <main class="flex-1 p-8">
-            <h1 class="text-3xl font-bold text-gray-800 mb-8">Manage Card Data</h1>
+        <main class="flex-1 p-4 md:p-8 pt-20 ml-0 lg:ml-64 min-h-screen">
+            <h1 class="text-2xl md:text-3xl font-bold text-gray-800 mb-8">Manage Card Data</h1>
             
             <?php if ($success): ?>
             <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-4"><?php echo $success; ?></div>
@@ -98,8 +99,15 @@ if (isset($_GET['edit'])) {
                         </div>
                         <div>
                             <label class="block text-gray-700 font-semibold mb-2">Display Order</label>
-                            <input type="number" name="display_order" value="<?php echo $edit_item ? $edit_item['display_order'] : 0; ?>"
-                                class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:border-blue-500">
+                            <select name="display_order" class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:border-blue-500">
+                                <?php 
+                                $max_order = $edit_item ? $total_cards : $total_cards + 1;
+                                for ($i = 1; $i <= $max_order; $i++): 
+                                    $selected = ($edit_item && $edit_item['display_order'] == $i) ? 'selected' : (!$edit_item && $i == $max_order ? 'selected' : '');
+                                ?>
+                                    <option value="<?php echo $i; ?>" <?php echo $selected; ?>><?php echo $i; ?></option>
+                                <?php endfor; ?>
+                            </select>
                         </div>
                     </div>
                     
@@ -152,5 +160,6 @@ if (isset($_GET['edit'])) {
             </div>
         </main>
     </div>
+    <script src="assets/js/admin.js"></script>
 </body>
 </html>

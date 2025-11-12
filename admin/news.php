@@ -65,15 +65,15 @@ if (isset($_GET['edit'])) {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Manage News - InLet Admin</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="../assets/css/tailwind.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body class="bg-gray-100">
     <?php include 'includes/admin_navbar.php'; ?>
     <div class="flex">
         <?php include 'includes/admin_sidebar.php'; ?>
-        <main class="flex-1 p-8">
-            <h1 class="text-3xl font-bold text-gray-800 mb-8">Manage News</h1>
+        <main class="flex-1 p-4 md:p-8 pt-20 ml-0 lg:ml-64 min-h-screen">
+            <h1 class="text-2xl md:text-3xl font-bold text-gray-800 mb-8">Manage News</h1>
             
             <?php if ($success): ?>
             <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-4"><?php echo $success; ?></div>
@@ -164,5 +164,6 @@ if (isset($_GET['edit'])) {
             </div>
         </main>
     </div>
+    <script src="assets/js/admin.js"></script>
 </body>
 </html>

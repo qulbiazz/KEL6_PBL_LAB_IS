@@ -201,10 +201,12 @@
                 <p class="text-gray-600">Moments captured at InLet</p>
             </div>
             <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-                <?php foreach ($gallery as $item): ?>
+                <?php
+                $index = 0;
+                foreach ($gallery as $item):
+                ?>
                     <div class="relative overflow-hidden rounded-lg group cursor-pointer gallery-item"
-                        data-image="<?php echo htmlspecialchars($item['image']); ?>"
-                        data-caption="<?php echo htmlspecialchars($item['caption']); ?>">
+                        onclick="openGalleryModal('<?php echo addslashes(htmlspecialchars($item['image'])); ?>', '<?php echo addslashes(htmlspecialchars($item['caption'])); ?>', <?php echo $index; ?>)">
                         <img src="uploads/gallery/<?php echo htmlspecialchars($item['image']); ?>"
                             alt="<?php echo htmlspecialchars($item['caption']); ?>"
                             class="w-full h-64 object-cover group-hover:scale-110 transition duration-300"
@@ -215,7 +217,10 @@
                             </h3>
                         </div>
                     </div>
-                <?php endforeach; ?>
+                <?php
+                    $index++;
+                endforeach;
+                ?>
             </div>
         </div>
     </section>
@@ -246,16 +251,3 @@
             </div>
         </div>
     </section>
-
-    <!-- Gallery Modal -->
-    <div id="galleryModal" style="display: none;" class="fixed inset-0 bg-black bg-opacity-75 z-50 flex items-center justify-center p-4">
-        <div class="relative max-w-4xl w-full">
-            <button onclick="closeGalleryModal()" class="absolute top-4 right-4 text-white text-3xl z-10 hover:text-gray-300">
-                <i class="fas fa-times"></i>
-            </button>
-            <div class="bg-white p-2 rounded-lg">
-                <img id="galleryModalImage" src="" alt="" class="w-full h-auto rounded-lg">
-                <p id="galleryModalCaption" class="text-gray-800 text-center mt-4 font-semibold"></p>
-            </div>
-        </div>
-    </div>

@@ -37,7 +37,7 @@ $recent_news = $conn->query("SELECT * FROM news ORDER BY created_at DESC LIMIT 5
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard - InLet Admin</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="../assets/css/tailwind.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body class="bg-gray-100">
@@ -46,10 +46,10 @@ $recent_news = $conn->query("SELECT * FROM news ORDER BY created_at DESC LIMIT 5
     <div class="flex">
         <?php include 'includes/admin_sidebar.php'; ?>
         
-        <main class="flex-1 p-8">
-            <div class="mb-8">
-                <h1 class="text-3xl font-bold text-gray-800">Dashboard</h1>
-                <p class="text-gray-600">Welcome back, <?php echo htmlspecialchars($_SESSION['admin_name']); ?>!</p>
+        <main class="flex-1 p-4 md:p-8 pt-24 ml-0 lg:ml-64 min-h-screen">
+            <div class="mb-8 mt-16">
+                <h1 class="text-2xl md:text-3xl font-bold text-gray-800">Dashboard</h1>
+                <p class="text-gray-600 text-sm md:text-base">Welcome back, <?php echo htmlspecialchars($_SESSION['admin_name']); ?>!</p>
             </div>
             
             <!-- Statistics Cards -->
@@ -195,5 +195,7 @@ $recent_news = $conn->query("SELECT * FROM news ORDER BY created_at DESC LIMIT 5
             </div>
         </main>
     </div>
+    
+    <script src="assets/js/admin.js"></script>
 </body>
 </html>

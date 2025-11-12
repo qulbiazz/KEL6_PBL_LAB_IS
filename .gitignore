@@ -4,6 +4,10 @@
 .env.*.local
 config/database.php.backup
 
+# Node modules & dependencies
+node_modules/
+package-lock.json
+
 # Uploads Directory
 uploads/*
 !uploads/.gitkeep
