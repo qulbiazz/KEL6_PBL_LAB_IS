@@ -36,7 +36,7 @@
                         <img src="assets/images/inlet_logo.png" alt="InLet Logo" class="h-12 md:h-14 lg:h-16 w-auto">
                     </a>
                 </div>
-                <div class="hidden md:flex space-x-8">
+                <div class="hidden md:flex space-x-8 items-center">
                     <a href="index.php" class="nav-home-link <?php echo isActive('home'); ?> transition">Home</a>
                     <a href="index.php?page=about" class="<?php echo isActive('about'); ?> transition">About</a>
                     <a href="index.php#products" data-section="products" class="<?php echo isSectionLink(); ?> transition">Products</a>
@@ -44,6 +44,9 @@
                     <a href="index.php#news" data-section="news" class="<?php echo isSectionLink(); ?> transition">News</a>
                     <a href="index.php#gallery" data-section="gallery" class="<?php echo isSectionLink(); ?> transition">Gallery</a>
                     <a href="index.php#research" data-section="research" class="<?php echo isSectionLink(); ?> transition">Research</a>
+                    <a href="views/pages/attendance.php" class="bg-transparent text-blue-700 border border-blue-700 hover:bg-blue-700 hover:text-white px-4 py-2 rounded-lg transition flex items-center">
+                        <i class="fas fa-clipboard-check mr-2"></i>Absen
+                    </a>
                 </div>
                 <div class="md:hidden">
                     <button id="mobile-menu-button" class="text-gray-700">
@@ -60,6 +63,9 @@
                 <a href="index.php#news" data-section="news" class="block py-2 <?php echo isSectionLink(); ?>">News</a>
                 <a href="index.php#gallery" data-section="gallery" class="block py-2 <?php echo isSectionLink(); ?>">Gallery</a>
                 <a href="index.php#research" data-section="research" class="block py-2 <?php echo isSectionLink(); ?>">Research</a>
+                <a href="views/pages/attendance.php" class="block py-2 mt-2 bg-transparent hover:bg-blue-700 text-white px-4 rounded-lg text-center">
+                    <i class="fas fa-clipboard-check mr-2"></i>Absen
+                </a>
             </div>
         </div>
     </nav>

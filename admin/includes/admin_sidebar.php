@@ -8,10 +8,13 @@
         <button id="sidebar-close" class="lg:hidden absolute top-4 right-4 text-white hover:text-gray-300">
             <i class="fas fa-times text-2xl"></i>
         </button>
-        
+
         <nav class="space-y-2">
             <a href="dashboard.php" class="block px-4 py-2 rounded hover:bg-gray-700 <?php echo basename($_SERVER['PHP_SELF']) == 'dashboard.php' ? 'bg-gray-700' : ''; ?>">
                 <i class="fas fa-tachometer-alt mr-2"></i> Dashboard
+            </a>
+            <a href="attendance.php" class="block px-4 py-2 rounded hover:bg-gray-700 <?php echo basename($_SERVER['PHP_SELF']) == 'attendance.php' ? 'bg-gray-700' : ''; ?>">
+                <i class="fas fa-clipboard-check mr-2"></i> Absensi Mahasiswa
             </a>
             <a href="banners.php" class="block px-4 py-2 rounded hover:bg-gray-700 <?php echo basename($_SERVER['PHP_SELF']) == 'banners.php' ? 'bg-gray-700' : ''; ?>">
                 <i class="fas fa-images mr-2"></i> Carousel Banners
@@ -40,6 +43,7 @@
             <a href="research.php" class="block px-4 py-2 rounded hover:bg-gray-700 <?php echo basename($_SERVER['PHP_SELF']) == 'research.php' ? 'bg-gray-700' : ''; ?>">
                 <i class="fas fa-flask mr-2"></i> Research Activities
             </a>
+
         </nav>
     </div>
 </aside>
