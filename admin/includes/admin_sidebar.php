@@ -17,7 +17,13 @@
                 <i class="fas fa-clipboard-check mr-2"></i> Absensi Mahasiswa
             </a>
             <a href="borrowing.php" class="block px-4 py-2 rounded hover:bg-gray-700 <?php echo basename($_SERVER['PHP_SELF']) == 'borrowing.php' ? 'bg-gray-700' : ''; ?>">
-                <i class="fas fa-tools mr-2"></i> Peminjaman
+                <i class="fas fa-clipboard-list mr-2"></i> Log Peminjaman
+            </a>
+            <a href="equipment.php" class="block px-4 py-2 rounded hover:bg-gray-700 <?php echo basename($_SERVER['PHP_SELF']) == 'equipment.php' ? 'bg-gray-700' : ''; ?>">
+                <i class="fas fa-tools mr-2"></i> Kelola Alat
+            </a>
+            <a href="rooms.php" class="block px-4 py-2 rounded hover:bg-gray-700 <?php echo basename($_SERVER['PHP_SELF']) == 'rooms.php' ? 'bg-gray-700' : ''; ?>">
+                <i class="fas fa-door-open mr-2"></i> Kelola Ruangan
             </a>
             <a href="banners.php" class="block px-4 py-2 rounded hover:bg-gray-700 <?php echo basename($_SERVER['PHP_SELF']) == 'banners.php' ? 'bg-gray-700' : ''; ?>">
                 <i class="fas fa-images mr-2"></i> Carousel Banners

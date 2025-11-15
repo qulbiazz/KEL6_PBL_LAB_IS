@@ -38,6 +38,11 @@ class Database {
             $this->conn->exec("SET timezone = 'Asia/Jakarta'");
             
         } catch(PDOException $exception) {
+            // Jika AJAX request, throw exception agar bisa di-catch
+            if (isset($_POST['ajax']) || isset($_GET['ajax'])) {
+                throw new Exception("Koneksi database gagal: " . $exception->getMessage());
+            }
+            
             // In production, log error instead of displaying
             if (Env::isProduction()) {
                 error_log("Database Connection Error: " . $exception->getMessage());

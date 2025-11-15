@@ -1,82 +1,162 @@
 <?php
 require_once __DIR__ . '/../../config/database.php';
 require_once __DIR__ . '/../../models/BorrowingModel.php';
+require_once __DIR__ . '/../../models/EquipmentModel.php';
+require_once __DIR__ . '/../../models/RoomModel.php';
 
 $response = ['success' => false, 'message' => ''];
 
+// Handle form submission
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
-    // Ambil input
-    $borrower_name = trim($_POST['nama'] ?? '');
-    $occupation = trim($_POST['pekerjaan'] ?? '');
-    if ($occupation === 'lainnya') {
-        $occupation = trim($_POST['pekerjaan_lainnya'] ?? '');
-    }
-    $type = $_POST['jenis'] ?? '';
-
-    if (isset($_POST['item'])) {
-        if (is_array($_POST['item'])) {
-            $item_name = implode(', ', $_POST['item']);
-        } else {
-            $item_name = $_POST['item'];
+    try {
+        // Ambil input
+        $borrower_name = trim($_POST['nama'] ?? '');
+        $occupation = trim($_POST['pekerjaan'] ?? '');
+        if ($occupation === 'lainnya') {
+            $occupation = trim($_POST['pekerjaan_lainnya'] ?? '');
         }
-    } else {
+        $type = $_POST['jenis'] ?? '';
+        $borrow_date = trim($_POST['waktu_pinjam'] ?? '');
+        $return_date = trim($_POST['waktu_kembali'] ?? '');
+
+        // Handle item based on type
         $item_name = '';
-    }
-
-    $borrow_date = trim($_POST['tanggal_pinjam'] ?? '');
-    $return_date = trim($_POST['tanggal_kembali'] ?? '');
-
-    // -----------------------------
-    // VALIDASI INPUT
-    // -----------------------------
-    if (empty($borrower_name) || empty($occupation) || empty($type) || empty($item_name) || empty($borrow_date)) {
-        $response['message'] = 'Semua field wajib diisi!';
-
-    } elseif (!in_array($type, ['equipment', 'room'])) {
-        $response['message'] = 'Tipe peminjaman tidak valid!';
-
-    } elseif (!strtotime($borrow_date)) {
-        $response['message'] = 'Format tanggal peminjaman tidak valid!';
-
-    } elseif (!empty($return_date) && !strtotime($return_date)) {
-        $response['message'] = 'Format tanggal pengembalian tidak valid!';
-
-    } elseif (!empty($return_date) && strtotime($return_date) < strtotime($borrow_date)) {
-        $response['message'] = 'Tanggal pengembalian tidak boleh lebih awal dari tanggal peminjaman!';
-
-    } else {
-
-        // Jika validasi lolos → Insert ke database
-        $db = new Database();
-        $conn = $db->getConnection();
-        $borrowModel = new BorrowingModel($conn);
-
-        $data = [
-            'borrower_name' => $borrower_name,
-            'occupation' => $occupation,
-            'type' => $type,
-            'item_name' => $item_name,
-            'borrow_date' => $borrow_date,
-            'return_date' => $return_date
-        ];
-
-        if ($borrowModel->createBorrowing($data)) {
-            $response['success'] = true;
-            $response['message'] = 'Peminjaman berhasil dicatat!';
-        } else {
-            $response['message'] = 'Gagal menyimpan data peminjaman!';
+        $item_id = null;
+        
+        if ($type === 'room') {
+            $item_id = $_POST['ruang'] ?? null;
+            if (empty($item_id)) {
+                throw new Exception('Ruang wajib dipilih!');
+            }
+        } elseif ($type === 'equipment') {
+            if (isset($_POST['alat']) && is_array($_POST['alat'])) {
+                $item_ids = $_POST['alat'];
+                if (empty($item_ids)) {
+                    throw new Exception('Minimal pilih 1 alat!');
+                }
+                // For equipment, store as comma-separated IDs in item_name
+                $item_id = null; // Multiple items, no single ID
+                $item_name = implode(',', $item_ids);
+            } else {
+                throw new Exception('Alat wajib dipilih!');
+            }
         }
+
+        // -----------------------------
+        // VALIDASI INPUT
+        // -----------------------------
+        if (empty($borrower_name)) {
+            $response['message'] = 'Nama lengkap wajib diisi!';
+
+        } elseif (empty($occupation)) {
+            $response['message'] = 'Pekerjaan wajib diisi!';
+
+        } elseif (empty($type)) {
+            $response['message'] = 'Jenis peminjaman wajib dipilih!';
+
+        } elseif (!in_array($type, ['equipment', 'room'])) {
+            $response['message'] = 'Tipe peminjaman tidak valid!';
+
+        } elseif (empty($borrow_date)) {
+            $response['message'] = 'Waktu peminjaman wajib diisi!';
+
+        } elseif (!strtotime($borrow_date)) {
+            $response['message'] = 'Format waktu peminjaman tidak valid!';
+
+        } elseif (empty($return_date)) {
+            $response['message'] = 'Waktu pengembalian wajib diisi!';
+
+        } elseif (!strtotime($return_date)) {
+            $response['message'] = 'Format waktu pengembalian tidak valid!';
+
+        } elseif (strtotime($return_date) <= strtotime($borrow_date)) {
+            $response['message'] = 'Waktu pengembalian harus lebih dari waktu peminjaman!';
+
+        } else {
+
+            // Jika validasi lolos → Insert ke database
+            $db = new Database();
+            $conn = $db->getConnection();
+            
+            if (!$conn) {
+                throw new Exception('Gagal terhubung ke database');
+            }
+            
+            $borrowModel = new BorrowingModel($conn);
+            $roomModel = new RoomModel($conn);
+            $equipmentModel = new EquipmentModel($conn);
+            
+            // Additional validation for room availability
+            if ($type === 'room') {
+                $roomData = $roomModel->getRoomById($item_id);
+                if (!$roomData) {
+                    throw new Exception('Ruang tidak ditemukan!');
+                }
+                
+                if (!$roomModel->isRoomAvailable($item_id, $borrow_date, $return_date)) {
+                    throw new Exception('Ruang "' . $roomData['name'] . '" sudah dibooking untuk waktu tersebut!');
+                }
+                
+                $item_name = $roomData['name'];
+            } else {
+                // Get equipment names
+                $equipmentNames = [];
+                foreach (explode(',', $item_name) as $eqId) {
+                    $eqData = $equipmentModel->getEquipmentById($eqId);
+                    if ($eqData) {
+                        $equipmentNames[] = $eqData['name'];
+                    }
+                }
+                $item_name = implode(', ', $equipmentNames);
+            }
+
+            $data = [
+                'borrower_name' => $borrower_name,
+                'occupation' => $occupation,
+                'type' => $type,
+                'item_name' => $item_name,
+                'item_id' => $item_id,
+                'item_type' => $type,
+                'borrow_date' => $borrow_date,
+                'return_date' => $return_date,
+                'status' => 'active'
+            ];
+
+            if ($borrowModel->createBorrowing($data)) {
+                $response['success'] = true;
+                $response['message'] = 'Peminjaman berhasil dicatat!';
+            } else {
+                $response['message'] = 'Gagal menyimpan data peminjaman!';
+            }
+        }
+        
+    } catch (Exception $e) {
+        $response['success'] = false;
+        $response['message'] = 'Terjadi kesalahan: ' . $e->getMessage();
     }
 
-    // ---------------------------------------
-    // 🔥 SELALU KEMBALIKAN JSON UNTUK AJAX
-    // ---------------------------------------
+    // Return JSON for AJAX request
     if (isset($_POST['ajax'])) {
+        ob_end_clean();
         header('Content-Type: application/json');
         echo json_encode($response);
         exit;
     }
+}
+
+// Load equipment and rooms for form display
+try {
+    $db = new Database();
+    $conn = $db->getConnection();
+    $equipmentModel = new EquipmentModel($conn);
+    $roomModel = new RoomModel($conn);
+    
+    $equipments = $equipmentModel->getAvailableEquipment();
+    $rooms = $roomModel->getAllRooms();
+} catch (Exception $e) {
+    $equipments = [];
+    $rooms = [];
 }
 ?>
 
@@ -86,27 +166,24 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Peminjaman Barang - InLet</title>
+    <title>Peminjaman Alat & Ruang - InLet</title>
     <link rel="stylesheet" href="../../assets/css/tailwind.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <!-- Flatpickr CSS -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
-    <!-- Tema opsional (bisa ganti ke "material_blue", "dark", dll) -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/themes/material_blue.css">
-
 </head>
 
 <body class="bg-gray-50">
 
     <div class="container mx-auto px-4 py-8 mt-20">
-        <div class="max-w-2xl mx-auto">
+        <div class="max-w-3xl mx-auto">
             <!-- Header -->
             <div class="text-center mb-8">
                 <div class="inline-flex items-center justify-center w-20 h-20 bg-blue-100 rounded-full mb-4">
-                    <i class="fas fa-tools text-4xl text-blue-600"></i>
+                    <i class="fas fa-calendar-check text-4xl text-blue-600"></i>
                 </div>
-                <h1 class="text-3xl md:text-4xl font-bold text-gray-800 mb-2">Peminjaman Alat</h1>
-                <p class="text-gray-600">Silakan isi form di bawah untuk melakukan Peminjaman</p>
+                <h1 class="text-3xl md:text-4xl font-bold text-gray-800 mb-2">Peminjaman Alat & Ruang</h1>
+                <p class="text-gray-600">Silakan isi form di bawah untuk melakukan peminjaman</p>
             </div>
 
             <!-- Alert Messages -->
@@ -114,7 +191,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
             <?php if (!empty($response['message']) && !isset($_POST['ajax'])): ?>
                 <div
-                    class="mb-6 p-4 rounded-lg <?php echo $response['success'] ? 'bg-green-100 border border-green-400 text-green-700' : 'bg-red-100 border border-red-400 text-red-700'; ?>">
+                    class="mb-6 p-4 rounded-lg <?php echo $response['success'] ? 'bg-green-100 border-green-400 text-green-700 border' : 'bg-red-100 border-red-400 text-red-700 border'; ?>">
                     <div class="flex items-center">
                         <i
                             class="fas <?php echo $response['success'] ? 'fa-check-circle' : 'fa-exclamation-circle'; ?> mr-2"></i>
@@ -138,115 +215,88 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                     <!-- Pekerjaan -->
                     <div class="mb-6">
-                        <label for="nama" class="block text-gray-700 font-semibold mb-2">
-                            <i class="fas fa-briefcase mr-2 text-blue-600"></i>Perkerjaan *
+                        <label class="block text-gray-700 font-semibold mb-2">
+                            <i class="fas fa-briefcase mr-2 text-blue-600"></i>Pekerjaan *
                         </label>
-                        <div class="flex items-center">
-                            <input id="dosen-pekerjaan" type="radio" value="dosen" name="pekerjaan"
-                                class="w-4 h-4 block text-gray-700 font-semibold mb-2 mr-2">
-                            <label for="dosen-pekerjaan" class="block text-gray-700 font-semibold mb-2">Dosen</label>
-                        </div>
-                        <div class="flex items-center">
-                            <input id="mahasiswa-pekerjaan" type="radio" value="mahasiswa" name="pekerjaan"
-                                class="w-4 h-4 block text-gray-700 font-semibold mb-2 mr-2">
-                            <label for="mahasiswa-pekerjaan"
-                                class="block text-gray-700 font-semibold mb-2">Mahasiswa</label>
-                        </div>
-                        <div class="flex items-center">
-                            <input id="lainnya-pekerjaan" type="radio" value="lainnya" name="pekerjaan"
-                                class="w-4 h-4 block text-gray-700 font-semibold mb-2 mr-2">
-                            <label for="lainnya-pekerjaan"
-                                class="block text-gray-700 font-semibold mb-2">Lainnya</label>
+                        <div class="space-y-2">
+                            <label class="flex items-center cursor-pointer">
+                                <input type="radio" value="Dosen" name="pekerjaan" required
+                                    class="w-4 h-4 text-blue-600 mr-3">
+                                <span>Dosen</span>
+                            </label>
+                            <label class="flex items-center cursor-pointer">
+                                <input type="radio" value="Mahasiswa" name="pekerjaan" required
+                                    class="w-4 h-4 text-blue-600 mr-3">
+                                <span>Mahasiswa</span>
+                            </label>
+                            <label class="flex items-center cursor-pointer">
+                                <input id="lainnya-pekerjaan" type="radio" value="lainnya" name="pekerjaan" required
+                                    class="w-4 h-4 text-blue-600 mr-3">
+                                <span>Lainnya</span>
+                            </label>
                         </div>
                         <div id="input-lainnya" class="mt-3 hidden">
                             <input type="text" id="pekerjaan-lainnya" name="pekerjaan_lainnya"
                                 placeholder="Masukkan pekerjaan lainnya"
-                                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
                         </div>
                     </div>
 
-                    <!-- Dropdown Alat/Ruang -->
+                    <!-- Jenis Peminjaman -->
                     <div class="mb-6">
-                        <label for="jenis-peminjaman" name="jenis" class="block text-gray-700 font-semibold mb-2">
+                        <label for="jenis-peminjaman" class="block text-gray-700 font-semibold mb-2">
                             <i class="fas fa-box mr-2 text-blue-600"></i>Jenis Peminjaman *
                         </label>
-
-                        <select id="jenis-peminjaman"
-                            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                            name="jenis">
+                        <select id="jenis-peminjaman" name="jenis" required
+                            class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
                             <option value="">-- Pilih Jenis --</option>
                             <option value="equipment">Alat</option>
                             <option value="room">Ruang</option>
                         </select>
                     </div>
 
-                    <!-- Pilihan ruang (single select) -->
-                    <div id="pilihan-ruang" class="mb-6 hidden">
-                        <label for="ruang" class="block text-gray-700 font-semibold mb-2">Pilih Ruang</label>
-                        <select id="ruang" name="item"
-                            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
-                            <option value="">-- Pilih Ruang --</option>
-                            <option value="Ruang Komputer">Ruang Komputer</option>
-                            <option value="Ruang Meeting">Ruang Meeting</option>
-                            <option value="Ruang Multimedia">Ruang Multimedia</option>
-                        </select>
+                    <!-- Waktu Peminjaman -->
+                    <div class="mb-6">
+                        <label for="waktu-pinjam" class="block text-gray-700 font-semibold mb-2">
+                            <i class="fas fa-calendar-alt mr-2 text-blue-600"></i>Waktu Peminjaman *
+                        </label>
+                        <input type="text" id="waktu-pinjam" name="waktu_pinjam" required
+                            placeholder="Pilih tanggal dan waktu peminjaman"
+                            class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
                     </div>
 
-                    <!-- Pilihan Alat (Checkbox Multiple) -->
-                    <div id="pilihan-alat" class="mb-6 hidden">
-                        <label class="block text-gray-700 font-semibold mb-2">
-                            Pilih Alat (bisa lebih dari 1)
+                    <!-- Waktu Pengembalian -->
+                    <div class="mb-6">
+                        <label for="waktu-kembali" class="block text-gray-700 font-semibold mb-2">
+                            <i class="fas fa-undo-alt mr-2 text-blue-600"></i>Waktu Pengembalian *
                         </label>
-                        <div class="grid grid-cols-2 gap-2">
-                            <label class="flex items-center">
-                                <input type="checkbox" name="item[]" value="Laptop"
-                                    class="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500 mr-2">
-                                Laptop
-                            </label>
-                            <label class="flex items-center">
-                                <input type="checkbox" name="item[]" value="Proyektor"
-                                    class="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500 mr-2">
-                                Proyektor
-                            </label>
-                            <label class="flex items-center">
-                                <input type="checkbox" name="item[]" value="Kamera"
-                                    class="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500 mr-2">
-                                Kamera
-                            </label>
-                            <label class="flex items-center">
-                                <input type="checkbox" name="item[]" value="Tripod"
-                                    class="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500 mr-2">
-                                Tripod
-                            </label>
-                            <label class="flex items-center">
-                                <input type="checkbox" name="item[]" value="Microphone"
-                                    class="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500 mr-2">
-                                Microphone
-                            </label>
+                        <input type="text" id="waktu-kembali" name="waktu_kembali" required
+                            placeholder="Pilih tanggal dan waktu pengembalian"
+                            class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    </div>
+
+                    <!-- Pilihan Ruang (initially hidden) -->
+                    <div id="pilihan-ruang" class="mb-6 hidden">
+                        <label class="block text-gray-700 font-semibold mb-3">
+                            <i class="fas fa-door-open mr-2 text-blue-600"></i>Pilih Ruang *
+                        </label>
+                        <div id="rooms-container" class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                            <p class="text-gray-500 col-span-2 text-center py-4">
+                                Pilih waktu peminjaman terlebih dahulu untuk melihat ketersediaan ruangan
+                            </p>
                         </div>
                     </div>
-                    <!-- Form Kalender Rentang Peminjaman -->
-                    <div class="mb-6">
-                        <label for="tanggal-peminjaman" class="block text-gray-700 font-semibold mb-2">
-                            <i class="fas fa-calendar-alt mr-2 text-blue-600"></i>Tanggal Peminjaman *
+
+                    <!-- Pilihan Alat (initially hidden) -->
+                    <div id="pilihan-alat" class="mb-6 hidden">
+                        <label class="block text-gray-700 font-semibold mb-3">
+                            <i class="fas fa-tools mr-2 text-blue-600"></i>Pilih Alat (bisa lebih dari 1) *
                         </label>
-
-                        <input id="tanggal-peminjaman" name="tanggal_pinjam"
-                            placeholder="Pilih rentang tanggal peminjaman"
-                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                            required>
-
-                        <p id="tanggal-info" class="text-sm text-gray-500 mt-2 hidden"></p>
-                    </div>
-                    <!-- Tanggal Kembali (otomatis dari rentang terakhir) -->
-                    <div class="mb-6">
-                        <label for="tanggal-kembali" class="block text-gray-700 font-semibold mb-2">
-                            <i class="fas fa-undo-alt mr-2 text-blue-600"></i>Tanggal Kembali
-                        </label>
-
-                        <input id="tanggal-kembali" name="tanggal_kembali" type="text" readonly
-                            class="w-full px-4 py-2 border border-gray-300 bg-gray-100 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                            placeholder="Tanggal kembali otomatis diisi">
+                        <div id="equipment-container" class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                            <p class="text-gray-500 col-span-2 text-center py-4">
+                                <i class="fas fa-spinner fa-spin mr-2"></i>Memuat data alat...
+                            </p>
+                        </div>
                     </div>
 
                     <!-- Submit Button -->
@@ -260,134 +310,73 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         </div>
     </div>
 
-
     <!-- Flatpickr JS -->
     <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
     <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/id.js"></script>
 
     <script>
         document.addEventListener("DOMContentLoaded", () => {
-            const tanggalPeminjaman = document.getElementById("tanggal-peminjaman");
-            const tanggalKembali = document.getElementById("tanggal-kembali");
-            const info = document.getElementById("tanggal-info");
+            console.log("DOM Loaded - Initializing borrowing form");
+            
+            const waktuPinjam = document.getElementById("waktu-pinjam");
+            const waktuKembali = document.getElementById("waktu-kembali");
+            const jenisPeminjaman = document.getElementById("jenis-peminjaman");
+            const pilihanRuang = document.getElementById("pilihan-ruang");
+            const pilihanAlat = document.getElementById("pilihan-alat");
+            const roomsContainer = document.getElementById("rooms-container");
+            const equipmentContainer = document.getElementById("equipment-container");
 
-            // Inisialisasi Flatpickr
-            flatpickr(tanggalPeminjaman, {
-                mode: "range",
-                dateFormat: "Y-m-d",
+            console.log("Elements found:", {
+                waktuPinjam: !!waktuPinjam,
+                waktuKembali: !!waktuKembali,
+                jenisPeminjaman: !!jenisPeminjaman,
+                pilihanRuang: !!pilihanRuang,
+                pilihanAlat: !!pilihanAlat,
+                roomsContainer: !!roomsContainer,
+                equipmentContainer: !!equipmentContainer
+            });
+
+            let borrowDatePicker, returnDatePicker;
+
+            // Inisialisasi Flatpickr untuk waktu peminjaman
+            borrowDatePicker = flatpickr(waktuPinjam, {
+                enableTime: true,
+                dateFormat: "Y-m-d H:i",
+                time_24hr: true,
                 minDate: "today",
                 locale: "id",
-                onChange: function (selectedDates, dateStr) {
-                    if (selectedDates.length === 2) {
-                        const start = selectedDates[0];
-                        const end = selectedDates[1];
-
-                        // Hitung lama hari
-                        const diffDays = Math.ceil((end - start) / (1000 * 60 * 60 * 24)) + 1;
-
-                        // Tampilkan info lama peminjaman
-                        info.textContent = `Lama peminjaman: ${diffDays} hari (${dateStr})`;
-                        info.classList.remove("hidden");
-
-                        // Format tanggal kembali manual tanpa timezone bug
-                        const year = end.getFullYear();
-                        const month = String(end.getMonth() + 1).padStart(2, '0');
-                        const day = String(end.getDate()).padStart(2, '0');
-
-                        tanggalKembali.value = `${year}-${month}-${day}`;
-                    } else {
-                        info.classList.add("hidden");
-                        tanggalKembali.value = "";
+                onChange: function (selectedDates) {
+                    // Set minDate untuk waktu pengembalian
+                    if (selectedDates[0]) {
+                        returnDatePicker.set('minDate', selectedDates[0]);
+                        
+                        // Check room availability if dates are selected
+                        if (jenisPeminjaman.value === 'room' && waktuKembali.value) {
+                            checkRoomAvailability();
+                        }
                     }
                 }
             });
-        });
-    </script>
 
-
-    <script>
-        // AJAX Form Submission
-        document.getElementById('borrowingForm').addEventListener('submit', function (e) {
-            e.preventDefault();
-
-            const formData = new FormData(this);
-            formData.append('ajax', '1');
-
-            // Disable button
-            const submitBtn = this.querySelector('button[type="submit"]');
-            const originalText = submitBtn.innerHTML;
-            submitBtn.disabled = true;
-            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i><span>Memproses...</span>';
-
-            fetch('', {
-                method: 'POST',
-                body: formData
-            })
-                .then(response => response.json())
-                .then(data => {
-                    const alertDiv = document.getElementById('alertMessage');
-                    alertDiv.className = `mb-6 p-4 rounded-lg ${data.success ? 'bg-green-100 border border-green-400 text-green-700' : 'bg-red-100 border border-red-400 text-red-700'}`;
-                    alertDiv.innerHTML = `
-                    <div class="flex items-center">
-                        <i class="fas ${data.success ? 'fa-check-circle' : 'fa-exclamation-circle'} mr-2"></i>
-                        <span>${data.message}</span>
-                    </div>
-                `;
-                    alertDiv.classList.remove('hidden');
-
-                    // Scroll to alert
-                    alertDiv.scrollIntoView({ behavior: 'smooth', block: 'center' });
-
-                    // Reset form if success
-                    if (data.success) {
-                        this.reset();
+            // Inisialisasi Flatpickr untuk waktu pengembalian
+            returnDatePicker = flatpickr(waktuKembali, {
+                enableTime: true,
+                dateFormat: "Y-m-d H:i",
+                time_24hr: true,
+                minDate: "today",
+                locale: "id",
+                onChange: function () {
+                    // Check room availability when return date changes
+                    if (jenisPeminjaman.value === 'room' && waktuPinjam.value) {
+                        checkRoomAvailability();
                     }
-
-                    // Enable button
-                    submitBtn.disabled = false;
-                    submitBtn.innerHTML = originalText;
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                    const alertDiv = document.getElementById('alertMessage');
-                    alertDiv.className = 'mb-6 p-4 rounded-lg bg-red-100 border border-red-400 text-red-700';
-                    alertDiv.innerHTML = `
-                    <div class="flex items-center">
-                        <i class="fas fa-exclamation-circle mr-2"></i>
-                        <span>Terjadi kesalahan. Silakan coba lagi.</span>
-                    </div>
-                `;
-                    alertDiv.classList.remove('hidden');
-
-                    // Enable button
-                    submitBtn.disabled = false;
-                    submitBtn.innerHTML = originalText;
-                });
-        });
-    </script>
-    <script>
-        // Ambil elemen radio dan input tambahan
-        const radioLainnya = document.getElementById("lainnya-pekerjaan");
-        const inputLainnya = document.getElementById("input-lainnya");
-        const radioSemua = document.querySelectorAll('input[name="pekerjaan"]');
-
-        // Saat salah satu radio diklik
-        radioSemua.forEach(radio => {
-            radio.addEventListener("change", () => {
-                if (radioLainnya.checked) {
-                    inputLainnya.classList.remove("hidden");
-                } else {
-                    inputLainnya.classList.add("hidden");
                 }
             });
-        });
-    </script>
-    <script>
-        document.addEventListener("DOMContentLoaded", () => {
-            // === Radio "Lainnya" ===
-            const radioLainnya = document.getElementById("lainnya-peminjaman");
+
+            // Handle radio "Lainnya"
+            const radioLainnya = document.getElementById("lainnya-pekerjaan");
             const inputLainnya = document.getElementById("input-lainnya");
-            const radioSemua = document.querySelectorAll('input[name="peminjaman"]');
+            const radioSemua = document.querySelectorAll('input[name="pekerjaan"]');
 
             radioSemua.forEach(radio => {
                 radio.addEventListener("change", () => {
@@ -395,28 +384,277 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 });
             });
 
-            // === Dropdown Alat / Ruang ===
-            const jenisPeminjaman = document.getElementById("jenis-peminjaman");
-            const pilihanRuang = document.getElementById("pilihan-ruang");
-            const pilihanAlat = document.getElementById("pilihan-alat");
-
-            if (jenisPeminjaman) {
-                jenisPeminjaman.addEventListener("change", () => {
-                    if (jenisPeminjaman.value === "room") {
-                        pilihanRuang.classList.remove("hidden");
-                        pilihanAlat.classList.add("hidden");
-                    } else if (jenisPeminjaman.value === "equipment") {
-                        pilihanAlat.classList.remove("hidden");
-                        pilihanRuang.classList.add("hidden");
+            // Handle dropdown Alat/Ruang
+            jenisPeminjaman.addEventListener("change", () => {
+                console.log("Jenis peminjaman changed to:", jenisPeminjaman.value);
+                
+                if (jenisPeminjaman.value === "room") {
+                    console.log("Showing room selection");
+                    pilihanRuang.classList.remove("hidden");
+                    pilihanAlat.classList.add("hidden");
+                    
+                    // Check room availability if dates are selected
+                    if (waktuPinjam.value && waktuKembali.value) {
+                        console.log("Dates selected, checking room availability");
+                        checkRoomAvailability();
                     } else {
-                        pilihanRuang.classList.add("hidden");
-                        pilihanAlat.classList.add("hidden");
+                        console.log("No dates selected yet");
+                        roomsContainer.innerHTML = '<p class="text-gray-500 col-span-2 text-center py-4">Pilih waktu peminjaman terlebih dahulu untuk melihat ketersediaan ruangan</p>';
                     }
-                });
+                } else if (jenisPeminjaman.value === "equipment") {
+                    console.log("Showing equipment selection");
+                    pilihanAlat.classList.remove("hidden");
+                    pilihanRuang.classList.add("hidden");
+                    
+                    // Load equipment
+                    console.log("Loading equipment...");
+                    loadEquipment();
+                } else {
+                    console.log("No selection, hiding both");
+                    pilihanRuang.classList.add("hidden");
+                    pilihanAlat.classList.add("hidden");
+                }
+            });
+
+            // Function to load equipment with availability
+            function loadEquipment() {
+                console.log("loadEquipment() called");
+                console.log("equipmentContainer:", equipmentContainer);
+                
+                // Show loading
+                equipmentContainer.innerHTML = '<p class="text-gray-500 col-span-2 text-center py-4"><i class="fas fa-spinner fa-spin mr-2"></i>Memuat data alat...</p>';
+
+                console.log("Fetching from: views/pages/ajax_check_equipment.php");
+                
+                // Fetch equipment
+                fetch(`views/pages/ajax_check_equipment.php`)
+                    .then(response => {
+                        console.log("Response received:", response);
+                        return response.json();
+                    })
+                    .then(data => {
+                        console.log('Equipment data:', data);
+                        if (data.success && data.equipment) {
+                            if (data.equipment.length === 0) {
+                                equipmentContainer.innerHTML = '<p class="text-gray-500 col-span-2 text-center py-4">Tidak ada alat tersedia</p>';
+                            } else {
+                                equipmentContainer.innerHTML = '';
+                                data.equipment.forEach(equipment => {
+                                    const isAvailable = equipment.is_active && equipment.available_quantity > 0;
+                                    const label = document.createElement('label');
+                                    label.className = `flex items-center p-3 border rounded-lg transition ${isAvailable ? 'border-gray-200 hover:bg-blue-50 cursor-pointer' : 'border-gray-300 bg-gray-100 cursor-not-allowed opacity-60'}`;
+                                    
+                                    label.innerHTML = `
+                                        <input type="checkbox" name="alat[]" value="${equipment.id}" ${!isAvailable ? 'disabled' : ''}
+                                            class="w-5 h-5 text-blue-600 border-gray-300 rounded focus:ring-blue-500 mr-3">
+                                        <div class="flex-1">
+                                            <div class="flex items-center justify-between">
+                                                <div class="font-medium text-gray-800">${equipment.name}</div>
+                                                ${!isAvailable ? '<span class="text-xs text-red-600 font-semibold"><i class="fas fa-times-circle mr-1"></i>Tidak Tersedia</span>' : `<span class="text-xs text-green-600 font-semibold"><i class="fas fa-check-circle mr-1"></i>Tersedia: ${equipment.available_quantity}/${equipment.quantity}</span>`}
+                                            </div>
+                                            ${equipment.description ? `<div class="text-xs text-gray-500 mt-1">${equipment.description}</div>` : ''}
+                                        </div>
+                                    `;
+                                    equipmentContainer.appendChild(label);
+                                });
+                            }
+                        } else {
+                            equipmentContainer.innerHTML = `<p class="text-red-500 col-span-2 text-center py-4">${data.message || 'Gagal memuat data alat'}</p>`;
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        equipmentContainer.innerHTML = '<p class="text-red-500 col-span-2 text-center py-4">Terjadi kesalahan saat memuat data alat</p>';
+                    });
+            }
+
+            // Function to check room availability
+            function checkRoomAvailability() {
+                const borrowDate = waktuPinjam.value;
+                const returnDate = waktuKembali.value;
+
+                if (!borrowDate || !returnDate) {
+                    roomsContainer.innerHTML = '<p class="text-gray-500 col-span-2 text-center py-4">Pilih waktu peminjaman terlebih dahulu</p>';
+                    return;
+                }
+
+                // Show loading
+                roomsContainer.innerHTML = '<p class="text-gray-500 col-span-2 text-center py-4"><i class="fas fa-spinner fa-spin mr-2"></i>Memeriksa ketersediaan ruangan...</p>';
+
+                // Fetch room availability
+                fetch(`views/pages/ajax_check_rooms.php?borrow_date=${encodeURIComponent(borrowDate)}&return_date=${encodeURIComponent(returnDate)}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        console.log('Room data:', data);
+                        if (data.success && data.rooms) {
+                            if (data.rooms.length === 0) {
+                                roomsContainer.innerHTML = '<p class="text-gray-500 col-span-2 text-center py-4">Tidak ada ruangan tersedia</p>';
+                            } else {
+                                roomsContainer.innerHTML = '';
+                                data.rooms.forEach(room => {
+                                    const isAvailable = room.is_available;
+                                    const div = document.createElement('label');
+                                    div.className = `flex items-center p-3 border rounded-lg transition ${isAvailable ? 'border-gray-200 hover:bg-blue-50 cursor-pointer' : 'border-gray-300 bg-gray-100 cursor-not-allowed opacity-60'}`;
+                                    
+                                    div.innerHTML = `
+                                        <input type="radio" name="ruang" value="${room.id}" ${!isAvailable ? 'disabled' : ''} required
+                                            class="w-5 h-5 text-blue-600 border-gray-300 focus:ring-blue-500 mr-3">
+                                        <div class="flex-1">
+                                            <div class="flex items-center justify-between">
+                                                <div class="font-medium text-gray-800">${room.name}</div>
+                                                ${!isAvailable ? '<span class="text-xs text-red-600 font-semibold"><i class="fas fa-lock mr-1"></i>Sedang Dipinjam</span>' : '<span class="text-xs text-green-600 font-semibold"><i class="fas fa-check-circle mr-1"></i>Tersedia</span>'}
+                                            </div>
+                                            ${room.description ? `<div class="text-xs text-gray-500 mt-1">${room.description}</div>` : ''}
+                                        </div>
+                                    `;
+                                    roomsContainer.appendChild(div);
+                                });
+                            }
+                        } else {
+                            roomsContainer.innerHTML = `<p class="text-red-500 col-span-2 text-center py-4">${data.message || 'Gagal memuat data ruangan'}</p>`;
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        roomsContainer.innerHTML = '<p class="text-red-500 col-span-2 text-center py-4">Terjadi kesalahan saat memeriksa ketersediaan</p>';
+                    });
+            }
+
+            // AJAX Form Submission dengan Validasi
+            document.getElementById('borrowingForm').addEventListener('submit', function (e) {
+                e.preventDefault();
+
+                // Validasi Frontend
+                const nama = document.getElementById('nama').value.trim();
+                const pekerjaan = document.querySelector('input[name="pekerjaan"]:checked');
+                const jenis = document.getElementById('jenis-peminjaman').value;
+                const waktuPinjamVal = document.getElementById('waktu-pinjam').value;
+                const waktuKembaliVal = document.getElementById('waktu-kembali').value;
+
+                // Cek nama
+                if (!nama) {
+                    showAlert('Nama lengkap wajib diisi!', false);
+                    return;
+                }
+
+                // Cek pekerjaan
+                if (!pekerjaan) {
+                    showAlert('Pekerjaan wajib dipilih!', false);
+                    return;
+                }
+
+                // Cek pekerjaan lainnya jika dipilih
+                if (pekerjaan.value === 'lainnya') {
+                    const pekerjaanLainnya = document.getElementById('pekerjaan-lainnya').value.trim();
+                    if (!pekerjaanLainnya) {
+                        showAlert('Pekerjaan lainnya wajib diisi!', false);
+                        return;
+                    }
+                }
+
+                // Cek jenis peminjaman
+                if (!jenis) {
+                    showAlert('Jenis peminjaman wajib dipilih!', false);
+                    return;
+                }
+
+                // Cek waktu peminjaman
+                if (!waktuPinjamVal) {
+                    showAlert('Waktu peminjaman wajib diisi!', false);
+                    return;
+                }
+
+                // Cek waktu pengembalian
+                if (!waktuKembaliVal) {
+                    showAlert('Waktu pengembalian wajib diisi!', false);
+                    return;
+                }
+
+                // Cek item berdasarkan jenis
+                if (jenis === 'equipment') {
+                    const checkboxes = document.querySelectorAll('input[name="alat[]"]:checked');
+                    if (checkboxes.length === 0) {
+                        showAlert('Minimal pilih 1 alat!', false);
+                        return;
+                    }
+                } else if (jenis === 'room') {
+                    const ruang = document.querySelector('input[name="ruang"]:checked');
+                    if (!ruang) {
+                        showAlert('Ruang wajib dipilih!', false);
+                        return;
+                    }
+                }
+
+                const formData = new FormData(this);
+                formData.append('ajax', '1');
+
+                // Disable button
+                const submitBtn = this.querySelector('button[type="submit"]');
+                const originalText = submitBtn.innerHTML;
+                submitBtn.disabled = true;
+                submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i><span>Memproses...</span>';
+
+                fetch('views/pages/ajax_submit_borrowing.php', {
+                    method: 'POST',
+                    body: formData
+                })
+                    .then(response => {
+                        return response.clone().text().then(text => {
+                            try {
+                                return JSON.parse(text);
+                            } catch (e) {
+                                console.error('JSON parse error:', e);
+                                console.log('Raw response:', text);
+                                throw new Error('Server mengembalikan response yang bukan JSON');
+                            }
+                        });
+                    })
+                    .then(data => {
+                        console.log('Parsed data:', data);
+                        showAlert(data.message, data.success);
+
+                        // Reset form if success
+                        if (data.success) {
+                            this.reset();
+                            // Reset hidden divs
+                            document.getElementById('pilihan-alat').classList.add('hidden');
+                            document.getElementById('pilihan-ruang').classList.add('hidden');
+                            document.getElementById('input-lainnya').classList.add('hidden');
+                            
+                            // Clear flatpickr
+                            borrowDatePicker.clear();
+                            returnDatePicker.clear();
+                        }
+
+                        // Enable button
+                        submitBtn.disabled = false;
+                        submitBtn.innerHTML = originalText;
+                    })
+                    .catch(error => {
+                        console.error('Fetch error:', error);
+                        showAlert(error.message || 'Terjadi kesalahan. Silakan coba lagi.', false);
+
+                        // Enable button
+                        submitBtn.disabled = false;
+                        submitBtn.innerHTML = originalText;
+                    });
+            });
+
+            // Helper function untuk menampilkan alert
+            function showAlert(message, isSuccess) {
+                const alertDiv = document.getElementById('alertMessage');
+                alertDiv.className = `mb-6 p-4 rounded-lg ${isSuccess ? 'bg-green-100 border border-green-400 text-green-700' : 'bg-red-100 border border-red-400 text-red-700'}`;
+                alertDiv.innerHTML = `
+                    <div class="flex items-center">
+                        <i class="fas ${isSuccess ? 'fa-check-circle' : 'fa-exclamation-circle'} mr-2"></i>
+                        <span>${message}</span>
+                    </div>
+                `;
+                alertDiv.classList.remove('hidden');
+                alertDiv.scrollIntoView({ behavior: 'smooth', block: 'center' });
             }
         });
     </script>
-
 
 </body>
 

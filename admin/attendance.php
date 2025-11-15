@@ -216,10 +216,10 @@ $today_stats = $attendanceModel->getAttendanceStats(date('Y-m-d'));
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900"><?php echo htmlspecialchars($attendance['nim']); ?></td>
                                     <td class="px-6 py-4 whitespace-nowrap">
-                                        <span class="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full 
+                                        <span class="px-3 py-1 inline-flex items-center gap-2 text-xs leading-5 font-semibold rounded-full 
                                             <?php echo $attendance['attendance_type'] === 'datang' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'; ?>">
-                                            <i class="fas fa-arrow-<?php echo $attendance['attendance_type'] === 'datang' ? 'right' : 'left'; ?> mr-1"></i>
-                                            <?php echo ucfirst($attendance['attendance_type']); ?>
+                                            <i class="fas fa-arrow-<?php echo $attendance['attendance_type'] === 'datang' ? 'right' : 'left'; ?>"></i>
+                                            <span><?php echo ucfirst($attendance['attendance_type']); ?></span>
                                         </span>
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
