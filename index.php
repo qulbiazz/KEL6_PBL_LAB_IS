@@ -51,7 +51,10 @@ switch ($page) {
         $pageTitle = 'About Us - InLet';
         $view = 'pages/about';
         break;
-        
+    case 'borrowing':
+        $pageTitle = 'Peminjaman - InLET';
+        $view = 'pages/borrowing';
+        break;
     case 'product-detail':
         // Get product ID
         $product_id = isset($_GET['id']) ? (int)$_GET['id'] : 0;
@@ -130,7 +133,7 @@ switch ($page) {
             exit();
         }
         
-        // Load LecturerDetailModel
+        // Load LecturerDetailMod
         require_once 'models/LecturerDetailModel.php';
         $lecturerModel = new LecturerDetailModel($conn);
         $lecturer = $lecturerModel->getLecturerProfile($lecturer_id);

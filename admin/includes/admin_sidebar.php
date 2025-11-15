@@ -16,6 +16,9 @@
             <a href="attendance.php" class="block px-4 py-2 rounded hover:bg-gray-700 <?php echo basename($_SERVER['PHP_SELF']) == 'attendance.php' ? 'bg-gray-700' : ''; ?>">
                 <i class="fas fa-clipboard-check mr-2"></i> Absensi Mahasiswa
             </a>
+            <a href="borrowing.php" class="block px-4 py-2 rounded hover:bg-gray-700 <?php echo basename($_SERVER['PHP_SELF']) == 'borrowing.php' ? 'bg-gray-700' : ''; ?>">
+                <i class="fas fa-tools mr-2"></i> Peminjaman
+            </a>
             <a href="banners.php" class="block px-4 py-2 rounded hover:bg-gray-700 <?php echo basename($_SERVER['PHP_SELF']) == 'banners.php' ? 'bg-gray-700' : ''; ?>">
                 <i class="fas fa-images mr-2"></i> Carousel Banners
             </a>

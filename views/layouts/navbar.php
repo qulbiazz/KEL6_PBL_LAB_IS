@@ -29,6 +29,7 @@ function isSectionLink()
                 <a href="../../index.php#news" data-section="news" class="text-gray-700 hover:text-blue-600 nav-section-link transition">News</a>
                 <a href="../../index.php#gallery" data-section="gallery" class="text-gray-700 hover:text-blue-600 nav-section-link transition">Gallery</a>
                 <a href="../../index.php#research" data-section="research" class="text-gray-700 hover:text-blue-600 nav-section-link transition">Research</a>
+                <a href="../../index.php?page=borrowing" class="text-gray-700 hover:text-blue-600 transition">Peminjaman</a>
                 <a href="attendance.php" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition flex items-center">
                     <i class="fas fa-clipboard-check mr-2"></i>Absen
                 </a>
@@ -48,6 +49,7 @@ function isSectionLink()
             <a href="../../index.php#news" data-section="news" class="block py-2 text-gray-700 hover:text-blue-600 nav-section-link">News</a>
             <a href="../../index.php#gallery" data-section="gallery" class="block py-2 text-gray-700 hover:text-blue-600 nav-section-link">Gallery</a>
             <a href="../../index.php#research" data-section="research" class="block py-2 text-gray-700 hover:text-blue-600 nav-section-link">Research</a>
+            <a href="../../index.php?page=borrowing" class="block py-2 text-gray-700 hover:text-blue-600">Peminjaman</a>
             <a href="attendance.php" class="block py-2 mt-2 bg-blue-600 hover:bg-blue-700 text-white px-4 rounded-lg text-center">
                 <i class="fas fa-clipboard-check mr-2"></i>Absen
             </a>
