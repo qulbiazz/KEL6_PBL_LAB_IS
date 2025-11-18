@@ -45,7 +45,7 @@
                     <a href="index.php#gallery" data-section="gallery" class="<?php echo isSectionLink(); ?> transition">Gallery</a>
                     <a href="index.php#research" data-section="research" class="<?php echo isSectionLink(); ?> transition">Research</a>
                     <a href="index.php?page=borrowing" class="block py-2 <?php echo isActive('borrowing'); ?>">Peminjaman</a>
-                    <a href="views/pages/attendance.php" class="bg-transparent text-blue-700 border border-blue-700 hover:bg-blue-700 hover:text-white px-4 py-2 rounded-lg transition flex items-center">
+                    <a href="index.php?page=attendance" class="bg-transparent text-blue-700 border border-blue-700 hover:bg-blue-700 hover:text-white px-4 py-2 rounded-lg transition flex items-center">
                         <i class="fas fa-clipboard-check mr-2"></i>Absen
                     </a>
                 </div>
@@ -65,7 +65,7 @@
                 <a href="index.php#gallery" data-section="gallery" class="block py-2 <?php echo isSectionLink(); ?>">Gallery</a>
                 <a href="index.php#research" data-section="research" class="block py-2 <?php echo isSectionLink(); ?>">Research</a>
                 <a href="index.php?page=borrowing" class="block py-2 <?php echo isActive('borrowing'); ?>">Peminjaman</a>
-                <a href="views/pages/attendance.php" class="block py-2 mt-2 bg-transparent hover:bg-blue-700 text-white px-4 rounded-lg text-center">
+                <a href="index.php?page=attendance" class="bg-transparent text-blue-700 border border-blue-700 hover:bg-blue-700 hover:text-white px-4 py-2 rounded-lg transition flex items-center">
                     <i class="fas fa-clipboard-check mr-2"></i>Absen
                 </a>
             </div>

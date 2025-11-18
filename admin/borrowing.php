@@ -83,7 +83,7 @@ $returnedCount = $borrowingModel->countBorrowings('', 'returned');
 
         <main class="flex-1 p-4 md:p-8 pt-20 ml-0 lg:ml-64 min-h-screen">
             <div class="mb-8 mt-12">
-                <h1 class="text-2xl md:text-3xl font-bold text-gray-800">Log Peminjaman Alat dan Ruang</h1>
+                <h1 class="text-2xl md:text-3xl font-bold text-gray-800">Kelola Peminjaman Alat dan Ruang</h1>
                 <p class="text-gray-600 mt-1">Semua riwayat peminjaman alat dan ruangan</p>
             </div>
 
@@ -217,12 +217,19 @@ $returnedCount = $borrowingModel->countBorrowings('', 'returned');
                                         <td class="px-6 py-4 text-sm text-gray-900">
                                             <span
                                                 class="px-3 py-1 inline-flex text-xs font-semibold rounded-full 
-                                                <?php echo ($borrow['type'] ?? '') === 'equipment' ? 'bg-blue-100 text-blue-800' : 'bg-purple-100 text-purple-800'; ?>">
-                                                <?php echo ($borrow['type'] ?? '') === 'equipment' ? 'Alat' : 'Ruang'; ?>
+                                                <?php echo ($borrow['borrowing_type'] ?? $borrow['type'] ?? '') === 'equipment' ? 'bg-blue-100 text-blue-800' : 'bg-purple-100 text-purple-800'; ?>">
+                                                <?php echo ($borrow['borrowing_type'] ?? $borrow['type'] ?? '') === 'equipment' ? 'Alat' : 'Ruang'; ?>
                                             </span>
                                         </td>
                                         <td class="px-6 py-4 text-sm text-gray-900">
-                                            <?php echo htmlspecialchars($borrow['item_display_name'] ?? $borrow['item_name'] ?? '-'); ?>
+                                            <?php 
+                                            // Display equipment names or room name based on type
+                                            if (($borrow['borrowing_type'] ?? $borrow['type'] ?? '') === 'equipment') {
+                                                echo htmlspecialchars($borrow['equipment_names'] ?? '-');
+                                            } else {
+                                                echo htmlspecialchars($borrow['room_name'] ?? '-');
+                                            }
+                                            ?>
                                         </td>
                                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                                             <?php echo !empty($borrow['borrow_date']) ? date('d/m/Y H:i', strtotime($borrow['borrow_date'])) : '-'; ?>
@@ -242,13 +249,13 @@ $returnedCount = $borrowingModel->countBorrowings('', 'returned');
                                         </td>
                                         <td class="px-6 py-4 whitespace-nowrap text-sm">
                                             <?php if (($borrow['status'] ?? 'active') === 'active'): ?>
-                                                <a href="?return=<?php echo $borrow['id']; ?>&page=<?php echo $page; ?>&type=<?php echo $filterType; ?>&status=<?php echo $filterStatus; ?>" 
+                                                <a href="?return=<?php echo $borrow['borrowing_id'] ?? $borrow['id']; ?>&page=<?php echo $page; ?>&type=<?php echo $filterType; ?>&status=<?php echo $filterStatus; ?>" 
                                                     onclick="return confirm('Tandai peminjaman ini sebagai sudah dikembalikan?')"
                                                     class="text-green-600 hover:text-green-900 mr-3" title="Kembalikan">
                                                     <i class="fas fa-undo"></i>
                                                 </a>
                                             <?php endif; ?>
-                                            <a href="?delete=<?php echo $borrow['id']; ?>&page=<?php echo $page; ?>&type=<?php echo $filterType; ?>&status=<?php echo $filterStatus; ?>" 
+                                            <a href="?delete=<?php echo $borrow['borrowing_id'] ?? $borrow['id']; ?>&page=<?php echo $page; ?>&type=<?php echo $filterType; ?>&status=<?php echo $filterStatus; ?>" 
                                                 onclick="return confirm('Hapus peminjaman ini?')"
                                                 class="text-red-600 hover:text-red-900" title="Hapus">
                                                 <i class="fas fa-trash"></i>
@@ -279,15 +286,22 @@ $returnedCount = $borrowingModel->countBorrowings('', 'returned');
                                         <p class="text-xs text-gray-600"><?php echo htmlspecialchars($borrow['occupation'] ?? '-'); ?></p>
                                     </div>
                                     <span class="px-2 py-1 text-xs font-semibold rounded-full 
-                                        <?php echo ($borrow['type'] ?? '') === 'equipment' ? 'bg-blue-100 text-blue-800' : 'bg-purple-100 text-purple-800'; ?>">
-                                        <?php echo ($borrow['type'] ?? '') === 'equipment' ? 'Alat' : 'Ruang'; ?>
+                                        <?php echo ($borrow['borrowing_type'] ?? $borrow['type'] ?? '') === 'equipment' ? 'bg-blue-100 text-blue-800' : 'bg-purple-100 text-purple-800'; ?>">
+                                        <?php echo ($borrow['borrowing_type'] ?? $borrow['type'] ?? '') === 'equipment' ? 'Alat' : 'Ruang'; ?>
                                     </span>
                                 </div>
                                 
                                 <div class="mb-2">
                                     <p class="text-sm text-gray-700">
                                         <i class="fas fa-box text-gray-400 mr-2"></i>
-                                        <?php echo htmlspecialchars($borrow['item_display_name'] ?? $borrow['item_name'] ?? '-'); ?>
+                                        <?php 
+                                        // Display equipment names or room name based on type
+                                        if (($borrow['borrowing_type'] ?? $borrow['type'] ?? '') === 'equipment') {
+                                            echo htmlspecialchars($borrow['equipment_names'] ?? '-');
+                                        } else {
+                                            echo htmlspecialchars($borrow['room_name'] ?? '-');
+                                        }
+                                        ?>
                                     </p>
                                 </div>
 
@@ -314,13 +328,13 @@ $returnedCount = $borrowingModel->countBorrowings('', 'returned');
                                     
                                     <div class="flex space-x-3">
                                         <?php if (($borrow['status'] ?? 'active') === 'active'): ?>
-                                            <a href="?return=<?php echo $borrow['id']; ?>&page=<?php echo $page; ?>&type=<?php echo $filterType; ?>&status=<?php echo $filterStatus; ?>" 
+                                            <a href="?return=<?php echo $borrow['borrowing_id'] ?? $borrow['id']; ?>&page=<?php echo $page; ?>&type=<?php echo $filterType; ?>&status=<?php echo $filterStatus; ?>" 
                                                 onclick="return confirm('Tandai peminjaman ini sebagai sudah dikembalikan?')"
                                                 class="text-green-600 hover:text-green-900">
                                                 <i class="fas fa-undo"></i>
                                             </a>
                                         <?php endif; ?>
-                                        <a href="?delete=<?php echo $borrow['id']; ?>&page=<?php echo $page; ?>&type=<?php echo $filterType; ?>&status=<?php echo $filterStatus; ?>" 
+                                        <a href="?delete=<?php echo $borrow['borrowing_id'] ?? $borrow['id']; ?>&page=<?php echo $page; ?>&type=<?php echo $filterType; ?>&status=<?php echo $filterStatus; ?>" 
                                             onclick="return confirm('Hapus peminjaman ini?')"
                                             class="text-red-600 hover:text-red-900">
                                             <i class="fas fa-trash"></i>
@@ -389,8 +403,8 @@ $returnedCount = $borrowingModel->countBorrowings('', 'returned');
                 <?php endif; ?>
             </div>
         </main>
+    </div>
 
-        <script src="../assets/js/admin.js"></script>
+    <script src="assets/js/admin.js"></script>
 </body>
-
 </html>

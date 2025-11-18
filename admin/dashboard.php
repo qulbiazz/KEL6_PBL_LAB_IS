@@ -116,7 +116,7 @@ $recent_news = $conn->query("SELECT * FROM news ORDER BY created_at DESC LIMIT 5
                     <div class="grid grid-cols-3 gap-4 mb-6">
                         <div class="text-center p-4 bg-blue-50 rounded-lg">
                             <div class="text-3xl font-bold text-blue-600">
-                                <?php echo number_format($visitorStats['total'] ?? 0); ?>
+                                <?php echo number_format($visitorStats['total_views'] ?? 0); ?>
                             </div>
                             <div class="text-xs text-gray-600 mt-1">Total Visitors</div>
                         </div>
@@ -135,12 +135,12 @@ $recent_news = $conn->query("SELECT * FROM news ORDER BY created_at DESC LIMIT 5
                     </div>
                     
                     <!-- Page Views -->
-                    <div class="text-center mb-6 pb-4 border-b">
+                    <!-- <div class="text-center mb-6 pb-4 border-b">
                         <div class="text-sm text-gray-600">
                             <i class="fas fa-eye mr-1"></i>
                             Total Page Views: <span class="font-semibold text-gray-800"><?php echo number_format($visitorStats['total_views'] ?? 0); ?></span>
                         </div>
-                    </div>
+                    </div> -->
                     
                     <!-- Top Countries -->
                     <?php if (!empty($visitorStats['countries'])): ?>

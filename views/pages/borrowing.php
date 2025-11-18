@@ -175,7 +175,7 @@ try {
 
 <body class="bg-gray-50">
 
-    <div class="container mx-auto px-4 py-8 mt-20">
+    <div class="container mx-auto px-4 py-8">
         <div class="max-w-3xl mx-auto">
             <!-- Header -->
             <div class="text-center mb-8">
@@ -316,7 +316,7 @@ try {
 
     <script>
         document.addEventListener("DOMContentLoaded", () => {
-            console.log("DOM Loaded - Initializing borrowing form");
+            // console.log("DOM Loaded - Initializing borrowing form");
             
             const waktuPinjam = document.getElementById("waktu-pinjam");
             const waktuKembali = document.getElementById("waktu-kembali");
@@ -326,15 +326,15 @@ try {
             const roomsContainer = document.getElementById("rooms-container");
             const equipmentContainer = document.getElementById("equipment-container");
 
-            console.log("Elements found:", {
-                waktuPinjam: !!waktuPinjam,
-                waktuKembali: !!waktuKembali,
-                jenisPeminjaman: !!jenisPeminjaman,
-                pilihanRuang: !!pilihanRuang,
-                pilihanAlat: !!pilihanAlat,
-                roomsContainer: !!roomsContainer,
-                equipmentContainer: !!equipmentContainer
-            });
+            // console.log("Elements found:", {
+            //     waktuPinjam: !!waktuPinjam,
+            //     waktuKembali: !!waktuKembali,
+            //     jenisPeminjaman: !!jenisPeminjaman,
+            //     pilihanRuang: !!pilihanRuang,
+            //     pilihanAlat: !!pilihanAlat,
+            //     roomsContainer: !!roomsContainer,
+            //     equipmentContainer: !!equipmentContainer
+            // });
 
             let borrowDatePicker, returnDatePicker;
 
@@ -386,31 +386,31 @@ try {
 
             // Handle dropdown Alat/Ruang
             jenisPeminjaman.addEventListener("change", () => {
-                console.log("Jenis peminjaman changed to:", jenisPeminjaman.value);
+                // console.log("Jenis peminjaman changed to:", jenisPeminjaman.value);
                 
                 if (jenisPeminjaman.value === "room") {
-                    console.log("Showing room selection");
+                    // console.log("Showing room selection");
                     pilihanRuang.classList.remove("hidden");
                     pilihanAlat.classList.add("hidden");
                     
                     // Check room availability if dates are selected
                     if (waktuPinjam.value && waktuKembali.value) {
-                        console.log("Dates selected, checking room availability");
+                        // console.log("Dates selected, checking room availability");
                         checkRoomAvailability();
                     } else {
-                        console.log("No dates selected yet");
+                        // console.log("No dates selected yet");
                         roomsContainer.innerHTML = '<p class="text-gray-500 col-span-2 text-center py-4">Pilih waktu peminjaman terlebih dahulu untuk melihat ketersediaan ruangan</p>';
                     }
                 } else if (jenisPeminjaman.value === "equipment") {
-                    console.log("Showing equipment selection");
+                    // console.log("Showing equipment selection");
                     pilihanAlat.classList.remove("hidden");
                     pilihanRuang.classList.add("hidden");
                     
                     // Load equipment
-                    console.log("Loading equipment...");
+                    // console.log("Loading equipment...");
                     loadEquipment();
                 } else {
-                    console.log("No selection, hiding both");
+                    // console.log("No selection, hiding both");
                     pilihanRuang.classList.add("hidden");
                     pilihanAlat.classList.add("hidden");
                 }
@@ -418,22 +418,22 @@ try {
 
             // Function to load equipment with availability
             function loadEquipment() {
-                console.log("loadEquipment() called");
-                console.log("equipmentContainer:", equipmentContainer);
+                // console.log("loadEquipment() called");
+                // console.log("equipmentContainer:", equipmentContainer);
                 
                 // Show loading
                 equipmentContainer.innerHTML = '<p class="text-gray-500 col-span-2 text-center py-4"><i class="fas fa-spinner fa-spin mr-2"></i>Memuat data alat...</p>';
 
-                console.log("Fetching from: views/pages/ajax_check_equipment.php");
+                // console.log("Fetching from: views/pages/ajax_check_equipment.php");
                 
                 // Fetch equipment
                 fetch(`views/pages/ajax_check_equipment.php`)
                     .then(response => {
-                        console.log("Response received:", response);
+                        // console.log("Response received:", response);
                         return response.json();
                     })
                     .then(data => {
-                        console.log('Equipment data:', data);
+                        // console.log('Equipment data:', data);
                         if (data.success && data.equipment) {
                             if (data.equipment.length === 0) {
                                 equipmentContainer.innerHTML = '<p class="text-gray-500 col-span-2 text-center py-4">Tidak ada alat tersedia</p>';
@@ -485,7 +485,7 @@ try {
                 fetch(`views/pages/ajax_check_rooms.php?borrow_date=${encodeURIComponent(borrowDate)}&return_date=${encodeURIComponent(returnDate)}`)
                     .then(response => response.json())
                     .then(data => {
-                        console.log('Room data:', data);
+                        // console.log('Room data:', data);
                         if (data.success && data.rooms) {
                             if (data.rooms.length === 0) {
                                 roomsContainer.innerHTML = '<p class="text-gray-500 col-span-2 text-center py-4">Tidak ada ruangan tersedia</p>';
@@ -604,13 +604,13 @@ try {
                                 return JSON.parse(text);
                             } catch (e) {
                                 console.error('JSON parse error:', e);
-                                console.log('Raw response:', text);
+                                // console.log('Raw response:', text);
                                 throw new Error('Server mengembalikan response yang bukan JSON');
                             }
                         });
                     })
                     .then(data => {
-                        console.log('Parsed data:', data);
+                        // console.log('Parsed data:', data);
                         showAlert(data.message, data.success);
 
                         // Reset form if success

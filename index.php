@@ -14,13 +14,57 @@ require_once 'config/database.php';
 $db = new Database();
 $conn = $db->getConnection();
 
-// Track visitor
+// Get page parameter from URL
+$page = $_GET['page'] ?? 'home';
+
+// Handle AJAX requests BEFORE any output
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['ajax'])) {
+    // Clean any output buffers
+    while (ob_get_level()) {
+        ob_end_clean();
+    }
+    
+    // Route AJAX requests to appropriate handlers
+    if ($page === 'attendance') {
+        require_once 'models/AttendanceModel.php';
+        
+        $student_id = (int)($_POST['student_id'] ?? 0);
+        $attendance_type = $_POST['attendance_type'] ?? '';
+        
+        $response = ['success' => false, 'message' => ''];
+
+        // Validasi input
+        if (empty($student_id) || empty($attendance_type)) {
+            $response['message'] = 'Semua field harus diisi!';
+        } elseif (!in_array($attendance_type, ['datang', 'pulang'])) {
+            $response['message'] = 'Tipe absensi tidak valid!';
+        } else {
+            $attendanceModel = new AttendanceModel($conn);
+
+            // Ambil IP address dan user agent
+            $ip_address = $_SERVER['REMOTE_ADDR'] ?? null;
+            $user_agent = $_SERVER['HTTP_USER_AGENT'] ?? null;
+
+            // Catat absensi
+            $response = $attendanceModel->recordAttendance(
+                $student_id,
+                $attendance_type,
+                $ip_address,
+                $user_agent
+            );
+        }
+
+        // Return JSON response
+        header('Content-Type: application/json');
+        echo json_encode($response);
+        exit;
+    }
+}
+
+// Track visitor (after AJAX check)
 require_once 'models/VisitorModel.php';
 $visitorModel = new VisitorModel($conn);
 $visitorStats = $visitorModel->trackVisitor();
-
-// Get page parameter from URL
-$page = $_GET['page'] ?? 'home';
 
 // Initialize variables
 $pageTitle = 'InLet - Information and Learning Engineering Technology';
@@ -55,6 +99,12 @@ switch ($page) {
         $pageTitle = 'Peminjaman - InLET';
         $view = 'pages/borrowing';
         break;
+    
+    case 'attendance':
+        $pageTitle = 'Absensi Mahasiswa - InLET';
+        $view = 'pages/attendance';
+        break;
+        
     case 'product-detail':
         // Get product ID
         $product_id = isset($_GET['id']) ? (int)$_GET['id'] : 0;

@@ -108,8 +108,10 @@ $rooms = $roomModel->getAllRooms(false);
             </div>
 
             <!-- Rooms Table -->
-            <div class="bg-white rounded-lg shadow-md overflow-x-auto">
-                <table class="min-w-full divide-y divide-gray-200">
+            <div class="bg-white rounded-lg shadow-md overflow-hidden">
+                <!-- Desktop Table -->
+                <div class="hidden md:block overflow-x-auto">
+                    <table class="min-w-full divide-y divide-gray-200">
                     <thead class="bg-gray-50">
                         <tr>
                             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">No</th>
@@ -162,7 +164,50 @@ $rooms = $roomModel->getAllRooms(false);
                             <?php endforeach; ?>
                         <?php endif; ?>
                     </tbody>
-                </table>
+                    </table>
+                </div>
+
+                <!-- Mobile Cards -->
+                <div class="md:hidden divide-y divide-gray-200">
+                    <?php if (empty($rooms)): ?>
+                        <div class="p-8 text-center text-gray-500">
+                            <i class="fas fa-inbox text-4xl mb-2"></i>
+                            <p>Belum ada data ruangan</p>
+                        </div>
+                    <?php else: ?>
+                        <?php foreach ($rooms as $index => $room): ?>
+                            <div class="p-4 hover:bg-gray-50">
+                                <div class="flex items-start justify-between mb-2">
+                                    <div class="flex-1">
+                                        <h3 class="text-sm font-semibold text-gray-900"><?php echo htmlspecialchars($room['name']); ?></h3>
+                                        <p class="text-xs text-gray-600 mt-1"><?php echo htmlspecialchars($room['description'] ?? '-'); ?></p>
+                                    </div>
+                                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full <?php echo $room['is_active'] ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'; ?>">
+                                        <?php echo $room['is_active'] ? 'Aktif' : 'Nonaktif'; ?>
+                                    </span>
+                                </div>
+                                
+                                <div class="grid grid-cols-2 gap-2 text-xs text-gray-600 mb-3">
+                                    <div>
+                                        <span class="text-gray-400">Kapasitas:</span> <span class="font-semibold"><?php echo $room['capacity'] ?? '-'; ?> orang</span>
+                                    </div>
+                                    <div>
+                                        <span class="text-gray-400">Urutan:</span> <span class="font-semibold"><?php echo $room['display_order']; ?></span>
+                                    </div>
+                                </div>
+
+                                <div class="flex items-center justify-end space-x-3">
+                                    <button onclick='showEditModal(<?php echo json_encode($room); ?>)' class="text-blue-600 hover:text-blue-900">
+                                        <i class="fas fa-edit"></i>
+                                    </button>
+                                    <a href="?delete=<?php echo $room['id']; ?>" onclick="return confirm('Yakin ingin menghapus ruangan ini?')" class="text-red-600 hover:text-red-900">
+                                        <i class="fas fa-trash"></i>
+                                    </a>
+                                </div>
+                            </div>
+                        <?php endforeach; ?>
+                    <?php endif; ?>
+                </div>
             </div>
         </main>
     </div>
@@ -226,7 +271,7 @@ $rooms = $roomModel->getAllRooms(false);
         </div>
     </div>
 
-    <script src="../assets/js/admin.js"></script>
+    <script src="assets/js/admin.js"></script>
     <script>
         function showAddModal() {
             document.getElementById('modalTitle').textContent = 'Tambah Ruangan';

@@ -2,7 +2,7 @@
 <div id="sidebar-overlay" class="fixed inset-0 bg-black bg-opacity-50 z-40 lg:hidden hidden"></div>
 
 <!-- Sidebar -->
-<aside id="admin-sidebar" class="bg-gray-800 text-white w-64 fixed top-16 bottom-0 left-0 z-40 transform -translate-x-full lg:translate-x-0 transition-transform duration-300 ease-in-out overflow-y-auto">
+<aside id="admin-sidebar" class="bg-gray-800 text-white w-64 mt-1 fixed top-16 bottom-0 left-0 z-40 transform -translate-x-full lg:translate-x-0 transition-transform duration-300 ease-in-out overflow-y-auto">
     <div class="p-6">
         <!-- Close button for mobile -->
         <button id="sidebar-close" class="lg:hidden absolute top-4 right-4 text-white hover:text-gray-300">
@@ -14,10 +14,13 @@
                 <i class="fas fa-tachometer-alt mr-2"></i> Dashboard
             </a>
             <a href="attendance.php" class="block px-4 py-2 rounded hover:bg-gray-700 <?php echo basename($_SERVER['PHP_SELF']) == 'attendance.php' ? 'bg-gray-700' : ''; ?>">
-                <i class="fas fa-clipboard-check mr-2"></i> Absensi Mahasiswa
+                <i class="fas fa-clipboard-check mr-2"></i> Log Absensi
+            </a>
+            <a href="students.php" class="block px-4 py-2 rounded hover:bg-gray-700 <?php echo basename($_SERVER['PHP_SELF']) == 'students.php' ? 'bg-gray-700' : ''; ?>">
+                <i class="fas fa-user-graduate mr-2"></i> Kelola Mahasiswa
             </a>
             <a href="borrowing.php" class="block px-4 py-2 rounded hover:bg-gray-700 <?php echo basename($_SERVER['PHP_SELF']) == 'borrowing.php' ? 'bg-gray-700' : ''; ?>">
-                <i class="fas fa-clipboard-list mr-2"></i> Log Peminjaman
+                <i class="fas fa-clipboard-list mr-2"></i> Kelola Peminjaman
             </a>
             <a href="equipment.php" class="block px-4 py-2 rounded hover:bg-gray-700 <?php echo basename($_SERVER['PHP_SELF']) == 'equipment.php' ? 'bg-gray-700' : ''; ?>">
                 <i class="fas fa-tools mr-2"></i> Kelola Alat

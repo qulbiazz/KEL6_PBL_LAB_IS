@@ -47,8 +47,8 @@ class RoomModel
     public function isRoomAvailable($roomId, $borrowDate, $returnDate, $excludeBorrowingId = null)
     {
         $query = "SELECT COUNT(*) as count FROM borrowings 
-                  WHERE item_type = 'room' 
-                  AND item_id = :room_id 
+                  WHERE type = 'room' 
+                  AND room_id = :room_id 
                   AND status = 'active'
                   AND (
                       (borrow_date <= :borrow_date AND return_date >= :borrow_date)
@@ -61,12 +61,12 @@ class RoomModel
         }
 
         $stmt = $this->conn->prepare($query);
-        $stmt->bindParam(':room_id', $roomId);
+        $stmt->bindParam(':room_id', $roomId, PDO::PARAM_INT);
         $stmt->bindParam(':borrow_date', $borrowDate);
         $stmt->bindParam(':return_date', $returnDate);
         
         if ($excludeBorrowingId) {
-            $stmt->bindParam(':exclude_id', $excludeBorrowingId);
+            $stmt->bindParam(':exclude_id', $excludeBorrowingId, PDO::PARAM_INT);
         }
 
         $stmt->execute();
@@ -81,8 +81,9 @@ class RoomModel
         $query = "SELECT r.* FROM $this->table r
                   WHERE r.is_active = true
                   AND r.id NOT IN (
-                      SELECT DISTINCT item_id FROM borrowings
-                      WHERE item_type = 'room'
+                      SELECT DISTINCT room_id FROM borrowings
+                      WHERE type = 'room'
+                      AND room_id IS NOT NULL
                       AND status = 'active'
                       AND (
                           (borrow_date <= :borrow_date AND return_date >= :borrow_date)
@@ -102,8 +103,9 @@ class RoomModel
     // READ - Get occupied rooms for specific time range
     public function getOccupiedRoomIds($borrowDate, $returnDate)
     {
-        $query = "SELECT DISTINCT item_id FROM borrowings
-                  WHERE item_type = 'room'
+        $query = "SELECT DISTINCT room_id FROM borrowings
+                  WHERE type = 'room'
+                  AND room_id IS NOT NULL
                   AND status = 'active'
                   AND (
                       (borrow_date <= :borrow_date AND return_date >= :borrow_date)
@@ -117,7 +119,7 @@ class RoomModel
         $stmt->execute();
         
         $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
-        return array_column($result, 'item_id');
+        return array_column($result, 'room_id');
     }
 
     // READ - Get by ID

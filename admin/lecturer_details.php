@@ -59,7 +59,7 @@ $pageTitle = 'Lecturer Details';
         * {
             box-sizing: border-box;
         }
-        
+
         body {
             overflow-x: hidden;
         }
@@ -73,6 +73,7 @@ $pageTitle = 'Lecturer Details';
             0% {
                 background-color: hsl(200, 20%, 80%);
             }
+
             100% {
                 background-color: hsl(200, 20%, 95%);
             }
@@ -105,15 +106,22 @@ $pageTitle = 'Lecturer Details';
         .tab-scroll::-webkit-scrollbar-thumb:hover {
             background: #a0aec0;
         }
+
+        .no-underline,
+        .no-underline:active,
+        .no-underline:focus {
+            text-decoration: none !important;
+            border-bottom: none !important;
+        }
     </style>
 </head>
 
 <body class="bg-gray-100">
     <?php include 'includes/admin_navbar.php'; ?>
-    
+
     <div class="flex">
         <?php include 'includes/admin_sidebar.php'; ?>
-        
+
         <main class="flex-1 p-4 md:p-8 pt-20 ml-0 lg:ml-64 min-h-screen overflow-x-hidden">
             <div class="max-w-7xl mx-auto w-full">
                 <?php if (isset($_SESSION['success'])): ?>
@@ -152,10 +160,10 @@ $pageTitle = 'Lecturer Details';
                         <form method="GET" action="" class="flex flex-col md:flex-row gap-4 items-stretch md:items-end">
                             <div class="flex-1 w-full min-w-0">
                                 <label class="block font-bold mb-2 text-sm md:text-base">Choose Team</label>
-                                <select name="lecturer_id" 
-                                        id="lecturerSelect"
-                                        class="w-full border border-gray-300 rounded px-3 md:px-4 py-2 md:py-3 text-sm md:text-base focus:outline-none focus:ring-2 focus:ring-blue-500" 
-                                        required>
+                                <select name="lecturer_id"
+                                    id="lecturerSelect"
+                                    class="w-full border border-gray-300 rounded px-3 md:px-4 py-2 md:py-3 text-sm md:text-base focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                    required>
                                     <option value="">-- Select Team Members --</option>
                                     <?php foreach ($teamMembers as $member): ?>
                                         <option value="<?php echo $member['id']; ?>" <?php echo ($selectedLecturerId == $member['id']) ? 'selected' : ''; ?>>
@@ -165,9 +173,9 @@ $pageTitle = 'Lecturer Details';
                                 </select>
                             </div>
                             <div class="w-full md:w-auto flex-shrink-0">
-                                <button type="submit" 
-                                        id="loadProfileBtn"
-                                        class="w-full md:w-auto bg-blue-500 text-white px-4 md:px-6 py-2 md:py-3 rounded text-sm md:text-base hover:bg-blue-600 transition-colors whitespace-nowrap">
+                                <button type="submit"
+                                    id="loadProfileBtn"
+                                    class="w-full md:w-auto bg-blue-500 text-white px-4 md:px-6 py-2 md:py-3 rounded text-sm md:text-base hover:bg-blue-600 transition-colors whitespace-nowrap">
                                     <i class="fas fa-search mr-2"></i> Load Profile
                                 </button>
                             </div>
@@ -180,7 +188,7 @@ $pageTitle = 'Lecturer Details';
                     <!-- Tabs Navigation -->
                     <div class="border-b-2 border-gray-200 mb-6 -mx-4 md:mx-0 overflow-hidden">
                         <div class="overflow-x-auto tab-scroll px-4 md:px-0">
-                            <nav class="flex space-x-1 min-w-max" id="lecturerTabs">
+                            <nav class="flex space-x-1 min-w-max " id="lecturerTabs">
                                 <button class="px-3 md:px-4 py-2 md:py-3 font-medium text-xs md:text-sm text-blue-600 border-b-2 border-blue-600 whitespace-nowrap transition-colors flex-shrink-0" onclick="showTab('basic')">
                                     <i class="fas fa-info-circle mr-1"></i> <span>Info</span>
                                 </button>
@@ -555,7 +563,7 @@ $pageTitle = 'Lecturer Details';
                     </div>
 
                 <?php endif; ?>
-                
+
             </div><!-- End container -->
         </main>
     </div>
@@ -731,7 +739,7 @@ $pageTitle = 'Lecturer Details';
             </form>
         </div>
     </div>
-    
+
     <script src="assets/js/admin.js"></script>
 </body>
 

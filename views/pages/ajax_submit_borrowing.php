@@ -1,7 +1,9 @@
 <?php
 header('Content-Type: application/json');
 error_reporting(E_ALL);
-ini_set('display_errors', 0);
+ini_set('display_errors', 1); // Enable to see errors
+ini_set('log_errors', 1);
+ini_set('error_log', __DIR__ . '/../../error.log'); // Log errors to file
 
 try {
     if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
@@ -92,20 +94,30 @@ try {
     $db = new Database();
     $conn = $db->getConnection();
 
-    // Additional validation for room availability
+    // Save to database using optimized BorrowingModel
+    $borrowingModel = new BorrowingModel($conn);
+    
     if ($type === 'room') {
-        $roomModel = new RoomModel($conn);
-        if (!$roomModel->isRoomAvailable($item_id, $borrow_date, $return_date)) {
+        // Room borrowing
+        $data = [
+            'borrower_name' => $borrower_name,
+            'occupation' => $occupation,
+            'room_id' => $item_id,
+            'borrow_date' => $borrow_date,
+            'return_date' => $return_date,
+            'status' => 'active',
+            'notes' => null
+        ];
+        
+        // Validate room availability using model
+        if (!$borrowingModel->checkRoomAvailability($item_id, $borrow_date, $return_date)) {
             throw new Exception('Ruang tersebut sudah dipinjam pada waktu yang dipilih!');
         }
         
-        // Get room name
-        $room = $roomModel->getRoomById($item_id);
-        $item_name = $room['name'] ?? 'Unknown Room';
-    }
-
-    // Additional validation for equipment availability
-    if ($type === 'equipment') {
+        $result = $borrowingModel->createRoomBorrowing($data);
+        
+    } elseif ($type === 'equipment') {
+        // Equipment borrowing
         $equipmentModel = new EquipmentModel($conn);
         
         // Get list of equipment IDs
@@ -113,51 +125,54 @@ try {
             // Single item
             $item_ids_array = [$item_id];
         } else {
-            // Multiple items
+            // Multiple items from comma-separated string
             $item_ids_array = explode(',', $item_name);
         }
         
-        $equipment_names = [];
-        $equipment_ids = [];
-        
+        // Prepare equipment items array for junction table
+        $equipmentItems = [];
         foreach ($item_ids_array as $eq_id) {
             $eq_id = trim($eq_id);
-            $equipment = $equipmentModel->getEquipmentById($eq_id);
-            if (!$equipment || $equipment['available_quantity'] <= 0) {
-                throw new Exception('Alat "' . ($equipment['name'] ?? 'Unknown') . '" tidak tersedia!');
+            if (empty($eq_id) || !is_numeric($eq_id)) {
+                continue;
             }
-            $equipment_names[] = $equipment['name'];
-            $equipment_ids[] = $eq_id;
             
-            // Decrease available quantity
-            $equipmentModel->decreaseAvailableQuantity($eq_id, 1);
+            // Validate equipment exists and available
+            $equipment = $equipmentModel->getEquipmentById($eq_id);
+            if (!$equipment) {
+                throw new Exception('Alat dengan ID ' . $eq_id . ' tidak ditemukan!');
+            }
+            
+            // Check availability using optimized model method
+            if (!$borrowingModel->checkEquipmentAvailability($eq_id, 1)) {
+                throw new Exception('Alat "' . $equipment['name'] . '" tidak tersedia!');
+            }
+            
+            $equipmentItems[] = [
+                'equipment_id' => intval($eq_id),
+                'quantity' => 1
+            ];
         }
         
-        // Update item_name with actual names for display
-        $item_name = implode(', ', $equipment_names);
-        
-        // If single item, keep item_id, otherwise store IDs in item_name
-        if (count($equipment_ids) > 1) {
-            $item_id = null;
-            // Also store IDs for return process - prepend with "IDS:"
-            $item_name = 'IDS:' . implode(',', $equipment_ids) . '|' . $item_name;
+        if (empty($equipmentItems)) {
+            throw new Exception('Tidak ada alat yang valid untuk dipinjam!');
         }
+        
+        $data = [
+            'borrower_name' => $borrower_name,
+            'occupation' => $occupation,
+            'borrow_date' => $borrow_date,
+            'return_date' => $return_date,
+            'status' => 'active',
+            'notes' => null
+        ];
+        
+        $result = $borrowingModel->createEquipmentBorrowing($data, $equipmentItems);
+    } else {
+        throw new Exception('Tipe peminjaman tidak valid!');
     }
 
-    // Save to database
-    $borrowingModel = new BorrowingModel($conn);
-    $data = [
-        'borrower_name' => $borrower_name,
-        'occupation' => $occupation,
-        'type' => $type,
-        'item_id' => $item_id,
-        'item_name' => $item_name,
-        'borrow_date' => $borrow_date,
-        'return_date' => $return_date,
-        'status' => 'active'
-    ];
-
-    if ($borrowingModel->createBorrowing($data)) {
+    if ($result) {
         echo json_encode([
             'success' => true,
             'message' => 'Peminjaman berhasil diajukan! Silakan hubungi admin untuk konfirmasi.'
@@ -167,13 +182,21 @@ try {
     }
 
 } catch (Exception $e) {
+    http_response_code(400);
     echo json_encode([
         'success' => false,
-        'message' => $e->getMessage()
+        'message' => $e->getMessage(),
+        'file' => $e->getFile(),
+        'line' => $e->getLine(),
+        'trace' => $e->getTraceAsString()
     ]);
 } catch (Error $e) {
+    http_response_code(500);
     echo json_encode([
         'success' => false,
-        'message' => 'Error sistem: ' . $e->getMessage()
+        'message' => 'Error sistem: ' . $e->getMessage(),
+        'file' => $e->getFile(),
+        'line' => $e->getLine(),
+        'trace' => $e->getTraceAsString()
     ]);
 }

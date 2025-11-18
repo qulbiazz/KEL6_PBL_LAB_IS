@@ -310,25 +310,25 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 });
 
-// Track page visits
-function trackPageVisit() {
-    fetch('api/track_visit.php', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-            page: window.location.pathname
-        })
-    });
-}
+// // Track page visits
+// function trackPageVisit() {
+//     fetch('api/track_visit.php', {
+//         method: 'POST',
+//         headers: {
+//             'Content-Type': 'application/json',
+//         },
+//         body: JSON.stringify({
+//             page: window.location.pathname
+//         })
+//     });
+// }
 
-// Call on page load
-if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', trackPageVisit);
-} else {
-    trackPageVisit();
-}
+// // Call on page load
+// if (document.readyState === 'loading') {
+//     document.addEventListener('DOMContentLoaded', trackPageVisit);
+// } else {
+//     trackPageVisit();
+// }
 
 // Add error handler to all images on page load
 document.addEventListener('DOMContentLoaded', function() {
