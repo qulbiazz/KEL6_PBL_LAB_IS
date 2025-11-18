@@ -70,7 +70,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !isset($_POST['ajax'])) {
                         id="student_id"
                         name="student_id"
                         required
-                        class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition">
+                        class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition"
+                        style="width: 100%;">
                         <option value="">-- Pilih Mahasiswa --</option>
                         <?php foreach ($students as $student): ?>
                             <option value="<?= $student['id'] ?>">
@@ -83,7 +84,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !isset($_POST['ajax'])) {
                     </select>
                     <p class="text-sm text-gray-500 mt-2">
                         <i class="fas fa-info-circle mr-1"></i>
-                        Jika nama Anda tidak ada dalam daftar, silakan hubungi admin untuk mendaftarkan data Anda.
+                        Ketik untuk mencari nama atau NIM mahasiswa. Jika tidak ada, hubungi admin.
                     </p>
                 </div>
 
@@ -170,7 +171,81 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !isset($_POST['ajax'])) {
     </div>
 </div>
 
+<!-- Select2 CSS -->
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+<style>
+    /* Custom styling for Select2 to match our design */
+    .select2-container--default .select2-selection--single {
+        height: 50px !important;
+        border: 1px solid #d1d5db !important;
+        border-radius: 0.5rem !important;
+        padding: 0.75rem 1rem !important;
+    }
+    
+    .select2-container--default .select2-selection--single .select2-selection__rendered {
+        line-height: 32px !important;
+        padding-left: 0 !important;
+        color: #374151 !important;
+    }
+    
+    .select2-container--default .select2-selection--single .select2-selection__arrow {
+        height: 48px !important;
+        right: 8px !important;
+    }
+    
+    .select2-container--default.select2-container--focus .select2-selection--single {
+        border-color: #3b82f6 !important;
+        box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1) !important;
+    }
+    
+    .select2-dropdown {
+        border: 1px solid #d1d5db !important;
+        border-radius: 0.5rem !important;
+        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1) !important;
+    }
+    
+    .select2-search--dropdown .select2-search__field {
+        border: 1px solid #d1d5db !important;
+        border-radius: 0.5rem !important;
+        padding: 0.5rem !important;
+    }
+    
+    .select2-results__option--highlighted[aria-selected] {
+        background-color: #3b82f6 !important;
+    }
+    
+    .select2-container--default .select2-results__option[aria-selected=true] {
+        background-color: #dbeafe !important;
+        color: #1e40af !important;
+    }
+</style>
+
+<!-- jQuery (required for Select2) -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<!-- Select2 JS -->
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+
 <script>
+    // Initialize Select2 with search
+    $(document).ready(function() {
+        $('#student_id').select2({
+            placeholder: '-- Pilih Mahasiswa --',
+            allowClear: true,
+            language: {
+                noResults: function() {
+                    return "Mahasiswa tidak ditemukan";
+                },
+                searching: function() {
+                    return "Mencari...";
+                },
+                inputTooShort: function() {
+                    return "Ketik untuk mencari";
+                }
+            },
+            width: '100%'
+        });
+    });
+
     // Update waktu real-time
     function updateTime() {
         const now = new Date();
