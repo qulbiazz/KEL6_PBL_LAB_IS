@@ -74,30 +74,42 @@ $today_stats = $attendanceModel->getAttendanceStats(date('Y-m-d'));
 <body class="bg-gray-100">
     <?php include 'includes/admin_navbar.php'; ?>
     
-    <div class="flex">
+    <div class="flex pt-16">
         <?php include 'includes/admin_sidebar.php'; ?>
         
-        <main class="flex-1 p-4 md:p-8 pt-20 ml-0 lg:ml-64 min-h-screen">
-            <div class="mb-8 mt-12">
+        <main class="flex-1 p-4 md:p-8 ml-0 lg:ml-64 min-h-screen">
+            <div class="mb-8">
                 <h1 class="text-2xl md:text-3xl font-bold text-gray-800">Absensi Mahasiswa</h1>
-                <p class="text-gray-600 mt-1">Kelola dan pantau absensi mahasiswa</p>
+                <p class="text-gray-500 text-sm mt-1">Kelola dan pantau absensi mahasiswa</p>
             </div>
 
             <?php if ($success): ?>
-            <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-4">
-                <i class="fas fa-check-circle mr-2"></i><?php echo htmlspecialchars($success); ?>
+            <div class="mb-6 bg-green-50 border-l-4 border-green-500 text-green-700 p-4 rounded-r shadow-sm flex justify-between items-center">
+                <div class="flex items-center">
+                    <i class="fas fa-check-circle text-xl mr-3"></i>
+                    <span><?php echo htmlspecialchars($success); ?></span>
+                </div>
+                <button onclick="this.parentElement.remove()" class="text-green-700 hover:text-green-900">
+                    <i class="fas fa-times"></i>
+                </button>
             </div>
             <?php endif; ?>
             
             <?php if ($error): ?>
-            <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
-                <i class="fas fa-exclamation-circle mr-2"></i><?php echo htmlspecialchars($error); ?>
+            <div class="mb-6 bg-red-50 border-l-4 border-red-500 text-red-700 p-4 rounded-r shadow-sm flex justify-between items-center">
+                <div class="flex items-center">
+                    <i class="fas fa-exclamation-circle text-xl mr-3"></i>
+                    <span><?php echo htmlspecialchars($error); ?></span>
+                </div>
+                <button onclick="this.parentElement.remove()" class="text-red-700 hover:text-red-900">
+                    <i class="fas fa-times"></i>
+                </button>
             </div>
             <?php endif; ?>
 
             <!-- Statistics Cards -->
             <div class="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6 mb-8">
-                <div class="bg-white rounded-lg shadow-md p-6">
+                <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
                     <div class="flex items-center justify-between">
                         <div>
                             <p class="text-gray-500 text-sm font-semibold uppercase">Absen Datang Hari Ini</p>
@@ -135,7 +147,7 @@ $today_stats = $attendanceModel->getAttendanceStats(date('Y-m-d'));
             </div>
 
             <!-- Filter Section -->
-            <div class="bg-white rounded-lg shadow-md p-6 mb-8">
+            <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 mb-8">
                 <h2 class="text-xl font-bold mb-4 flex items-center">
                     <i class="fas fa-filter mr-2 text-blue-600"></i>Filter Data
                 </h2>
@@ -165,15 +177,15 @@ $today_stats = $attendanceModel->getAttendanceStats(date('Y-m-d'));
             </div>
 
             <!-- Action Buttons -->
-            <div class="flex flex-wrap gap-2 mb-4">
+            <div class="flex flex-wrap gap-2 mb-6">
                 <a href="?export=1<?php echo $filter_date ? '&filter_date=' . $filter_date : ''; ?><?php echo $filter_name ? '&filter_name=' . $filter_name : ''; ?>" 
-                   class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg inline-flex items-center">
-                    <i class="fas fa-file-export mr-2"></i>Export CSV
+                   class="bg-green-600 hover:bg-green-700 text-white font-medium px-4 py-2 rounded-lg inline-flex items-center transition-colors">
+                    <i class="fas fa-file-export mr-2"></i>Export ke CSV
                 </a>
             </div>
 
             <!-- Table -->
-            <div class="bg-white rounded-lg shadow-md overflow-hidden">
+            <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
                 <!-- Desktop Table View -->
                 <div class="hidden md:block overflow-x-auto">
                     <table class="min-w-full divide-y divide-gray-200">

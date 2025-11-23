@@ -78,30 +78,37 @@ $returnedCount = $borrowingModel->countBorrowings('', 'returned');
 <body class="bg-gray-100">
     <?php include 'includes/admin_navbar.php'; ?>
 
-    <div class="flex">
+    <div class="flex pt-16">
         <?php include 'includes/admin_sidebar.php'; ?>
 
-        <main class="flex-1 p-4 md:p-8 pt-20 ml-0 lg:ml-64 min-h-screen">
-            <div class="mb-8 mt-12">
+        <main class="flex-1 p-4 md:p-8 ml-0 lg:ml-64 min-h-screen">
+            <div class="mb-8">
                 <h1 class="text-2xl md:text-3xl font-bold text-gray-800">Kelola Peminjaman Alat dan Ruang</h1>
-                <p class="text-gray-600 mt-1">Semua riwayat peminjaman alat dan ruangan</p>
+                <p class="text-gray-500 text-sm mt-1">Semua riwayat peminjaman alat dan ruangan</p>
             </div>
 
             <!-- Success Message -->
             <?php if (isset($_GET['success'])): ?>
-                <div class="mb-6 p-4 bg-green-100 border border-green-400 text-green-700 rounded-lg">
-                    <i class="fas fa-check-circle mr-2"></i>
-                    <?php if ($_GET['success'] === 'returned'): ?>
-                        Peminjaman berhasil dikembalikan!
-                    <?php elseif ($_GET['success'] === 'deleted'): ?>
-                        Data peminjaman berhasil dihapus!
-                    <?php endif; ?>
+                <div class="mb-6 bg-green-50 border-l-4 border-green-500 text-green-700 p-4 rounded-r shadow-sm flex justify-between items-center">
+                    <div class="flex items-center">
+                        <i class="fas fa-check-circle text-xl mr-3"></i>
+                        <span>
+                            <?php if ($_GET['success'] === 'returned'): ?>
+                                Peminjaman berhasil dikembalikan!
+                            <?php elseif ($_GET['success'] === 'deleted'): ?>
+                                Data peminjaman berhasil dihapus!
+                            <?php endif; ?>
+                        </span>
+                    </div>
+                    <button onclick="this.parentElement.remove()" class="text-green-700 hover:text-green-900">
+                        <i class="fas fa-times"></i>
+                    </button>
                 </div>
             <?php endif; ?>
 
             <!-- Statistics Cards -->
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
-                <div class="bg-white rounded-lg shadow p-6">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
                     <div class="flex items-center">
                         <div class="flex-shrink-0 bg-blue-100 rounded-lg p-3">
                             <i class="fas fa-list text-2xl text-blue-600"></i>
@@ -113,7 +120,7 @@ $returnedCount = $borrowingModel->countBorrowings('', 'returned');
                     </div>
                 </div>
                 
-                <div class="bg-white rounded-lg shadow p-6">
+                <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
                     <div class="flex items-center">
                         <div class="flex-shrink-0 bg-yellow-100 rounded-lg p-3">
                             <i class="fas fa-clock text-2xl text-yellow-600"></i>
@@ -125,7 +132,7 @@ $returnedCount = $borrowingModel->countBorrowings('', 'returned');
                     </div>
                 </div>
                 
-                <div class="bg-white rounded-lg shadow p-6">
+                <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
                     <div class="flex items-center">
                         <div class="flex-shrink-0 bg-green-100 rounded-lg p-3">
                             <i class="fas fa-check-circle text-2xl text-green-600"></i>
@@ -139,7 +146,7 @@ $returnedCount = $borrowingModel->countBorrowings('', 'returned');
             </div>
 
             <!-- Filter Section -->
-            <div class="bg-white rounded-lg shadow p-6 mb-6">
+            <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 mb-8">
                 <h3 class="text-lg font-semibold text-gray-800 mb-4">
                     <i class="fas fa-filter mr-2"></i>Filter Data
                 </h3>
@@ -172,7 +179,7 @@ $returnedCount = $borrowingModel->countBorrowings('', 'returned');
             </div>
 
             <!-- TABLE -->
-            <div class="bg-white rounded-lg shadow-md overflow-hidden">
+            <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
                 <!-- Desktop Table -->
                 <div class="hidden md:block overflow-x-auto">
                     <table class="min-w-full divide-y divide-gray-200">
@@ -248,18 +255,20 @@ $returnedCount = $borrowingModel->countBorrowings('', 'returned');
                                             </span>
                                         </td>
                                         <td class="px-6 py-4 whitespace-nowrap text-sm">
-                                            <?php if (($borrow['status'] ?? 'active') === 'active'): ?>
-                                                <a href="?return=<?php echo $borrow['borrowing_id'] ?? $borrow['id']; ?>&page=<?php echo $page; ?>&type=<?php echo $filterType; ?>&status=<?php echo $filterStatus; ?>" 
-                                                    onclick="return confirm('Tandai peminjaman ini sebagai sudah dikembalikan?')"
-                                                    class="text-green-600 hover:text-green-900 mr-3" title="Kembalikan">
-                                                    <i class="fas fa-undo"></i>
+                                            <div class="flex items-center gap-2">
+                                                <?php if (($borrow['status'] ?? 'active') === 'active'): ?>
+                                                    <a href="?return=<?php echo $borrow['borrowing_id'] ?? $borrow['id']; ?>&page=<?php echo $page; ?>&type=<?php echo $filterType; ?>&status=<?php echo $filterStatus; ?>" 
+                                                        onclick="return confirm('Tandai peminjaman ini sebagai sudah dikembalikan?')"
+                                                        class="bg-green-50 hover:bg-green-100 text-green-700 px-3 py-1.5 rounded-lg text-xs font-medium transition-colors flex items-center">
+                                                        <i class="fas fa-undo mr-1.5"></i> Kembalikan
+                                                    </a>
+                                                <?php endif; ?>
+                                                <a href="?delete=<?php echo $borrow['borrowing_id'] ?? $borrow['id']; ?>&page=<?php echo $page; ?>&type=<?php echo $filterType; ?>&status=<?php echo $filterStatus; ?>" 
+                                                    onclick="return confirm('Hapus peminjaman ini?')"
+                                                    class="bg-red-50 hover:bg-red-100 text-red-700 px-3 py-1.5 rounded-lg text-xs font-medium transition-colors flex items-center">
+                                                    <i class="fas fa-trash mr-1.5"></i> Hapus
                                                 </a>
-                                            <?php endif; ?>
-                                            <a href="?delete=<?php echo $borrow['borrowing_id'] ?? $borrow['id']; ?>&page=<?php echo $page; ?>&type=<?php echo $filterType; ?>&status=<?php echo $filterStatus; ?>" 
-                                                onclick="return confirm('Hapus peminjaman ini?')"
-                                                class="text-red-600 hover:text-red-900" title="Hapus">
-                                                <i class="fas fa-trash"></i>
-                                            </a>
+                                            </div>
                                         </td>
                                     </tr>
                                 <?php endforeach; ?>
@@ -316,7 +325,7 @@ $returnedCount = $borrowingModel->countBorrowings('', 'returned');
                                     </p>
                                 </div>
 
-                                <div class="flex items-center justify-between">
+                                <div class="flex items-center justify-between mb-3">
                                     <?php 
                                     $status = $borrow['status'] ?? 'active';
                                     $statusClass = $status === 'active' ? 'bg-yellow-100 text-yellow-800' : 'bg-green-100 text-green-800';
@@ -325,21 +334,21 @@ $returnedCount = $borrowingModel->countBorrowings('', 'returned');
                                     <span class="px-2 py-1 text-xs font-semibold rounded-full <?php echo $statusClass; ?>">
                                         <?php echo $statusText; ?>
                                     </span>
+                                </div>
                                     
-                                    <div class="flex space-x-3">
-                                        <?php if (($borrow['status'] ?? 'active') === 'active'): ?>
-                                            <a href="?return=<?php echo $borrow['borrowing_id'] ?? $borrow['id']; ?>&page=<?php echo $page; ?>&type=<?php echo $filterType; ?>&status=<?php echo $filterStatus; ?>" 
-                                                onclick="return confirm('Tandai peminjaman ini sebagai sudah dikembalikan?')"
-                                                class="text-green-600 hover:text-green-900">
-                                                <i class="fas fa-undo"></i>
-                                            </a>
-                                        <?php endif; ?>
-                                        <a href="?delete=<?php echo $borrow['borrowing_id'] ?? $borrow['id']; ?>&page=<?php echo $page; ?>&type=<?php echo $filterType; ?>&status=<?php echo $filterStatus; ?>" 
-                                            onclick="return confirm('Hapus peminjaman ini?')"
-                                            class="text-red-600 hover:text-red-900">
-                                            <i class="fas fa-trash"></i>
+                                <div class="flex flex-col gap-2">
+                                    <?php if (($borrow['status'] ?? 'active') === 'active'): ?>
+                                        <a href="?return=<?php echo $borrow['borrowing_id'] ?? $borrow['id']; ?>&page=<?php echo $page; ?>&type=<?php echo $filterType; ?>&status=<?php echo $filterStatus; ?>" 
+                                            onclick="return confirm('Tandai peminjaman ini sebagai sudah dikembalikan?')"
+                                            class="bg-green-50 hover:bg-green-100 text-green-700 px-3 py-2 rounded-lg text-xs font-medium transition-colors flex items-center justify-center">
+                                            <i class="fas fa-undo mr-1.5"></i> Kembalikan
                                         </a>
-                                    </div>
+                                    <?php endif; ?>
+                                    <a href="?delete=<?php echo $borrow['borrowing_id'] ?? $borrow['id']; ?>&page=<?php echo $page; ?>&type=<?php echo $filterType; ?>&status=<?php echo $filterStatus; ?>" 
+                                        onclick="return confirm('Hapus peminjaman ini?')"
+                                        class="bg-red-50 hover:bg-red-100 text-red-700 px-3 py-2 rounded-lg text-xs font-medium transition-colors flex items-center justify-center">
+                                        <i class="fas fa-trash mr-1.5"></i> Hapus
+                                    </a>
                                 </div>
                             </div>
                         <?php endforeach; ?>

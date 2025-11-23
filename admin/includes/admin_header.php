@@ -13,4 +13,4 @@
     <div class="flex pt-16">
         <?php include 'includes/admin_sidebar.php'; ?>
         
-        <main class="flex-1 p-4 md:p-8 w-full lg:w-auto min-h-screen">
+        <main class="flex-1 p-4 md:p-8 w-full lg:w-auto min-h-screen lg:ml-64">

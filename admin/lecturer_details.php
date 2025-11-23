@@ -13,7 +13,7 @@ $conn = $db->getConnection();
 $lecturerModel = new LecturerDetailModel($conn);
 
 // Get all team members for dropdown
-$query = "SELECT id, name, position FROM team_members ORDER BY name";
+$query = "SELECT id, name, position, photo FROM team_members ORDER BY name";
 $stmt = $conn->prepare($query);
 $stmt->execute();
 $teamMembers = $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -43,7 +43,7 @@ if ($selectedLecturerId) {
     }
 }
 
-$pageTitle = 'Lecturer Details';
+$pageTitle = 'Team Details';
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -54,693 +54,676 @@ $pageTitle = 'Lecturer Details';
     <title><?php echo $pageTitle; ?> - InLet Admin</title>
     <link rel="stylesheet" href="../assets/css/tailwind.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        /* Prevent horizontal overflow */
-        * {
-            box-sizing: border-box;
-        }
-
         body {
-            overflow-x: hidden;
+            font-family: 'Inter', sans-serif;
+            background-color: #f3f4f6;
         }
-
-        /* Skeleton loader styles */
-        .skeleton {
-            animation: skeleton-loading 1s linear infinite alternate;
+        
+        .tab-active {
+            border-bottom: 2px solid #3b82f6;
+            color: #2563eb;
+            font-weight: 600;
         }
-
-        @keyframes skeleton-loading {
-            0% {
-                background-color: hsl(200, 20%, 80%);
-            }
-
-            100% {
-                background-color: hsl(200, 20%, 95%);
-            }
+        
+        .tab-inactive {
+            color: #6b7280;
+            border-bottom: 2px solid transparent;
         }
-
-        .skeleton-text {
-            height: 1rem;
-            border-radius: 0.25rem;
-        }
-
-        .skeleton-button {
-            height: 2.5rem;
-            border-radius: 0.375rem;
+        
+        .tab-inactive:hover {
+            color: #374151;
+            border-bottom: 2px solid #d1d5db;
         }
 
         /* Custom scrollbar for tab navigation */
         .tab-scroll::-webkit-scrollbar {
-            height: 4px;
-        }
-
-        .tab-scroll::-webkit-scrollbar-track {
-            background: #f1f1f1;
-        }
-
-        .tab-scroll::-webkit-scrollbar-thumb {
-            background: #cbd5e0;
-            border-radius: 2px;
-        }
-
-        .tab-scroll::-webkit-scrollbar-thumb:hover {
-            background: #a0aec0;
-        }
-
-        .no-underline,
-        .no-underline:active,
-        .no-underline:focus {
-            text-decoration: none !important;
-            border-bottom: none !important;
+            height: 0px;
+            background: transparent;
         }
     </style>
 </head>
 
-<body class="bg-gray-100">
+<body class="bg-gray-100 text-gray-800">
     <?php include 'includes/admin_navbar.php'; ?>
 
-    <div class="flex">
+    <div class="flex pt-16">
         <?php include 'includes/admin_sidebar.php'; ?>
 
-        <main class="flex-1 p-4 md:p-8 pt-20 ml-0 lg:ml-64 min-h-screen overflow-x-hidden">
-            <div class="max-w-7xl mx-auto w-full">
+        <main class="flex-1 p-6 lg:ml-64 min-h-screen">
+            <div class="max-w-7xl mx-auto">
+                
+                <!-- Header Section -->
+                <div class="flex flex-col md:flex-row md:items-center justify-between mb-6 gap-4">
+                    <div>
+                        <h1 class="text-2xl font-bold text-gray-900">Team Details</h1>
+                        <p class="text-gray-500 text-sm mt-1">Manage detailed profiles for team members.</p>
+                    </div>
+                    <div class="flex items-center gap-3">
+                        <a href="team.php" class="bg-white text-gray-700 border border-gray-300 px-4 py-2 rounded-lg text-sm font-medium hover:bg-gray-50 transition-colors shadow-sm">
+                            <i class="fas fa-arrow-left mr-2"></i> Back to Team
+                        </a>
+                    </div>
+                </div>
+
                 <?php if (isset($_SESSION['success'])): ?>
-                    <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative mb-4" role="alert">
-                        <i class="fas fa-check-circle mr-2"></i><?php echo $_SESSION['success'];
-                                                                unset($_SESSION['success']); ?>
-                        <button type="button" class="absolute top-0 bottom-0 right-0 px-4 py-3" onclick="this.parentElement.remove()">
-                            <span class="text-2xl">&times;</span>
-                        </button>
+                    <div class="bg-green-50 border-l-4 border-green-500 text-green-700 p-4 rounded-r shadow-sm mb-6 flex justify-between items-center">
+                        <div class="flex items-center">
+                            <i class="fas fa-check-circle text-xl mr-3"></i>
+                            <span><?php echo $_SESSION['success']; unset($_SESSION['success']); ?></span>
+                        </div>
+                        <button onclick="this.parentElement.remove()" class="text-green-700 hover:text-green-900"><i class="fas fa-times"></i></button>
                     </div>
                 <?php endif; ?>
 
                 <?php if (isset($_SESSION['error'])): ?>
-                    <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4" role="alert">
-                        <i class="fas fa-exclamation-circle mr-2"></i><?php echo $_SESSION['error'];
-                                                                        unset($_SESSION['error']); ?>
-                        <button type="button" class="absolute top-0 bottom-0 right-0 px-4 py-3" onclick="this.parentElement.remove()">
-                            <span class="text-2xl">&times;</span>
-                        </button>
+                    <div class="bg-red-50 border-l-4 border-red-500 text-red-700 p-4 rounded-r shadow-sm mb-6 flex justify-between items-center">
+                        <div class="flex items-center">
+                            <i class="fas fa-exclamation-circle text-xl mr-3"></i>
+                            <span><?php echo $_SESSION['error']; unset($_SESSION['error']); ?></span>
+                        </div>
+                        <button onclick="this.parentElement.remove()" class="text-red-700 hover:text-red-900"><i class="fas fa-times"></i></button>
                     </div>
                 <?php endif; ?>
 
-                <div class="flex flex-col md:flex-row md:justify-between md:items-center mb-6 gap-4">
-                    <div class="w-full md:w-auto">
-                        <h1 class="text-2xl md:text-3xl font-bold text-gray-800 break-words">Manage Team Details</h1>
-                    </div>
-                </div>
-
-                <!-- Select Lecturer -->
-                <div class="bg-white shadow rounded-lg mb-6 overflow-hidden">
-                    <div class="bg-gray-50 px-4 md:px-6 py-4 border-b-2 border-gray-200 font-semibold">
-                        <i class="fas fa-user-tie mr-2"></i>
-                        <span class="break-words">Select Team</span>
-                    </div>
-                    <div class="p-4 md:p-6">
-                        <form method="GET" action="" class="flex flex-col md:flex-row gap-4 items-stretch md:items-end">
-                            <div class="flex-1 w-full min-w-0">
-                                <label class="block font-bold mb-2 text-sm md:text-base">Choose Team</label>
-                                <select name="lecturer_id"
-                                    id="lecturerSelect"
-                                    class="w-full border border-gray-300 rounded px-3 md:px-4 py-2 md:py-3 text-sm md:text-base focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                    required>
-                                    <option value="">-- Select Team Members --</option>
+                <!-- Selection Card -->
+                <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 mb-8">
+                    <form method="GET" action="" class="flex flex-col md:flex-row gap-4 items-end">
+                        <div class="flex-1 w-full">
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Select Team Member</label>
+                            <div class="relative">
+                                <select name="lecturer_id" onchange="this.form.submit()" class="w-full appearance-none bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-3 pr-8">
+                                    <option value="">-- Choose a member to view details --</option>
                                     <?php foreach ($teamMembers as $member): ?>
                                         <option value="<?php echo $member['id']; ?>" <?php echo ($selectedLecturerId == $member['id']) ? 'selected' : ''; ?>>
                                             <?php echo htmlspecialchars($member['name']); ?> - <?php echo htmlspecialchars($member['position']); ?>
                                         </option>
                                     <?php endforeach; ?>
                                 </select>
+                                <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-gray-500">
+                                    <i class="fas fa-chevron-down text-xs"></i>
+                                </div>
                             </div>
-                            <div class="w-full md:w-auto flex-shrink-0">
-                                <button type="submit"
-                                    id="loadProfileBtn"
-                                    class="w-full md:w-auto bg-blue-500 text-white px-4 md:px-6 py-2 md:py-3 rounded text-sm md:text-base hover:bg-blue-600 transition-colors whitespace-nowrap">
-                                    <i class="fas fa-search mr-2"></i> Load Profile
-                                </button>
-                            </div>
-                        </form>
-                    </div>
+                        </div>
+                        <div class="w-full md:w-auto">
+                             <a href="team.php" class="block w-full md:w-auto text-center bg-gray-100 text-gray-700 px-6 py-3 rounded-lg text-sm font-medium hover:bg-gray-200 transition-colors">
+                                Manage Members
+                            </a>
+                        </div>
+                    </form>
                 </div>
 
                 <?php if ($lecturer): ?>
+                    <!-- Profile Header -->
+                    <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden mb-6">
+                        <div class="h-32 bg-gradient-to-r from-blue-600 to-indigo-700"></div>
+                        <div class="px-6 pb-6">
+                            <div class="relative flex items-end -mt-12 mb-4">
+                                <div class="bg-white p-1 rounded-full shadow-lg">
+                                    <?php if (!empty($lecturer['photo'])): ?>
+                                        <img src="../uploads/team/<?php echo htmlspecialchars($lecturer['photo']); ?>" alt="<?php echo htmlspecialchars($lecturer['name']); ?>" class="w-24 h-24 rounded-full object-cover border-4 border-white">
+                                    <?php else: ?>
+                                        <div class="w-24 h-24 rounded-full bg-gray-200 flex items-center justify-center border-4 border-white text-gray-400">
+                                            <i class="fas fa-user text-4xl"></i>
+                                        </div>
+                                    <?php endif; ?>
+                                </div>
+                                <div class="ml-4 mb-1">
+                                    <h2 class="text-2xl font-bold text-gray-900"><?php echo htmlspecialchars($lecturer['name']); ?></h2>
+                                    <p class="text-gray-600"><?php echo htmlspecialchars($lecturer['position']); ?></p>
+                                </div>
+                                <div class="ml-auto mb-2 hidden md:block">
+                                    <a href="../index.php?page=lecturer-detail&id=<?php echo $selectedLecturerId; ?>" target="_blank" class="text-blue-600 hover:text-blue-800 font-medium text-sm">
+                                        <i class="fas fa-external-link-alt mr-1"></i> View Public Profile
+                                    </a>
+                                </div>
+                            </div>
+                            
+                            <!-- Social Links -->
+                            <div class="flex flex-wrap gap-3 mt-4">
+                                <?php if (!empty($lecturer['email'])): ?>
+                                    <a href="mailto:<?php echo htmlspecialchars($lecturer['email']); ?>" class="text-gray-500 hover:text-blue-600 transition-colors"><i class="fas fa-envelope text-lg"></i></a>
+                                <?php endif; ?>
+                                <?php if (!empty($lecturer['linkedin_url'])): ?>
+                                    <a href="<?php echo htmlspecialchars($lecturer['linkedin_url']); ?>" target="_blank" class="text-gray-500 hover:text-blue-700 transition-colors"><i class="fab fa-linkedin text-lg"></i></a>
+                                <?php endif; ?>
+                                <?php if (!empty($lecturer['google_scholar_url'])): ?>
+                                    <a href="<?php echo htmlspecialchars($lecturer['google_scholar_url']); ?>" target="_blank" class="text-gray-500 hover:text-blue-600 transition-colors"><i class="fas fa-graduation-cap text-lg"></i></a>
+                                <?php endif; ?>
+                            </div>
+                        </div>
+                    </div>
 
                     <!-- Tabs Navigation -->
-                    <div class="border-b-2 border-gray-200 mb-6 -mx-4 md:mx-0 overflow-hidden">
-                        <div class="overflow-x-auto tab-scroll px-4 md:px-0">
-                            <nav class="flex space-x-1 min-w-max " id="lecturerTabs">
-                                <button class="px-3 md:px-4 py-2 md:py-3 font-medium text-xs md:text-sm text-blue-600 border-b-2 border-blue-600 whitespace-nowrap transition-colors flex-shrink-0" onclick="showTab('basic')">
-                                    <i class="fas fa-info-circle mr-1"></i> <span>Info</span>
+                    <div class="bg-white rounded-xl shadow-sm border border-gray-200 mb-6 overflow-hidden">
+                        <div class="overflow-x-auto tab-scroll">
+                            <nav class="flex border-b border-gray-200" id="lecturerTabs">
+                                <button class="flex-1 min-w-[100px] py-4 px-6 text-sm font-medium text-center transition-colors tab-active focus:outline-none" onclick="showTab('basic', this)">
+                                    Basic Info
                                 </button>
-                                <button class="px-3 md:px-4 py-2 md:py-3 font-medium text-xs md:text-sm text-gray-600 hover:text-blue-600 whitespace-nowrap transition-colors flex-shrink-0" onclick="showTab('projects')">
-                                    <i class="fas fa-project-diagram mr-1"></i> <span>Projects</span> <span class="bg-gray-200 px-1.5 py-0.5 rounded text-xs ml-1"><?php echo count($projects); ?></span>
+                                <button class="flex-1 min-w-[100px] py-4 px-6 text-sm font-medium text-center transition-colors tab-inactive focus:outline-none" onclick="showTab('projects', this)">
+                                    Projects <span class="ml-1 bg-gray-100 text-gray-600 py-0.5 px-2 rounded-full text-xs"><?php echo count($projects); ?></span>
                                 </button>
-                                <button class="px-3 md:px-4 py-2 md:py-3 font-medium text-xs md:text-sm text-gray-600 hover:text-blue-600 whitespace-nowrap transition-colors flex-shrink-0" onclick="showTab('education')">
-                                    <i class="fas fa-graduation-cap mr-1"></i> <span>Education</span> <span class="bg-gray-200 px-1.5 py-0.5 rounded text-xs ml-1"><?php echo count($education); ?></span>
+                                <button class="flex-1 min-w-[100px] py-4 px-6 text-sm font-medium text-center transition-colors tab-inactive focus:outline-none" onclick="showTab('education', this)">
+                                    Education <span class="ml-1 bg-gray-100 text-gray-600 py-0.5 px-2 rounded-full text-xs"><?php echo count($education); ?></span>
                                 </button>
-                                <button class="px-3 md:px-4 py-2 md:py-3 font-medium text-xs md:text-sm text-gray-600 hover:text-blue-600 whitespace-nowrap transition-colors flex-shrink-0" onclick="showTab('skills')">
-                                    <i class="fas fa-code mr-1"></i> <span>Skills</span> <span class="bg-gray-200 px-1.5 py-0.5 rounded text-xs ml-1"><?php echo count($skills); ?></span>
+                                <button class="flex-1 min-w-[100px] py-4 px-6 text-sm font-medium text-center transition-colors tab-inactive focus:outline-none" onclick="showTab('skills', this)">
+                                    Skills <span class="ml-1 bg-gray-100 text-gray-600 py-0.5 px-2 rounded-full text-xs"><?php echo count($skills); ?></span>
                                 </button>
-                                <button class="px-3 md:px-4 py-2 md:py-3 font-medium text-xs md:text-sm text-gray-600 hover:text-blue-600 whitespace-nowrap transition-colors flex-shrink-0" onclick="showTab('interests')">
-                                    <i class="fas fa-heart mr-1"></i> <span>Interests</span> <span class="bg-gray-200 px-1.5 py-0.5 rounded text-xs ml-1"><?php echo count($interests); ?></span>
+                                <button class="flex-1 min-w-[100px] py-4 px-6 text-sm font-medium text-center transition-colors tab-inactive focus:outline-none" onclick="showTab('interests', this)">
+                                    Interests <span class="ml-1 bg-gray-100 text-gray-600 py-0.5 px-2 rounded-full text-xs"><?php echo count($interests); ?></span>
                                 </button>
-                                <button class="px-3 md:px-4 py-2 md:py-3 font-medium text-xs md:text-sm text-gray-600 hover:text-blue-600 whitespace-nowrap transition-colors flex-shrink-0" onclick="showTab('publications')">
-                                    <i class="fas fa-file-alt mr-1"></i> <span>Publications</span> <span class="bg-gray-200 px-1.5 py-0.5 rounded text-xs ml-1"><?php echo count($publications); ?></span>
+                                <button class="flex-1 min-w-[100px] py-4 px-6 text-sm font-medium text-center transition-colors tab-inactive focus:outline-none" onclick="showTab('publications', this)">
+                                    Publications <span class="ml-1 bg-gray-100 text-gray-600 py-0.5 px-2 rounded-full text-xs"><?php echo count($publications); ?></span>
                                 </button>
                             </nav>
                         </div>
                     </div>
 
-                    <!-- Tabs Content -->
+                    <!-- Tab Contents -->
                     <div id="lecturerTabsContent">
-
-                        <!-- Basic Info Tab -->
-                        <div id="basic" class="tab-content">
-                            <div class="bg-white shadow rounded-lg mb-6 overflow-hidden">
-                                <div class="bg-gray-50 px-4 md:px-6 py-4 border-b-2 border-gray-200 font-semibold text-sm md:text-base">
-                                    <i class="fas fa-edit mr-2"></i>
-                                    <span class="break-words">Update Basic Information</span>
+                        
+                        <!-- Basic Info -->
+                        <div id="basic" class="tab-content block">
+                            <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+                                <div class="flex justify-between items-center mb-6">
+                                    <h3 class="text-lg font-bold text-gray-900">Basic Information</h3>
                                 </div>
-                                <div class="p-4 md:p-6">
-                                    <!-- Info Alert -->
-                                    <div class="bg-blue-100 border-l-4 border-blue-500 text-blue-700 p-3 md:p-4 mb-4 md:mb-6 flex text-sm md:text-base" role="alert">
-                                        <i class="fas fa-info-circle mr-2 md:mr-3 mt-1 flex-shrink-0"></i>
-                                        <div class="break-words min-w-0">
-                                            <strong>Note:</strong> To edit <strong>Name</strong>, <strong>Position</strong>, and <strong>Profile Photo</strong>, please go to
-                                            <a href="team.php" class="font-bold underline">Team Members</a> page.
+                                
+                                <form action="actions/update_lecturer_basic.php" method="POST">
+                                    <input type="hidden" name="lecturer_id" value="<?php echo $selectedLecturerId; ?>">
+                                    
+                                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                                        <div>
+                                            <label class="block text-sm font-medium text-gray-700 mb-2">Address</label>
+                                            <input type="text" name="address" value="<?php echo htmlspecialchars($lecturer['address'] ?? ''); ?>" class="w-full bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5">
+                                        </div>
+                                        <div>
+                                            <label class="block text-sm font-medium text-gray-700 mb-2">Phone</label>
+                                            <input type="text" name="phone" value="<?php echo htmlspecialchars($lecturer['phone'] ?? ''); ?>" class="w-full bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5">
+                                        </div>
+                                        <div class="md:col-span-2">
+                                            <label class="block text-sm font-medium text-gray-700 mb-2">Email</label>
+                                            <input type="email" name="email" value="<?php echo htmlspecialchars($lecturer['email'] ?? ''); ?>" class="w-full bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5">
+                                        </div>
+                                        <div class="md:col-span-2">
+                                            <label class="block text-sm font-medium text-gray-700 mb-2">Biography</label>
+                                            <textarea name="bio" rows="4" class="w-full bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5"><?php echo htmlspecialchars($lecturer['bio'] ?? ''); ?></textarea>
                                         </div>
                                     </div>
 
-                                    <form action="actions/update_lecturer_basic.php" method="POST">
-                                        <input type="hidden" name="lecturer_id" value="<?php echo $selectedLecturerId; ?>">
+                                    <h4 class="text-sm font-bold text-gray-900 uppercase tracking-wider mb-4 border-b pb-2">Social Profiles</h4>
+                                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                                        <div>
+                                            <label class="block text-sm font-medium text-gray-700 mb-2">LinkedIn URL</label>
+                                            <input type="url" name="linkedin_url" value="<?php echo htmlspecialchars($lecturer['linkedin_url'] ?? ''); ?>" class="w-full bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5">
+                                        </div>
+                                        <div>
+                                            <label class="block text-sm font-medium text-gray-700 mb-2">Google Scholar URL</label>
+                                            <input type="url" name="google_scholar_url" value="<?php echo htmlspecialchars($lecturer['google_scholar_url'] ?? ''); ?>" class="w-full bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5">
+                                        </div>
+                                        <div>
+                                            <label class="block text-sm font-medium text-gray-700 mb-2">ResearchGate URL</label>
+                                            <input type="url" name="researchgate_url" value="<?php echo htmlspecialchars($lecturer['researchgate_url'] ?? ''); ?>" class="w-full bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5">
+                                        </div>
+                                        <div>
+                                            <label class="block text-sm font-medium text-gray-700 mb-2">ORCID URL</label>
+                                            <input type="url" name="orcid_url" value="<?php echo htmlspecialchars($lecturer['orcid_url'] ?? ''); ?>" class="w-full bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5">
+                                        </div>
+                                    </div>
 
-                                        <!-- Display Current Name & Position (Read-only) -->
-                                        <div class="mb-4 md:mb-6">
-                                            <div class="bg-gray-50 rounded-lg p-3 md:p-4">
-                                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 md:gap-4">
-                                                    <div class="min-w-0">
-                                                        <label class="block font-bold text-gray-600 text-xs md:text-sm mb-1">Current Name</label>
-                                                        <p class="text-base md:text-lg break-words"><?php echo htmlspecialchars($lecturer['name']); ?></p>
-                                                    </div>
-                                                    <div class="min-w-0">
-                                                        <label class="block font-bold text-gray-600 text-xs md:text-sm mb-1">Current Position</label>
-                                                        <p class="text-base md:text-lg break-words"><?php echo htmlspecialchars($lecturer['position']); ?></p>
-                                                    </div>
+                                    <div class="flex justify-end">
+                                        <button type="submit" class="text-white bg-blue-600 hover:bg-blue-700 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center">
+                                            Save Changes
+                                        </button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+
+                        <!-- Projects -->
+                        <div id="projects" class="tab-content hidden">
+                            <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+                                <div class="flex justify-between items-center mb-6">
+                                    <h3 class="text-lg font-bold text-gray-900">Projects</h3>
+                                    <button onclick="openModal('addProjectModal')" class="text-white bg-green-600 hover:bg-green-700 focus:ring-4 focus:ring-green-300 font-medium rounded-lg text-sm px-4 py-2">
+                                        <i class="fas fa-plus mr-2"></i> Add Project
+                                    </button>
+                                </div>
+                                
+                                <?php if (empty($projects)): ?>
+                                    <div class="text-center py-8 text-gray-500">
+                                        <i class="fas fa-folder-open text-4xl mb-3 text-gray-300"></i>
+                                        <p>No projects added yet.</p>
+                                    </div>
+                                <?php else: ?>
+                                    <div class="overflow-x-auto">
+                                        <table class="w-full text-sm text-left text-gray-500">
+                                            <thead class="text-xs text-gray-700 uppercase bg-gray-50">
+                                                <tr>
+                                                    <th scope="col" class="px-6 py-3">Title</th>
+                                                    <th scope="col" class="px-6 py-3">Category</th>
+                                                    <th scope="col" class="px-6 py-3">Period</th>
+                                                    <th scope="col" class="px-6 py-3 text-right">Actions</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <?php foreach ($projects as $project): ?>
+                                                    <tr class="bg-white border-b hover:bg-gray-50">
+                                                        <td class="px-6 py-4 font-medium text-gray-900"><?php echo htmlspecialchars($project['title']); ?></td>
+                                                        <td class="px-6 py-4"><?php echo htmlspecialchars($project['category']); ?></td>
+                                                        <td class="px-6 py-4">
+                                                            <?php echo date('M Y', strtotime($project['start_date'])); ?> - 
+                                                            <?php echo $project['end_date'] ? date('M Y', strtotime($project['end_date'])) : 'Present'; ?>
+                                                        </td>
+                                                        <td class="px-6 py-4 text-right">
+                                                            <a href="actions/delete_lecturer_item.php?type=project&id=<?php echo $project['id']; ?>&lecturer_id=<?php echo $selectedLecturerId; ?>" 
+                                                               onclick="return confirm('Delete this project?')" 
+                                                               class="font-medium text-red-600 hover:underline">Delete</a>
+                                                        </td>
+                                                    </tr>
+                                                <?php endforeach; ?>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                <?php endif; ?>
+                            </div>
+                        </div>
+
+                        <!-- Education -->
+                        <div id="education" class="tab-content hidden">
+                            <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+                                <div class="flex justify-between items-center mb-6">
+                                    <h3 class="text-lg font-bold text-gray-900">Education</h3>
+                                    <button onclick="openModal('addEducationModal')" class="text-white bg-green-600 hover:bg-green-700 focus:ring-4 focus:ring-green-300 font-medium rounded-lg text-sm px-4 py-2">
+                                        <i class="fas fa-plus mr-2"></i> Add Education
+                                    </button>
+                                </div>
+
+                                <?php if (empty($education)): ?>
+                                    <div class="text-center py-8 text-gray-500">
+                                        <i class="fas fa-graduation-cap text-4xl mb-3 text-gray-300"></i>
+                                        <p>No education history added yet.</p>
+                                    </div>
+                                <?php else: ?>
+                                    <div class="space-y-4">
+                                        <?php foreach ($education as $edu): ?>
+                                            <div class="flex flex-col sm:flex-row sm:items-center justify-between p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors">
+                                                <div>
+                                                    <h4 class="text-base font-semibold text-gray-900"><?php echo htmlspecialchars($edu['institution']); ?></h4>
+                                                    <p class="text-sm text-gray-600"><?php echo htmlspecialchars($edu['degree']); ?> in <?php echo htmlspecialchars($edu['field_of_study']); ?></p>
+                                                    <p class="text-xs text-gray-500 mt-1">
+                                                        <?php echo date('M Y', strtotime($edu['start_date'])); ?> - 
+                                                        <?php echo date('M Y', strtotime($edu['end_date'])); ?>
+                                                    </p>
+                                                </div>
+                                                <div class="mt-3 sm:mt-0">
+                                                    <a href="actions/delete_lecturer_item.php?type=education&id=<?php echo $edu['id']; ?>&lecturer_id=<?php echo $selectedLecturerId; ?>" 
+                                                       onclick="return confirm('Delete this record?')" 
+                                                       class="text-red-600 hover:text-red-800 text-sm font-medium">
+                                                        <i class="fas fa-trash mr-1"></i> Delete
+                                                    </a>
                                                 </div>
                                             </div>
-                                        </div>
-
-                                        <div class="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4 mb-3 md:mb-4">
-                                            <div class="min-w-0">
-                                                <label class="block mb-2 text-sm md:text-base">Address</label>
-                                                <input type="text" name="address" class="w-full border border-gray-300 rounded px-3 md:px-4 py-2 text-sm md:text-base focus:outline-none focus:ring-2 focus:ring-blue-500" value="<?php echo htmlspecialchars($lecturer['address'] ?? ''); ?>">
-                                            </div>
-                                            <div class="min-w-0">
-                                                <label class="block mb-2 text-sm md:text-base">Phone</label>
-                                                <input type="text" name="phone" class="w-full border border-gray-300 rounded px-3 md:px-4 py-2 text-sm md:text-base focus:outline-none focus:ring-2 focus:ring-blue-500" value="<?php echo htmlspecialchars($lecturer['phone'] ?? ''); ?>">
-                                            </div>
-                                        </div>
-
-                                        <div class="mb-3 md:mb-4 min-w-0">
-                                            <label class="block mb-2 text-sm md:text-base">Email</label>
-                                            <input type="email" name="email" class="w-full border border-gray-300 rounded px-3 md:px-4 py-2 text-sm md:text-base focus:outline-none focus:ring-2 focus:ring-blue-500" value="<?php echo htmlspecialchars($lecturer['email'] ?? ''); ?>">
-                                        </div>
-
-                                        <div class="mb-3 md:mb-4 min-w-0">
-                                            <label class="block mb-2 text-sm md:text-base">Biography</label>
-                                            <textarea name="bio" class="w-full border border-gray-300 rounded px-3 md:px-4 py-2 text-sm md:text-base focus:outline-none focus:ring-2 focus:ring-blue-500" rows="4"><?php echo htmlspecialchars($lecturer['bio'] ?? ''); ?></textarea>
-                                        </div>
-
-                                        <div class="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4 mb-3 md:mb-4">
-                                            <div class="min-w-0">
-                                                <label class="block mb-2 text-sm md:text-base">LinkedIn URL</label>
-                                                <input type="url" name="linkedin_url" class="w-full border border-gray-300 rounded px-3 md:px-4 py-2 text-sm md:text-base focus:outline-none focus:ring-2 focus:ring-blue-500" value="<?php echo htmlspecialchars($lecturer['linkedin_url'] ?? ''); ?>">
-                                            </div>
-                                            <div class="min-w-0">
-                                                <label class="block mb-2 text-sm md:text-base">Google Scholar URL</label>
-                                                <input type="url" name="google_scholar_url" class="w-full border border-gray-300 rounded px-3 md:px-4 py-2 text-sm md:text-base focus:outline-none focus:ring-2 focus:ring-blue-500" value="<?php echo htmlspecialchars($lecturer['google_scholar_url'] ?? ''); ?>">
-                                            </div>
-                                        </div>
-
-                                        <div class="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4 mb-4 md:mb-6">
-                                            <div class="min-w-0">
-                                                <label class="block mb-2 text-sm md:text-base">ResearchGate URL</label>
-                                                <input type="url" name="researchgate_url" class="w-full border border-gray-300 rounded px-3 md:px-4 py-2 text-sm md:text-base focus:outline-none focus:ring-2 focus:ring-blue-500" value="<?php echo htmlspecialchars($lecturer['researchgate_url'] ?? ''); ?>">
-                                            </div>
-                                            <div class="min-w-0">
-                                                <label class="block mb-2 text-sm md:text-base">ORCID URL</label>
-                                                <input type="url" name="orcid_url" class="w-full border border-gray-300 rounded px-3 md:px-4 py-2 text-sm md:text-base focus:outline-none focus:ring-2 focus:ring-blue-500" value="<?php echo htmlspecialchars($lecturer['orcid_url'] ?? ''); ?>">
-                                            </div>
-                                        </div>
-
-                                        <button type="submit" class="w-full md:w-auto bg-blue-500 text-white px-4 md:px-6 py-2 rounded text-sm md:text-base hover:bg-blue-600 transition-colors">
-                                            <i class="fas fa-save mr-1"></i> Save Changes
-                                        </button>
-                                    </form>
-                                </div>
+                                        <?php endforeach; ?>
+                                    </div>
+                                <?php endif; ?>
                             </div>
                         </div>
 
-                        <!-- Projects Tab -->
-                        <div id="projects" class="tab-content hidden">
-                            <div class="bg-white shadow rounded-lg mb-6 overflow-hidden">
-                                <div class="bg-gray-50 px-4 md:px-6 py-4 border-b-2 border-gray-200 font-semibold flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 text-sm md:text-base">
-                                    <span class="break-words"><i class="fas fa-list mr-1"></i> Work in Progress / Projects</span>
-                                    <button class="w-full sm:w-auto bg-green-500 text-white px-3 md:px-4 py-2 rounded text-xs md:text-sm hover:bg-green-600 transition-colors whitespace-nowrap flex-shrink-0" onclick="openModal('addProjectModal')">
-                                        <i class="fas fa-plus mr-1"></i> Add Project
-                                    </button>
-                                </div>
-                                <div class="p-4 md:p-6 overflow-x-auto">
-                                    <table class="min-w-full border border-gray-300">
-                                        <thead class="bg-gray-100">
-                                            <tr>
-                                                <th class="border border-gray-300 px-2 md:px-4 py-2 text-left text-xs md:text-sm">Title</th>
-                                                <th class="border border-gray-300 px-2 md:px-4 py-2 text-left text-xs md:text-sm">Category</th>
-                                                <th class="border border-gray-300 px-2 md:px-4 py-2 text-left text-xs md:text-sm">Period</th>
-                                                <th class="border border-gray-300 px-2 md:px-4 py-2 text-left text-xs md:text-sm">Actions</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            <?php if (empty($projects)): ?>
-                                                <tr>
-                                                    <td colspan="4" class="border border-gray-300 px-2 md:px-4 py-3 text-center text-xs md:text-sm">No projects added yet</td>
-                                                </tr>
-                                            <?php else: ?>
-                                                <?php foreach ($projects as $project): ?>
-                                                    <tr>
-                                                        <td class="border border-gray-300 px-2 md:px-4 py-2 text-xs md:text-sm break-words max-w-xs"><?php echo htmlspecialchars($project['title']); ?></td>
-                                                        <td class="border border-gray-300 px-2 md:px-4 py-2 text-xs md:text-sm break-words"><?php echo htmlspecialchars($project['category']); ?></td>
-                                                        <td class="border border-gray-300 px-2 md:px-4 py-2 text-xs md:text-sm whitespace-nowrap">
-                                                            <?php
-                                                            echo date('M Y', strtotime($project['start_date']));
-                                                            echo ' - ';
-                                                            echo $project['end_date'] ? date('M Y', strtotime($project['end_date'])) : 'Present';
-                                                            ?>
-                                                        </td>
-                                                        <td class="border border-gray-300 px-2 md:px-4 py-2">
-                                                            <a href="actions/delete_lecturer_item.php?type=project&id=<?php echo $project['id']; ?>&lecturer_id=<?php echo $selectedLecturerId; ?>"
-                                                                class="inline-block bg-red-500 text-white px-2 md:px-3 py-1 rounded text-xs md:text-sm hover:bg-red-600 transition-colors"
-                                                                onclick="return confirm('Delete this project?')">
-                                                                <i class="fas fa-trash"></i>
-                                                            </a>
-                                                        </td>
-                                                    </tr>
-                                                <?php endforeach; ?>
-                                            <?php endif; ?>
-                                        </tbody>
-                                    </table>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Education Tab -->
-                        <div id="education" class="tab-content hidden">
-                            <div class="bg-white shadow rounded-lg mb-6 overflow-hidden">
-                                <div class="bg-gray-50 px-4 md:px-6 py-4 border-b-2 border-gray-200 font-semibold flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 text-sm md:text-base">
-                                    <span class="break-words"><i class="fas fa-list mr-1"></i> Education History</span>
-                                    <button class="w-full sm:w-auto bg-green-500 text-white px-3 md:px-4 py-2 rounded text-xs md:text-sm hover:bg-green-600 transition-colors whitespace-nowrap flex-shrink-0" onclick="openModal('addEducationModal')">
-                                        <i class="fas fa-plus mr-1"></i> Add Education
-                                    </button>
-                                </div>
-                                <div class="p-4 md:p-6 overflow-x-auto">
-                                    <table class="min-w-full border border-gray-300">
-                                        <thead class="bg-gray-100">
-                                            <tr>
-                                                <th class="border border-gray-300 px-2 md:px-4 py-2 text-left text-xs md:text-sm">Institution</th>
-                                                <th class="border border-gray-300 px-2 md:px-4 py-2 text-left text-xs md:text-sm">Degree</th>
-                                                <th class="border border-gray-300 px-2 md:px-4 py-2 text-left text-xs md:text-sm">Field</th>
-                                                <th class="border border-gray-300 px-2 md:px-4 py-2 text-left text-xs md:text-sm">Period</th>
-                                                <th class="border border-gray-300 px-2 md:px-4 py-2 text-left text-xs md:text-sm">Actions</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            <?php if (empty($education)): ?>
-                                                <tr>
-                                                    <td colspan="5" class="border border-gray-300 px-2 md:px-4 py-3 text-center text-xs md:text-sm">No education records added yet</td>
-                                                </tr>
-                                            <?php else: ?>
-                                                <?php foreach ($education as $edu): ?>
-                                                    <tr>
-                                                        <td class="border border-gray-300 px-2 md:px-4 py-2 text-xs md:text-sm break-words max-w-xs"><?php echo htmlspecialchars($edu['institution']); ?></td>
-                                                        <td class="border border-gray-300 px-2 md:px-4 py-2 text-xs md:text-sm break-words"><?php echo htmlspecialchars($edu['degree']); ?></td>
-                                                        <td class="border border-gray-300 px-2 md:px-4 py-2 text-xs md:text-sm break-words"><?php echo htmlspecialchars($edu['field_of_study']); ?></td>
-                                                        <td class="border border-gray-300 px-2 md:px-4 py-2 text-xs md:text-sm whitespace-nowrap">
-                                                            <?php
-                                                            echo date('M Y', strtotime($edu['start_date']));
-                                                            echo ' - ';
-                                                            echo date('M Y', strtotime($edu['end_date']));
-                                                            ?>
-                                                        </td>
-                                                        <td class="border border-gray-300 px-2 md:px-4 py-2">
-                                                            <a href="actions/delete_lecturer_item.php?type=education&id=<?php echo $edu['id']; ?>&lecturer_id=<?php echo $selectedLecturerId; ?>"
-                                                                class="inline-block bg-red-500 text-white px-2 md:px-3 py-1 rounded text-xs md:text-sm hover:bg-red-600 transition-colors"
-                                                                onclick="return confirm('Delete this education record?')">
-                                                                <i class="fas fa-trash"></i>
-                                                            </a>
-                                                        </td>
-                                                    </tr>
-                                                <?php endforeach; ?>
-                                            <?php endif; ?>
-                                        </tbody>
-                                    </table>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Skills Tab -->
+                        <!-- Skills -->
                         <div id="skills" class="tab-content hidden">
-                            <div class="bg-white shadow rounded-lg mb-6 overflow-hidden">
-                                <div class="bg-gray-50 px-4 md:px-6 py-4 border-b-2 border-gray-200 font-semibold flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 text-sm md:text-base">
-                                    <span class="break-words"><i class="fas fa-list mr-1"></i> Skills</span>
-                                    <button class="w-full sm:w-auto bg-green-500 text-white px-3 md:px-4 py-2 rounded text-xs md:text-sm hover:bg-green-600 transition-colors whitespace-nowrap flex-shrink-0" onclick="openModal('addSkillModal')">
-                                        <i class="fas fa-plus mr-1"></i> Add Skill
+                            <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+                                <div class="flex justify-between items-center mb-6">
+                                    <h3 class="text-lg font-bold text-gray-900">Skills</h3>
+                                    <button onclick="openModal('addSkillModal')" class="text-white bg-green-600 hover:bg-green-700 focus:ring-4 focus:ring-green-300 font-medium rounded-lg text-sm px-4 py-2">
+                                        <i class="fas fa-plus mr-2"></i> Add Skill
                                     </button>
                                 </div>
-                                <div class="p-4 md:p-6 overflow-x-auto">
-                                    <table class="min-w-full border border-gray-300">
-                                        <thead class="bg-gray-100">
-                                            <tr>
-                                                <th class="border border-gray-300 px-2 md:px-4 py-2 text-left text-xs md:text-sm">Skill Name</th>
-                                                <th class="border border-gray-300 px-2 md:px-4 py-2 text-left text-xs md:text-sm">Category</th>
-                                                <th class="border border-gray-300 px-2 md:px-4 py-2 text-left text-xs md:text-sm">Icon</th>
-                                                <th class="border border-gray-300 px-2 md:px-4 py-2 text-left text-xs md:text-sm">Actions</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            <?php if (empty($skills)): ?>
-                                                <tr>
-                                                    <td colspan="4" class="border border-gray-300 px-2 md:px-4 py-3 text-center text-xs md:text-sm">No skills added yet</td>
-                                                </tr>
-                                            <?php else: ?>
-                                                <?php foreach ($skills as $skill): ?>
-                                                    <tr>
-                                                        <td class="border border-gray-300 px-2 md:px-4 py-2 text-xs md:text-sm break-words max-w-xs"><?php echo htmlspecialchars($skill['skill_name']); ?></td>
-                                                        <td class="border border-gray-300 px-2 md:px-4 py-2 text-xs md:text-sm break-words"><?php echo htmlspecialchars($skill['category']); ?></td>
-                                                        <td class="border border-gray-300 px-2 md:px-4 py-2 text-xs md:text-sm">
-                                                            <?php if (!empty($skill['skill_icon'])): ?>
-                                                                <i class="<?php echo htmlspecialchars($skill['skill_icon']); ?>"></i>
-                                                            <?php endif; ?>
-                                                        </td>
-                                                        <td class="border border-gray-300 px-2 md:px-4 py-2">
-                                                            <a href="actions/delete_lecturer_item.php?type=skill&id=<?php echo $skill['id']; ?>&lecturer_id=<?php echo $selectedLecturerId; ?>"
-                                                                class="inline-block bg-red-500 text-white px-2 md:px-3 py-1 rounded text-xs md:text-sm hover:bg-red-600 transition-colors"
-                                                                onclick="return confirm('Delete this skill?')">
-                                                                <i class="fas fa-trash"></i>
-                                                            </a>
-                                                        </td>
-                                                    </tr>
-                                                <?php endforeach; ?>
-                                            <?php endif; ?>
-                                        </tbody>
-                                    </table>
-                                </div>
+
+                                <?php if (empty($skills)): ?>
+                                    <div class="text-center py-8 text-gray-500">
+                                        <i class="fas fa-code text-4xl mb-3 text-gray-300"></i>
+                                        <p>No skills added yet.</p>
+                                    </div>
+                                <?php else: ?>
+                                    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+                                        <?php foreach ($skills as $skill): ?>
+                                            <div class="flex items-center justify-between p-3 border border-gray-200 rounded-lg hover:shadow-sm transition-shadow">
+                                                <div class="flex items-center">
+                                                    <?php if (!empty($skill['skill_icon'])): ?>
+                                                        <i class="<?php echo htmlspecialchars($skill['skill_icon']); ?> text-blue-500 text-xl mr-3 w-6 text-center"></i>
+                                                    <?php else: ?>
+                                                        <i class="fas fa-check-circle text-blue-500 text-xl mr-3 w-6 text-center"></i>
+                                                    <?php endif; ?>
+                                                    <div>
+                                                        <p class="font-medium text-gray-900"><?php echo htmlspecialchars($skill['skill_name']); ?></p>
+                                                        <p class="text-xs text-gray-500"><?php echo htmlspecialchars($skill['category']); ?></p>
+                                                    </div>
+                                                </div>
+                                                <a href="actions/delete_lecturer_item.php?type=skill&id=<?php echo $skill['id']; ?>&lecturer_id=<?php echo $selectedLecturerId; ?>" 
+                                                   onclick="return confirm('Delete this skill?')" 
+                                                   class="text-gray-400 hover:text-red-500">
+                                                    <i class="fas fa-times"></i>
+                                                </a>
+                                            </div>
+                                        <?php endforeach; ?>
+                                    </div>
+                                <?php endif; ?>
                             </div>
                         </div>
 
-                        <!-- Interests Tab -->
+                        <!-- Interests -->
                         <div id="interests" class="tab-content hidden">
-                            <div class="bg-white shadow rounded-lg mb-6 overflow-hidden">
-                                <div class="bg-gray-50 px-4 md:px-6 py-4 border-b-2 border-gray-200 font-semibold flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 text-sm md:text-base">
-                                    <span class="break-words"><i class="fas fa-list mr-1"></i> Research Interests</span>
-                                    <button class="w-full sm:w-auto bg-green-500 text-white px-3 md:px-4 py-2 rounded text-xs md:text-sm hover:bg-green-600 transition-colors whitespace-nowrap flex-shrink-0" onclick="openModal('addInterestModal')">
-                                        <i class="fas fa-plus mr-1"></i> Add Interest
+                            <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+                                <div class="flex justify-between items-center mb-6">
+                                    <h3 class="text-lg font-bold text-gray-900">Research Interests</h3>
+                                    <button onclick="openModal('addInterestModal')" class="text-white bg-green-600 hover:bg-green-700 focus:ring-4 focus:ring-green-300 font-medium rounded-lg text-sm px-4 py-2">
+                                        <i class="fas fa-plus mr-2"></i> Add Interest
                                     </button>
                                 </div>
-                                <div class="p-4 md:p-6 overflow-x-auto">
-                                    <table class="min-w-full border border-gray-300">
-                                        <thead class="bg-gray-100">
-                                            <tr>
-                                                <th class="border border-gray-300 px-2 md:px-4 py-2 text-left text-xs md:text-sm">Interest</th>
-                                                <th class="border border-gray-300 px-2 md:px-4 py-2 text-left text-xs md:text-sm">Actions</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            <?php if (empty($interests)): ?>
-                                                <tr>
-                                                    <td colspan="2" class="border border-gray-300 px-2 md:px-4 py-3 text-center text-xs md:text-sm">No interests added yet</td>
-                                                </tr>
-                                            <?php else: ?>
-                                                <?php foreach ($interests as $interest): ?>
-                                                    <tr>
-                                                        <td class="border border-gray-300 px-2 md:px-4 py-2 text-xs md:text-sm break-words"><?php echo nl2br(htmlspecialchars($interest['interest_text'])); ?></td>
-                                                        <td class="border border-gray-300 px-2 md:px-4 py-2">
-                                                            <a href="actions/delete_lecturer_item.php?type=interest&id=<?php echo $interest['id']; ?>&lecturer_id=<?php echo $selectedLecturerId; ?>"
-                                                                class="inline-block bg-red-500 text-white px-2 md:px-3 py-1 rounded text-xs md:text-sm hover:bg-red-600 transition-colors"
-                                                                onclick="return confirm('Delete this interest?')">
-                                                                <i class="fas fa-trash"></i>
-                                                            </a>
-                                                        </td>
-                                                    </tr>
-                                                <?php endforeach; ?>
-                                            <?php endif; ?>
-                                        </tbody>
-                                    </table>
-                                </div>
+
+                                <?php if (empty($interests)): ?>
+                                    <div class="text-center py-8 text-gray-500">
+                                        <i class="fas fa-lightbulb text-4xl mb-3 text-gray-300"></i>
+                                        <p>No interests added yet.</p>
+                                    </div>
+                                <?php else: ?>
+                                    <ul class="space-y-2">
+                                        <?php foreach ($interests as $interest): ?>
+                                            <li class="flex items-start justify-between p-3 bg-gray-50 rounded-lg">
+                                                <div class="flex items-start">
+                                                    <i class="fas fa-dot-circle text-blue-500 mt-1 mr-3 text-xs"></i>
+                                                    <span class="text-gray-700"><?php echo nl2br(htmlspecialchars($interest['interest_text'])); ?></span>
+                                                </div>
+                                                <a href="actions/delete_lecturer_item.php?type=interest&id=<?php echo $interest['id']; ?>&lecturer_id=<?php echo $selectedLecturerId; ?>" 
+                                                   onclick="return confirm('Delete this interest?')" 
+                                                   class="text-gray-400 hover:text-red-500 ml-2">
+                                                    <i class="fas fa-trash"></i>
+                                                </a>
+                                            </li>
+                                        <?php endforeach; ?>
+                                    </ul>
+                                <?php endif; ?>
                             </div>
                         </div>
 
-                        <!-- Publications Tab -->
+                        <!-- Publications -->
                         <div id="publications" class="tab-content hidden">
-                            <div class="bg-white shadow rounded-lg mb-6 overflow-hidden">
-                                <div class="bg-gray-50 px-4 md:px-6 py-4 border-b-2 border-gray-200 font-semibold flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 text-sm md:text-base">
-                                    <span class="break-words"><i class="fas fa-list mr-1"></i> Publications</span>
-                                    <button class="w-full sm:w-auto bg-green-500 text-white px-3 md:px-4 py-2 rounded text-xs md:text-sm hover:bg-green-600 transition-colors whitespace-nowrap flex-shrink-0" onclick="openModal('addPublicationModal')">
-                                        <i class="fas fa-plus mr-1"></i> Add Publication
+                            <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+                                <div class="flex justify-between items-center mb-6">
+                                    <h3 class="text-lg font-bold text-gray-900">Publications</h3>
+                                    <button onclick="openModal('addPublicationModal')" class="text-white bg-green-600 hover:bg-green-700 focus:ring-4 focus:ring-green-300 font-medium rounded-lg text-sm px-4 py-2">
+                                        <i class="fas fa-plus mr-2"></i> Add Publication
                                     </button>
                                 </div>
-                                <div class="p-4 md:p-6 overflow-x-auto">
-                                    <table class="min-w-full border border-gray-300">
-                                        <thead class="bg-gray-100">
-                                            <tr>
-                                                <th class="border border-gray-300 px-2 md:px-4 py-2 text-left text-xs md:text-sm">Title</th>
-                                                <th class="border border-gray-300 px-2 md:px-4 py-2 text-left text-xs md:text-sm">Year</th>
-                                                <th class="border border-gray-300 px-2 md:px-4 py-2 text-left text-xs md:text-sm">URL</th>
-                                                <th class="border border-gray-300 px-2 md:px-4 py-2 text-left text-xs md:text-sm">Actions</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            <?php if (empty($publications)): ?>
-                                                <tr>
-                                                    <td colspan="4" class="border border-gray-300 px-2 md:px-4 py-3 text-center text-xs md:text-sm">No publications added yet</td>
-                                                </tr>
-                                            <?php else: ?>
-                                                <?php foreach ($publications as $pub): ?>
-                                                    <tr>
-                                                        <td class="border border-gray-300 px-2 md:px-4 py-2 text-xs md:text-sm break-words max-w-xs"><?php echo htmlspecialchars($pub['title']); ?></td>
-                                                        <td class="border border-gray-300 px-2 md:px-4 py-2 text-xs md:text-sm"><?php echo $pub['year']; ?></td>
-                                                        <td class="border border-gray-300 px-2 md:px-4 py-2 text-xs md:text-sm">
-                                                            <?php if (!empty($pub['url'])): ?>
-                                                                <a href="<?php echo htmlspecialchars($pub['url']); ?>" target="_blank" class="text-blue-600 hover:underline break-all">
-                                                                    <i class="fas fa-external-link-alt"></i>
-                                                                </a>
-                                                            <?php endif; ?>
-                                                        </td>
-                                                        <td class="border border-gray-300 px-2 md:px-4 py-2">
-                                                            <a href="actions/delete_lecturer_item.php?type=publication&id=<?php echo $pub['id']; ?>&lecturer_id=<?php echo $selectedLecturerId; ?>"
-                                                                class="inline-block bg-red-500 text-white px-2 md:px-3 py-1 rounded text-xs md:text-sm hover:bg-red-600 transition-colors"
-                                                                onclick="return confirm('Delete this publication?')">
-                                                                <i class="fas fa-trash"></i>
+
+                                <?php if (empty($publications)): ?>
+                                    <div class="text-center py-8 text-gray-500">
+                                        <i class="fas fa-book text-4xl mb-3 text-gray-300"></i>
+                                        <p>No publications added yet.</p>
+                                    </div>
+                                <?php else: ?>
+                                    <div class="space-y-4">
+                                        <?php foreach ($publications as $pub): ?>
+                                            <div class="flex flex-col sm:flex-row sm:items-start justify-between p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors">
+                                                <div class="flex-1 pr-4">
+                                                    <h4 class="text-base font-medium text-gray-900"><?php echo htmlspecialchars($pub['title']); ?></h4>
+                                                    <div class="flex items-center mt-1 text-sm text-gray-500">
+                                                        <span class="bg-gray-100 px-2 py-0.5 rounded text-xs font-semibold text-gray-600 mr-2"><?php echo $pub['year']; ?></span>
+                                                        <?php if (!empty($pub['url'])): ?>
+                                                            <a href="<?php echo htmlspecialchars($pub['url']); ?>" target="_blank" class="text-blue-600 hover:underline flex items-center">
+                                                                View <i class="fas fa-external-link-alt ml-1 text-xs"></i>
                                                             </a>
-                                                        </td>
-                                                    </tr>
-                                                <?php endforeach; ?>
-                                            <?php endif; ?>
-                                        </tbody>
-                                    </table>
-                                </div>
+                                                        <?php endif; ?>
+                                                    </div>
+                                                </div>
+                                                <div class="mt-2 sm:mt-0 flex-shrink-0">
+                                                    <a href="actions/delete_lecturer_item.php?type=publication&id=<?php echo $pub['id']; ?>&lecturer_id=<?php echo $selectedLecturerId; ?>" 
+                                                       onclick="return confirm('Delete this publication?')" 
+                                                       class="text-red-600 hover:text-red-800 text-sm">
+                                                        <i class="fas fa-trash"></i>
+                                                    </a>
+                                                </div>
+                                            </div>
+                                        <?php endforeach; ?>
+                                    </div>
+                                <?php endif; ?>
                             </div>
                         </div>
 
                     </div>
-
-                    <!-- Preview Button -->
-                    <div class="text-right mb-6">
-                        <a href="../index.php?page=lecturer-detail&id=<?php echo $selectedLecturerId; ?>"
-                            target="_blank"
-                            class="inline-block w-full sm:w-auto bg-cyan-500 text-white px-4 md:px-6 py-2 rounded hover:bg-cyan-600 text-sm md:text-base transition-colors text-center">
-                            <i class="fas fa-eye mr-1"></i> Preview Profile
-                        </a>
-                    </div>
-
                 <?php endif; ?>
 
-            </div><!-- End container -->
+            </div>
         </main>
     </div>
 
+    <!-- Modals (Keep existing structure but style them) -->
     <!-- Add Project Modal -->
-    <div id="addProjectModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 hidden overflow-y-auto h-full w-full z-50">
-        <div class="relative top-4 md:top-20 mx-auto p-4 md:p-5 border w-11/12 md:w-full max-w-3xl shadow-lg rounded-md bg-white my-4">
-            <div class="flex justify-between items-center pb-3 border-b">
-                <h5 class="text-lg md:text-xl font-semibold">Add New Project</h5>
-                <button type="button" class="text-gray-400 hover:text-gray-600 text-2xl md:text-3xl" onclick="closeModal('addProjectModal')">&times;</button>
+    <div id="addProjectModal" class="fixed inset-0 bg-gray-900 bg-opacity-50 hidden overflow-y-auto h-full w-full z-50 flex items-center justify-center backdrop-blur-sm">
+        <div class="relative p-5 border w-full max-w-2xl shadow-lg rounded-xl bg-white">
+            <div class="flex justify-between items-center pb-4 border-b">
+                <h3 class="text-xl font-bold text-gray-900">Add New Project</h3>
+                <button onclick="closeModal('addProjectModal')" class="text-gray-400 hover:text-gray-600">
+                    <i class="fas fa-times text-xl"></i>
+                </button>
             </div>
-            <form action="actions/add_lecturer_project.php" method="POST">
+            <form action="actions/add_lecturer_project.php" method="POST" class="mt-4">
                 <input type="hidden" name="lecturer_id" value="<?php echo $selectedLecturerId; ?>">
-                <div class="p-3 md:p-4 max-h-[60vh] md:max-h-none overflow-y-auto">
-                    <div class="mb-3 md:mb-4">
-                        <label class="block mb-2 text-sm md:text-base">Project Title *</label>
-                        <input type="text" name="title" class="w-full border border-gray-300 rounded px-3 md:px-4 py-2 text-sm md:text-base focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Project Title *</label>
+                        <input type="text" name="title" required class="w-full bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5">
                     </div>
-                    <div class="mb-3 md:mb-4">
-                        <label class="block mb-2 text-sm md:text-base">Category</label>
-                        <input type="text" name="category" class="w-full border border-gray-300 rounded px-3 md:px-4 py-2 text-sm md:text-base focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="e.g., Research, Development, Consulting">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Category</label>
+                        <input type="text" name="category" class="w-full bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5">
                     </div>
-                    <div class="mb-3 md:mb-4">
-                        <label class="block mb-2 text-sm md:text-base">Description *</label>
-                        <textarea name="description" class="w-full border border-gray-300 rounded px-3 md:px-4 py-2 text-sm md:text-base focus:outline-none focus:ring-2 focus:ring-blue-500" rows="4" required></textarea>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Description *</label>
+                        <textarea name="description" rows="3" required class="w-full bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5"></textarea>
                     </div>
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4">
-                        <div class="mb-3 md:mb-4">
-                            <label class="block mb-2 text-sm md:text-base">Start Date *</label>
-                            <input type="date" name="start_date" class="w-full border border-gray-300 rounded px-3 md:px-4 py-2 text-sm md:text-base focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Start Date *</label>
+                            <input type="date" name="start_date" required class="w-full bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5">
                         </div>
-                        <div class="mb-3 md:mb-4">
-                            <label class="block mb-2 text-sm md:text-base">End Date (Leave empty if ongoing)</label>
-                            <input type="date" name="end_date" class="w-full border border-gray-300 rounded px-3 md:px-4 py-2 text-sm md:text-base focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">End Date</label>
+                            <input type="date" name="end_date" class="w-full bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5">
                         </div>
                     </div>
                 </div>
-                <div class="flex flex-col-reverse sm:flex-row justify-end p-3 md:p-4 border-t gap-2">
-                    <button type="button" class="w-full sm:w-auto bg-gray-500 text-white px-4 py-2 rounded text-sm md:text-base hover:bg-gray-600 transition-colors" onclick="closeModal('addProjectModal')">Cancel</button>
-                    <button type="submit" class="w-full sm:w-auto bg-blue-500 text-white px-4 py-2 rounded text-sm md:text-base hover:bg-blue-600 transition-colors">Add Project</button>
+                <div class="flex justify-end gap-2 mt-6 pt-4 border-t">
+                    <button type="button" onclick="closeModal('addProjectModal')" class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50">Cancel</button>
+                    <button type="submit" class="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700">Add Project</button>
                 </div>
             </form>
         </div>
     </div>
 
     <!-- Add Education Modal -->
-    <div id="addEducationModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 hidden overflow-y-auto h-full w-full z-50">
-        <div class="relative top-4 md:top-20 mx-auto p-4 md:p-5 border w-11/12 md:w-full max-w-3xl shadow-lg rounded-md bg-white my-4">
-            <div class="flex justify-between items-center pb-3 border-b">
-                <h5 class="text-lg md:text-xl font-semibold">Add Education</h5>
-                <button type="button" class="text-gray-400 hover:text-gray-600 text-2xl md:text-3xl" onclick="closeModal('addEducationModal')">&times;</button>
+    <div id="addEducationModal" class="fixed inset-0 bg-gray-900 bg-opacity-50 hidden overflow-y-auto h-full w-full z-50 flex items-center justify-center backdrop-blur-sm">
+        <div class="relative p-5 border w-full max-w-2xl shadow-lg rounded-xl bg-white">
+            <div class="flex justify-between items-center pb-4 border-b">
+                <h3 class="text-xl font-bold text-gray-900">Add Education</h3>
+                <button onclick="closeModal('addEducationModal')" class="text-gray-400 hover:text-gray-600">
+                    <i class="fas fa-times text-xl"></i>
+                </button>
             </div>
-            <form action="actions/add_lecturer_education.php" method="POST">
+            <form action="actions/add_lecturer_education.php" method="POST" class="mt-4">
                 <input type="hidden" name="lecturer_id" value="<?php echo $selectedLecturerId; ?>">
-                <div class="p-3 md:p-4 max-h-[60vh] md:max-h-none overflow-y-auto">
-                    <div class="mb-3 md:mb-4">
-                        <label class="block mb-2 text-sm md:text-base">Institution *</label>
-                        <input type="text" name="institution" class="w-full border border-gray-300 rounded px-3 md:px-4 py-2 text-sm md:text-base focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Institution *</label>
+                        <input type="text" name="institution" required class="w-full bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5">
                     </div>
-                    <div class="mb-3 md:mb-4">
-                        <label class="block mb-2 text-sm md:text-base">Degree *</label>
-                        <input type="text" name="degree" class="w-full border border-gray-300 rounded px-3 md:px-4 py-2 text-sm md:text-base focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="e.g., PhD, Master, Bachelor" required>
-                    </div>
-                    <div class="mb-3 md:mb-4">
-                        <label class="block mb-2 text-sm md:text-base">Field of Study *</label>
-                        <input type="text" name="field_of_study" class="w-full border border-gray-300 rounded px-3 md:px-4 py-2 text-sm md:text-base focus:outline-none focus:ring-2 focus:ring-blue-500" required>
-                    </div>
-                    <div class="mb-3 md:mb-4">
-                        <label class="block mb-2 text-sm md:text-base">Description</label>
-                        <textarea name="description" class="w-full border border-gray-300 rounded px-3 md:px-4 py-2 text-sm md:text-base focus:outline-none focus:ring-2 focus:ring-blue-500" rows="3"></textarea>
-                    </div>
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4">
-                        <div class="mb-3 md:mb-4">
-                            <label class="block mb-2 text-sm md:text-base">Start Date *</label>
-                            <input type="date" name="start_date" class="w-full border border-gray-300 rounded px-3 md:px-4 py-2 text-sm md:text-base focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Degree *</label>
+                            <input type="text" name="degree" required class="w-full bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5">
                         </div>
-                        <div class="mb-3 md:mb-4">
-                            <label class="block mb-2 text-sm md:text-base">End Date *</label>
-                            <input type="date" name="end_date" class="w-full border border-gray-300 rounded px-3 md:px-4 py-2 text-sm md:text-base focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Field of Study *</label>
+                            <input type="text" name="field_of_study" required class="w-full bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5">
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Description</label>
+                        <textarea name="description" rows="3" class="w-full bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5"></textarea>
+                    </div>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Start Date *</label>
+                            <input type="date" name="start_date" required class="w-full bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">End Date *</label>
+                            <input type="date" name="end_date" required class="w-full bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5">
                         </div>
                     </div>
                 </div>
-                <div class="flex flex-col-reverse sm:flex-row justify-end p-3 md:p-4 border-t gap-2">
-                    <button type="button" class="w-full sm:w-auto bg-gray-500 text-white px-4 py-2 rounded text-sm md:text-base hover:bg-gray-600 transition-colors" onclick="closeModal('addEducationModal')">Cancel</button>
-                    <button type="submit" class="w-full sm:w-auto bg-blue-500 text-white px-4 py-2 rounded text-sm md:text-base hover:bg-blue-600 transition-colors">Add Education</button>
+                <div class="flex justify-end gap-2 mt-6 pt-4 border-t">
+                    <button type="button" onclick="closeModal('addEducationModal')" class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50">Cancel</button>
+                    <button type="submit" class="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700">Add Education</button>
                 </div>
             </form>
         </div>
     </div>
 
     <!-- Add Skill Modal -->
-    <div id="addSkillModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 hidden overflow-y-auto h-full w-full z-50">
-        <div class="relative top-4 md:top-20 mx-auto p-4 md:p-5 border w-11/12 md:w-full max-w-lg shadow-lg rounded-md bg-white my-4">
-            <div class="flex justify-between items-center pb-3 border-b">
-                <h5 class="text-lg md:text-xl font-semibold">Add Skill</h5>
-                <button type="button" class="text-gray-400 hover:text-gray-600 text-2xl md:text-3xl" onclick="closeModal('addSkillModal')">&times;</button>
+    <div id="addSkillModal" class="fixed inset-0 bg-gray-900 bg-opacity-50 hidden overflow-y-auto h-full w-full z-50 flex items-center justify-center backdrop-blur-sm">
+        <div class="relative p-5 border w-full max-w-md shadow-lg rounded-xl bg-white">
+            <div class="flex justify-between items-center pb-4 border-b">
+                <h3 class="text-xl font-bold text-gray-900">Add Skill</h3>
+                <button onclick="closeModal('addSkillModal')" class="text-gray-400 hover:text-gray-600">
+                    <i class="fas fa-times text-xl"></i>
+                </button>
             </div>
-            <form action="actions/add_lecturer_skill.php" method="POST">
+            <form action="actions/add_lecturer_skill.php" method="POST" class="mt-4">
                 <input type="hidden" name="lecturer_id" value="<?php echo $selectedLecturerId; ?>">
-                <div class="p-3 md:p-4 max-h-[60vh] md:max-h-none overflow-y-auto">
-                    <div class="mb-3 md:mb-4">
-                        <label class="block mb-2 text-sm md:text-base">Skill Name *</label>
-                        <input type="text" name="skill_name" class="w-full border border-gray-300 rounded px-3 md:px-4 py-2 text-sm md:text-base focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Skill Name *</label>
+                        <input type="text" name="skill_name" required class="w-full bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5">
                     </div>
-                    <div class="mb-3 md:mb-4">
-                        <label class="block mb-2 text-sm md:text-base">Category *</label>
-                        <input type="text" name="category" class="w-full border border-gray-300 rounded px-3 md:px-4 py-2 text-sm md:text-base focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="e.g., Programming Languages, Tools, Frameworks" required>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Category *</label>
+                        <input type="text" name="category" required class="w-full bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5" placeholder="e.g. Programming">
                     </div>
-                    <div class="mb-3 md:mb-4">
-                        <label class="block mb-2 text-sm md:text-base">Icon (Font Awesome class)</label>
-                        <input type="text" name="skill_icon" class="w-full border border-gray-300 rounded px-3 md:px-4 py-2 text-sm md:text-base focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="e.g., fab fa-python">
-                        <small class="text-gray-600 text-xs md:text-sm">Visit <a href="https://fontawesome.com/icons" target="_blank" class="text-blue-600 underline">Font Awesome</a> for icons</small>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Icon Class</label>
+                        <input type="text" name="skill_icon" class="w-full bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5" placeholder="fab fa-python">
+                        <p class="text-xs text-gray-500 mt-1">Font Awesome class name</p>
                     </div>
                 </div>
-                <div class="flex flex-col-reverse sm:flex-row justify-end p-3 md:p-4 border-t gap-2">
-                    <button type="button" class="w-full sm:w-auto bg-gray-500 text-white px-4 py-2 rounded text-sm md:text-base hover:bg-gray-600 transition-colors" onclick="closeModal('addSkillModal')">Cancel</button>
-                    <button type="submit" class="w-full sm:w-auto bg-blue-500 text-white px-4 py-2 rounded text-sm md:text-base hover:bg-blue-600 transition-colors">Add Skill</button>
+                <div class="flex justify-end gap-2 mt-6 pt-4 border-t">
+                    <button type="button" onclick="closeModal('addSkillModal')" class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50">Cancel</button>
+                    <button type="submit" class="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700">Add Skill</button>
                 </div>
             </form>
         </div>
     </div>
 
     <!-- Add Interest Modal -->
-    <div id="addInterestModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 hidden overflow-y-auto h-full w-full z-50">
-        <div class="relative top-4 md:top-20 mx-auto p-4 md:p-5 border w-11/12 md:w-full max-w-lg shadow-lg rounded-md bg-white my-4">
-            <div class="flex justify-between items-center pb-3 border-b">
-                <h5 class="text-lg md:text-xl font-semibold">Add Research Interest</h5>
-                <button type="button" class="text-gray-400 hover:text-gray-600 text-2xl md:text-3xl" onclick="closeModal('addInterestModal')">&times;</button>
+    <div id="addInterestModal" class="fixed inset-0 bg-gray-900 bg-opacity-50 hidden overflow-y-auto h-full w-full z-50 flex items-center justify-center backdrop-blur-sm">
+        <div class="relative p-5 border w-full max-w-md shadow-lg rounded-xl bg-white">
+            <div class="flex justify-between items-center pb-4 border-b">
+                <h3 class="text-xl font-bold text-gray-900">Add Interest</h3>
+                <button onclick="closeModal('addInterestModal')" class="text-gray-400 hover:text-gray-600">
+                    <i class="fas fa-times text-xl"></i>
+                </button>
             </div>
-            <form action="actions/add_lecturer_interest.php" method="POST">
+            <form action="actions/add_lecturer_interest.php" method="POST" class="mt-4">
                 <input type="hidden" name="lecturer_id" value="<?php echo $selectedLecturerId; ?>">
-                <div class="p-3 md:p-4 max-h-[60vh] md:max-h-none overflow-y-auto">
-                    <div class="mb-3 md:mb-4">
-                        <label class="block mb-2 text-sm md:text-base">Interest *</label>
-                        <textarea name="interest_text" class="w-full border border-gray-300 rounded px-3 md:px-4 py-2 text-sm md:text-base focus:outline-none focus:ring-2 focus:ring-blue-500" rows="3" required></textarea>
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Interest *</label>
+                        <textarea name="interest_text" rows="3" required class="w-full bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5"></textarea>
                     </div>
                 </div>
-                <div class="flex flex-col-reverse sm:flex-row justify-end p-3 md:p-4 border-t gap-2">
-                    <button type="button" class="w-full sm:w-auto bg-gray-500 text-white px-4 py-2 rounded text-sm md:text-base hover:bg-gray-600 transition-colors" onclick="closeModal('addInterestModal')">Cancel</button>
-                    <button type="submit" class="w-full sm:w-auto bg-blue-500 text-white px-4 py-2 rounded text-sm md:text-base hover:bg-blue-600 transition-colors">Add Interest</button>
+                <div class="flex justify-end gap-2 mt-6 pt-4 border-t">
+                    <button type="button" onclick="closeModal('addInterestModal')" class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50">Cancel</button>
+                    <button type="submit" class="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700">Add Interest</button>
                 </div>
             </form>
         </div>
     </div>
 
     <!-- Add Publication Modal -->
-    <div id="addPublicationModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 hidden overflow-y-auto h-full w-full z-50">
-        <div class="relative top-4 md:top-20 mx-auto p-4 md:p-5 border w-11/12 md:w-full max-w-lg shadow-lg rounded-md bg-white my-4">
-            <div class="flex justify-between items-center pb-3 border-b">
-                <h5 class="text-lg md:text-xl font-semibold">Add Publication</h5>
-                <button type="button" class="text-gray-400 hover:text-gray-600 text-2xl md:text-3xl" onclick="closeModal('addPublicationModal')">&times;</button>
+    <div id="addPublicationModal" class="fixed inset-0 bg-gray-900 bg-opacity-50 hidden overflow-y-auto h-full w-full z-50 flex items-center justify-center backdrop-blur-sm">
+        <div class="relative p-5 border w-full max-w-lg shadow-lg rounded-xl bg-white">
+            <div class="flex justify-between items-center pb-4 border-b">
+                <h3 class="text-xl font-bold text-gray-900">Add Publication</h3>
+                <button onclick="closeModal('addPublicationModal')" class="text-gray-400 hover:text-gray-600">
+                    <i class="fas fa-times text-xl"></i>
+                </button>
             </div>
-            <form action="actions/add_lecturer_publication.php" method="POST">
+            <form action="actions/add_lecturer_publication.php" method="POST" class="mt-4">
                 <input type="hidden" name="lecturer_id" value="<?php echo $selectedLecturerId; ?>">
-                <div class="p-3 md:p-4 max-h-[60vh] md:max-h-none overflow-y-auto">
-                    <div class="mb-3 md:mb-4">
-                        <label class="block mb-2 text-sm md:text-base">Publication Title *</label>
-                        <input type="text" name="title" class="w-full border border-gray-300 rounded px-3 md:px-4 py-2 text-sm md:text-base focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Title *</label>
+                        <input type="text" name="title" required class="w-full bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5">
                     </div>
-                    <div class="mb-3 md:mb-4">
-                        <label class="block mb-2 text-sm md:text-base">Year *</label>
-                        <input type="number" name="year" class="w-full border border-gray-300 rounded px-3 md:px-4 py-2 text-sm md:text-base focus:outline-none focus:ring-2 focus:ring-blue-500" min="1900" max="<?php echo date('Y'); ?>" required>
-                    </div>
-                    <div class="mb-3 md:mb-4">
-                        <label class="block mb-2 text-sm md:text-base">URL</label>
-                        <input type="url" name="url" class="w-full border border-gray-300 rounded px-3 md:px-4 py-2 text-sm md:text-base focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="https://">
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Year *</label>
+                            <input type="number" name="year" required class="w-full bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">URL</label>
+                            <input type="url" name="url" class="w-full bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5">
+                        </div>
                     </div>
                 </div>
-                <div class="flex flex-col-reverse sm:flex-row justify-end p-3 md:p-4 border-t gap-2">
-                    <button type="button" class="w-full sm:w-auto bg-gray-500 text-white px-4 py-2 rounded text-sm md:text-base hover:bg-gray-600 transition-colors" onclick="closeModal('addPublicationModal')">Cancel</button>
-                    <button type="submit" class="w-full sm:w-auto bg-blue-500 text-white px-4 py-2 rounded text-sm md:text-base hover:bg-blue-600 transition-colors">Add Publication</button>
+                <div class="flex justify-end gap-2 mt-6 pt-4 border-t">
+                    <button type="button" onclick="closeModal('addPublicationModal')" class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50">Cancel</button>
+                    <button type="submit" class="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700">Add Publication</button>
                 </div>
             </form>
         </div>
     </div>
 
     <script src="assets/js/admin.js"></script>
-</body>
+    <script>
+        function showTab(tabId, btn) {
+            // Hide all tabs
+            document.querySelectorAll('.tab-content').forEach(el => {
+                el.classList.add('hidden');
+                el.classList.remove('block');
+            });
+            
+            // Show selected tab
+            document.getElementById(tabId).classList.remove('hidden');
+            document.getElementById(tabId).classList.add('block');
+            
+            // Update buttons
+            document.querySelectorAll('#lecturerTabs button').forEach(b => {
+                b.classList.remove('tab-active');
+                b.classList.add('tab-inactive');
+            });
+            
+            btn.classList.remove('tab-inactive');
+            btn.classList.add('tab-active');
+        }
 
+        // Open modal helper
+        function openModal(modalId) {
+            const modal = document.getElementById(modalId);
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeModal(modalId) {
+            const modal = document.getElementById(modalId);
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+            document.body.style.overflow = 'auto';
+        }
+    </script>
+</body>
 </html>

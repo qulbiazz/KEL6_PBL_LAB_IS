@@ -131,14 +131,13 @@ $programs = $studentModel->getProgramStudies();
 <body class="bg-gray-100">
     <?php include 'includes/admin_navbar.php'; ?>
 
-    <div class="flex">
+    <div class="flex pt-16">
         <?php include 'includes/admin_sidebar.php'; ?>
-
         <!-- Main Content -->
-        <main class="flex-1 p-4 md:p-8 pt-20 ml-0 lg:ml-64 min-h-screen">
-            <div class="mt-12 mb-8">
+        <main class="flex-1 p-4 md:p-8 ml-0 lg:ml-64 min-h-screen">
+            <div class="mb-8">
                 <h1 class="text-2xl md:text-3xl font-bold text-gray-800">Kelola Mahasiswa</h1>
-                <p class="text-gray-600 mt-1">Tambah, edit, dan hapus data mahasiswa</p>
+                <p class="text-gray-500 text-sm mt-1">Tambah, edit, dan hapus data mahasiswa</p>
             </div>
 
             <!-- Statistics Cards -->
