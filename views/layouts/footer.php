@@ -45,6 +45,39 @@
         </div>
     </footer>
 
+    <!-- Custom Styles for Shimmer Animation -->
+    <style>
+        @keyframes shimmer {
+            0% {
+                transform: translateX(-150%) skewX(-15deg);
+            }
+
+            100% {
+                transform: translateX(150%) skewX(-15deg);
+            }
+        }
+
+        .animate-shimmer {
+            animation: shimmer 2s infinite;
+        }
+    </style>
+
+    <!-- Scroll to Top Button (Liquid Glass Style - Transparent) -->
+    <button id="scrollToTop"
+        class="fixed bottom-8 right-8 w-14 h-14 flex items-center justify-center rounded-full z-50 transition-all duration-500 opacity-0 invisible
+                   bg-white/10 backdrop-blur-xl border border-white/20
+                   shadow-[0_8px_32px_0_rgba(31,38,135,0.15)]
+                   text-blue-600
+                   hover:scale-110 hover:-translate-y-1 hover:bg-white/20 hover:shadow-[0_8px_32px_0_rgba(31,38,135,0.25)]
+                   hover:border-white/40
+                   group overflow-hidden"
+        aria-label="Scroll to top">
+        <!-- Shine effect -->
+        <div class="absolute inset-0 w-full h-full bg-gradient-to-r from-transparent via-white/40 to-transparent -translate-x-full group-hover:animate-shimmer z-0"></div>
+
+        <i class="fas fa-arrow-up text-xl relative z-10 group-hover:animate-bounce"></i>
+    </button>
+
     <!-- Gallery Modal -->
     <div id="galleryModal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black bg-opacity-90 transition-opacity duration-300" style="display: none; opacity: 0;">
         <div class="relative w-full h-full flex items-center justify-center p-4">
@@ -82,8 +115,6 @@
             </button>
         </div>
     </div>
-
-
 
     <script src="assets/js/carousel.js"></script>
     <script src="assets/js/main.js"></script>
