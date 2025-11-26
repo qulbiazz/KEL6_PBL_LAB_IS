@@ -2,7 +2,6 @@
 require_once __DIR__ . '/../../config/database.php';
 require_once __DIR__ . '/../../models/BorrowingModel.php';
 require_once __DIR__ . '/../../models/EquipmentModel.php';
-require_once __DIR__ . '/../../models/RoomModel.php';
 
 $response = ['success' => false, 'message' => ''];
 
@@ -25,9 +24,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $item_id = null;
         
         if ($type === 'room') {
-            $item_id = $_POST['ruang'] ?? null;
-            if (empty($item_id)) {
-                throw new Exception('Ruang wajib dipilih!');
+            $item_name = trim($_POST['nama_ruang'] ?? '');
+            if (empty($item_name)) {
+                throw new Exception('Nama ruangan wajib diisi!');
             }
         } elseif ($type === 'equipment') {
             if (isset($_POST['alat']) && is_array($_POST['alat'])) {
@@ -84,21 +83,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
             
             $borrowModel = new BorrowingModel($conn);
-            $roomModel = new RoomModel($conn);
             $equipmentModel = new EquipmentModel($conn);
             
-            // Additional validation for room availability
+            // Additional validation for room - no availability check needed
             if ($type === 'room') {
-                $roomData = $roomModel->getRoomById($item_id);
-                if (!$roomData) {
-                    throw new Exception('Ruang tidak ditemukan!');
-                }
-                
-                if (!$roomModel->isRoomAvailable($item_id, $borrow_date, $return_date)) {
-                    throw new Exception('Ruang "' . $roomData['name'] . '" sudah dibooking untuk waktu tersebut!');
-                }
-                
-                $item_name = $roomData['name'];
+                // Room name is already validated above
             } else {
                 // Get equipment names
                 $equipmentNames = [];
@@ -145,18 +134,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 
-// Load equipment and rooms for form display
+// Load equipment for form display
 try {
     $db = new Database();
     $conn = $db->getConnection();
     $equipmentModel = new EquipmentModel($conn);
-    $roomModel = new RoomModel($conn);
     
     $equipments = $equipmentModel->getAvailableEquipment();
-    $rooms = $roomModel->getAllRooms();
 } catch (Exception $e) {
     $equipments = [];
-    $rooms = [];
 }
 ?>
 
@@ -275,16 +261,43 @@ try {
                             class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
                     </div>
 
-                    <!-- Pilihan Ruang (initially hidden) -->
+                    <!-- Keperluan Ruang (initially hidden) -->
                     <div id="pilihan-ruang" class="mb-6 hidden">
-                        <label class="block text-gray-700 font-semibold mb-3">
-                            <i class="fas fa-door-open mr-2 text-blue-600"></i>Pilih Ruang *
+                        <label for="keperluan-ruang" class="block text-gray-700 font-semibold mb-2">
+                            <i class="fas fa-clipboard-list mr-2 text-blue-600"></i>Keperluan Peminjaman Lab Inlet *
                         </label>
-                        <div id="rooms-container" class="grid grid-cols-1 md:grid-cols-2 gap-3">
-                            <p class="text-gray-500 col-span-2 text-center py-4">
-                                Pilih waktu peminjaman terlebih dahulu untuk melihat ketersediaan ruangan
-                            </p>
+                        <textarea id="keperluan-ruang" name="keperluan_ruang" rows="3"
+                            placeholder="Masukkan tujuan/keperluan peminjaman Lab Inlet (contoh: Praktikum Jaringan Komputer, Rapat Organisasi, dll)"
+                            class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"></textarea>
+                        
+                        <!-- Room availability indicator -->
+                        <div id="room-availability-indicator" class="mt-3 hidden">
+                            <div id="room-available" class="hidden p-3 bg-green-50 border border-green-200 rounded-lg">
+                                <div class="flex items-center text-green-700">
+                                    <i class="fas fa-check-circle mr-2"></i>
+                                    <span class="text-sm font-medium">Lab Inlet tersedia untuk waktu yang dipilih</span>
+                                </div>
+                            </div>
+                            <div id="room-unavailable" class="hidden p-3 bg-red-50 border border-red-200 rounded-lg">
+                                <div class="flex items-start text-red-700">
+                                    <i class="fas fa-exclamation-circle mr-2 mt-0.5"></i>
+                                    <div class="text-sm">
+                                        <span class="font-medium block mb-1">Lab Inlet sudah dipinjam pada tanggal dan waktu tersebut</span>
+                                        <span class="text-xs">Silahkan pilih tanggal dan waktu lainnya!</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div id="room-checking" class="hidden p-3 bg-blue-50 border border-blue-200 rounded-lg">
+                                <div class="flex items-center text-blue-700">
+                                    <i class="fas fa-spinner fa-spin mr-2"></i>
+                                    <span class="text-sm">Memeriksa ketersediaan...</span>
+                                </div>
+                            </div>
                         </div>
+                        
+                        <p class="text-sm text-gray-500 mt-2">
+                            <i class="fas fa-info-circle mr-1"></i>Peminjaman untuk Lab Inlet
+                        </p>
                     </div>
 
                     <!-- Pilihan Alat (initially hidden) -->
@@ -323,20 +336,15 @@ try {
             const jenisPeminjaman = document.getElementById("jenis-peminjaman");
             const pilihanRuang = document.getElementById("pilihan-ruang");
             const pilihanAlat = document.getElementById("pilihan-alat");
-            const roomsContainer = document.getElementById("rooms-container");
+            const keperluanRuang = document.getElementById("keperluan-ruang");
             const equipmentContainer = document.getElementById("equipment-container");
-
-            // console.log("Elements found:", {
-            //     waktuPinjam: !!waktuPinjam,
-            //     waktuKembali: !!waktuKembali,
-            //     jenisPeminjaman: !!jenisPeminjaman,
-            //     pilihanRuang: !!pilihanRuang,
-            //     pilihanAlat: !!pilihanAlat,
-            //     roomsContainer: !!roomsContainer,
-            //     equipmentContainer: !!equipmentContainer
-            // });
+            const roomAvailabilityIndicator = document.getElementById("room-availability-indicator");
+            const roomAvailable = document.getElementById("room-available");
+            const roomUnavailable = document.getElementById("room-unavailable");
+            const roomChecking = document.getElementById("room-checking");
 
             let borrowDatePicker, returnDatePicker;
+            let isRoomAvailable = true; // Track room availability
 
             // Inisialisasi Flatpickr untuk waktu peminjaman
             borrowDatePicker = flatpickr(waktuPinjam, {
@@ -349,11 +357,10 @@ try {
                     // Set minDate untuk waktu pengembalian
                     if (selectedDates[0]) {
                         returnDatePicker.set('minDate', selectedDates[0]);
-                        
-                        // Check room availability if dates are selected
-                        if (jenisPeminjaman.value === 'room' && waktuKembali.value) {
-                            checkRoomAvailability();
-                        }
+                    }
+                    // Check room availability if room is selected and both dates are filled
+                    if (jenisPeminjaman.value === 'room' && waktuPinjam.value && waktuKembali.value) {
+                        checkRoomAvailability();
                     }
                 }
             });
@@ -365,9 +372,9 @@ try {
                 time_24hr: true,
                 minDate: "today",
                 locale: "id",
-                onChange: function () {
-                    // Check room availability when return date changes
-                    if (jenisPeminjaman.value === 'room' && waktuPinjam.value) {
+                onChange: function (selectedDates) {
+                    // Check room availability if room is selected and both dates are filled
+                    if (jenisPeminjaman.value === 'room' && waktuPinjam.value && waktuKembali.value) {
                         checkRoomAvailability();
                     }
                 }
@@ -389,22 +396,23 @@ try {
                 // console.log("Jenis peminjaman changed to:", jenisPeminjaman.value);
                 
                 if (jenisPeminjaman.value === "room") {
-                    // console.log("Showing room selection");
+                    // console.log("Showing room input");
                     pilihanRuang.classList.remove("hidden");
                     pilihanAlat.classList.add("hidden");
-                    
+                    // Set required attribute on keperluan input
+                    if (keperluanRuang) keperluanRuang.required = true;
                     // Check room availability if dates are selected
                     if (waktuPinjam.value && waktuKembali.value) {
-                        // console.log("Dates selected, checking room availability");
                         checkRoomAvailability();
-                    } else {
-                        // console.log("No dates selected yet");
-                        roomsContainer.innerHTML = '<p class="text-gray-500 col-span-2 text-center py-4">Pilih waktu peminjaman terlebih dahulu untuk melihat ketersediaan ruangan</p>';
                     }
                 } else if (jenisPeminjaman.value === "equipment") {
                     // console.log("Showing equipment selection");
                     pilihanAlat.classList.remove("hidden");
                     pilihanRuang.classList.add("hidden");
+                    // Remove required from keperluan
+                    if (keperluanRuang) keperluanRuang.required = false;
+                    // Hide room availability indicator
+                    if (roomAvailabilityIndicator) roomAvailabilityIndicator.classList.add("hidden");
                     
                     // Load equipment
                     // console.log("Loading equipment...");
@@ -413,8 +421,49 @@ try {
                     // console.log("No selection, hiding both");
                     pilihanRuang.classList.add("hidden");
                     pilihanAlat.classList.add("hidden");
+                    if (keperluanRuang) keperluanRuang.required = false;
+                    if (roomAvailabilityIndicator) roomAvailabilityIndicator.classList.add("hidden");
                 }
             });
+
+            // Function to check room availability
+            function checkRoomAvailability() {
+                const borrowDate = waktuPinjam.value;
+                const returnDate = waktuKembali.value;
+
+                if (!borrowDate || !returnDate) {
+                    return;
+                }
+
+                // Show checking indicator
+                roomAvailabilityIndicator.classList.remove('hidden');
+                roomAvailable.classList.add('hidden');
+                roomUnavailable.classList.add('hidden');
+                roomChecking.classList.remove('hidden');
+
+                // Check availability via AJAX
+                fetch(`views/pages/ajax_check_room_availability.php?borrow_date=${encodeURIComponent(borrowDate)}&return_date=${encodeURIComponent(returnDate)}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        roomChecking.classList.add('hidden');
+                        
+                        if (data.available) {
+                            roomAvailable.classList.remove('hidden');
+                            roomUnavailable.classList.add('hidden');
+                            isRoomAvailable = true;
+                        } else {
+                            roomAvailable.classList.add('hidden');
+                            roomUnavailable.classList.remove('hidden');
+                            isRoomAvailable = false;
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error checking room availability:', error);
+                        roomChecking.classList.add('hidden');
+                        // Hide indicator on error
+                        roomAvailabilityIndicator.classList.add('hidden');
+                    });
+            }
 
             // Function to load equipment with availability
             function loadEquipment() {
@@ -465,58 +514,6 @@ try {
                     .catch(error => {
                         console.error('Error:', error);
                         equipmentContainer.innerHTML = '<p class="text-red-500 col-span-2 text-center py-4">Terjadi kesalahan saat memuat data alat</p>';
-                    });
-            }
-
-            // Function to check room availability
-            function checkRoomAvailability() {
-                const borrowDate = waktuPinjam.value;
-                const returnDate = waktuKembali.value;
-
-                if (!borrowDate || !returnDate) {
-                    roomsContainer.innerHTML = '<p class="text-gray-500 col-span-2 text-center py-4">Pilih waktu peminjaman terlebih dahulu</p>';
-                    return;
-                }
-
-                // Show loading
-                roomsContainer.innerHTML = '<p class="text-gray-500 col-span-2 text-center py-4"><i class="fas fa-spinner fa-spin mr-2"></i>Memeriksa ketersediaan ruangan...</p>';
-
-                // Fetch room availability
-                fetch(`views/pages/ajax_check_rooms.php?borrow_date=${encodeURIComponent(borrowDate)}&return_date=${encodeURIComponent(returnDate)}`)
-                    .then(response => response.json())
-                    .then(data => {
-                        // console.log('Room data:', data);
-                        if (data.success && data.rooms) {
-                            if (data.rooms.length === 0) {
-                                roomsContainer.innerHTML = '<p class="text-gray-500 col-span-2 text-center py-4">Tidak ada ruangan tersedia</p>';
-                            } else {
-                                roomsContainer.innerHTML = '';
-                                data.rooms.forEach(room => {
-                                    const isAvailable = room.is_available;
-                                    const div = document.createElement('label');
-                                    div.className = `flex items-center p-3 border rounded-lg transition ${isAvailable ? 'border-gray-200 hover:bg-blue-50 cursor-pointer' : 'border-gray-300 bg-gray-100 cursor-not-allowed opacity-60'}`;
-                                    
-                                    div.innerHTML = `
-                                        <input type="radio" name="ruang" value="${room.id}" ${!isAvailable ? 'disabled' : ''} required
-                                            class="w-5 h-5 text-blue-600 border-gray-300 focus:ring-blue-500 mr-3">
-                                        <div class="flex-1">
-                                            <div class="flex items-center justify-between">
-                                                <div class="font-medium text-gray-800">${room.name}</div>
-                                                ${!isAvailable ? '<span class="text-xs text-red-600 font-semibold"><i class="fas fa-lock mr-1"></i>Sedang Dipinjam</span>' : '<span class="text-xs text-green-600 font-semibold"><i class="fas fa-check-circle mr-1"></i>Tersedia</span>'}
-                                            </div>
-                                            ${room.description ? `<div class="text-xs text-gray-500 mt-1">${room.description}</div>` : ''}
-                                        </div>
-                                    `;
-                                    roomsContainer.appendChild(div);
-                                });
-                            }
-                        } else {
-                            roomsContainer.innerHTML = `<p class="text-red-500 col-span-2 text-center py-4">${data.message || 'Gagal memuat data ruangan'}</p>`;
-                        }
-                    })
-                    .catch(error => {
-                        console.error('Error:', error);
-                        roomsContainer.innerHTML = '<p class="text-red-500 col-span-2 text-center py-4">Terjadi kesalahan saat memeriksa ketersediaan</p>';
                     });
             }
 
@@ -578,9 +575,15 @@ try {
                         return;
                     }
                 } else if (jenis === 'room') {
-                    const ruang = document.querySelector('input[name="ruang"]:checked');
-                    if (!ruang) {
-                        showAlert('Ruang wajib dipilih!', false);
+                    const keperluanRuang = document.getElementById('keperluan-ruang').value.trim();
+                    if (!keperluanRuang) {
+                        showAlert('Keperluan peminjaman wajib diisi!', false);
+                        return;
+                    }
+
+                    // Cek ketersediaan ruang sebelum submit
+                    if (!isRoomAvailable) {
+                        showAlert('Lab Inlet sudah dipinjam pada tanggal dan waktu tersebut. Silahkan pilih waktu dan tanggal yang lain.', false);
                         return;
                     }
                 }

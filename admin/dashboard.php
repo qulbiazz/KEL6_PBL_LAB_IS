@@ -61,7 +61,7 @@ $recent_news = $conn->query("SELECT * FROM news ORDER BY created_at DESC LIMIT 5
         
         <main class="flex-1 p-4 md:p-8 ml-0 lg:ml-64 min-h-screen transition-all duration-300">
             <!-- Welcome Section -->
-            <div class="mb-8 mt-4 bg-gradient-to-r from-blue-600 to-indigo-700 rounded-2xl p-8 text-white shadow-lg relative overflow-hidden">
+            <div class="mb-8 mt-3 bg-gradient-to-r from-blue-600 to-indigo-700 rounded-2xl p-8 text-white shadow-lg relative overflow-hidden">
                 <div class="absolute top-0 right-0 -mt-10 -mr-10 w-40 h-40 bg-white opacity-10 rounded-full blur-2xl"></div>
                 <div class="absolute bottom-0 left-0 -mb-10 -ml-10 w-40 h-40 bg-white opacity-10 rounded-full blur-2xl"></div>
                 

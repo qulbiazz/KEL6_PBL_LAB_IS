@@ -13,7 +13,6 @@ try {
     require_once __DIR__ . '/../../config/database.php';
     require_once __DIR__ . '/../../models/BorrowingModel.php';
     require_once __DIR__ . '/../../models/EquipmentModel.php';
-    require_once __DIR__ . '/../../models/RoomModel.php';
 
     // Ambil input
     $borrower_name = trim($_POST['nama'] ?? '');
@@ -28,11 +27,12 @@ try {
     // Handle item based on type
     $item_name = '';
     $item_id = null;
+    $purpose = null;
     
     if ($type === 'room') {
-        $item_id = $_POST['ruang'] ?? null;
-        if (empty($item_id)) {
-            throw new Exception('Ruang wajib dipilih!');
+        $purpose = trim($_POST['keperluan_ruang'] ?? '');
+        if (empty($purpose)) {
+            throw new Exception('Keperluan peminjaman wajib diisi!');
         }
     } elseif ($type === 'equipment') {
         if (isset($_POST['alat']) && is_array($_POST['alat'])) {
@@ -98,23 +98,23 @@ try {
     $borrowingModel = new BorrowingModel($conn);
     
     if ($type === 'room') {
-        // Room borrowing
+        // Room borrowing - Lab Inlet only
         $data = [
             'borrower_name' => $borrower_name,
             'occupation' => $occupation,
-            'room_id' => $item_id,
+            'room_name' => 'Lab Inlet',
             'borrow_date' => $borrow_date,
             'return_date' => $return_date,
             'status' => 'active',
-            'notes' => null
+            'notes' => $purpose
         ];
         
-        // Validate room availability using model
-        if (!$borrowingModel->checkRoomAvailability($item_id, $borrow_date, $return_date)) {
-            throw new Exception('Ruang tersebut sudah dipinjam pada waktu yang dipilih!');
+        try {
+            $result = $borrowingModel->createRoomBorrowing($data);
+        } catch (Exception $e) {
+            // Re-throw the exception to be caught by outer try-catch
+            throw $e;
         }
-        
-        $result = $borrowingModel->createRoomBorrowing($data);
         
     } elseif ($type === 'equipment') {
         // Equipment borrowing

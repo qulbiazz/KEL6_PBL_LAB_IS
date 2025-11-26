@@ -21,7 +21,7 @@ try {
         throw new Exception('Database connection failed');
     }
     
-    $roomModel = new RoomModel($conn);
+    // $roomModel = new RoomModel($conn);
     
     // Get all rooms
     $allRooms = $roomModel->getAllRooms(true);

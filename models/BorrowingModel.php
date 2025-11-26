@@ -1,12 +1,4 @@
 <?php
-
-/**
- * Optimized Borrowing Model using proper relational structure
- * - Uses borrowing_equipment junction table for many-to-many equipment relationships
- * - Uses room_id foreign key for room borrowings
- * - Leverages database views for optimized queries
- * - Automatic quantity management via database triggers
- */
 class BorrowingModel
 {
     private $conn;
@@ -21,13 +13,6 @@ class BorrowingModel
     // ========================================================================
     // CREATE OPERATIONS
     // ========================================================================
-
-    /**
-     * Create a new borrowing with equipment (many-to-many via junction table)
-     * @param array $data Borrowing data
-     * @param array $equipmentItems Array of ['equipment_id' => int, 'quantity' => int]
-     * @return int|false Borrowing ID on success, false on failure
-     */
     public function createEquipmentBorrowing($data, $equipmentItems)
     {
         try {
@@ -89,28 +74,44 @@ class BorrowingModel
 
     /**
      * Create a new room borrowing
-     * @param array $data Borrowing data including room_id
-     * @return int|false Borrowing ID on success, false on failure
      */
     public function createRoomBorrowing($data)
     {
         try {
             $this->conn->beginTransaction();
 
-            // Validate room availability
-            if (!$this->checkRoomAvailability($data['room_id'], $data['borrow_date'], $data['return_date'])) {
-                throw new Exception("Ruang tidak tersedia untuk waktu yang dipilih");
+            // Check if Lab Inlet is already borrowed (active status)
+            $checkQuery = "SELECT COUNT(*) FROM $this->table 
+                          WHERE type = 'room' 
+                          AND room_name = :room_name 
+                          AND status = 'active'
+                          AND (
+                              (:borrow_date BETWEEN borrow_date AND return_date)
+                              OR (:return_date BETWEEN borrow_date AND return_date)
+                              OR (borrow_date BETWEEN :borrow_date AND :return_date)
+                          )";
+            
+            $checkStmt = $this->conn->prepare($checkQuery);
+            $checkStmt->bindParam(':room_name', $data['room_name']);
+            $checkStmt->bindParam(':borrow_date', $data['borrow_date']);
+            $checkStmt->bindParam(':return_date', $data['return_date']);
+            $checkStmt->execute();
+            
+            $count = $checkStmt->fetchColumn();
+            
+            if ($count > 0) {
+                throw new Exception('Lab Inlet sudah dipinjam pada waktu tersebut. Silakan pilih waktu lain atau tunggu hingga peminjaman sebelumnya dikembalikan.');
             }
 
             $query = "INSERT INTO $this->table 
-                      (borrower_name, occupation, type, room_id, borrow_date, return_date, status, notes)
-                      VALUES (:borrower_name, :occupation, 'room', :room_id, :borrow_date, :return_date, :status, :notes)
+                      (borrower_name, occupation, type, room_name, borrow_date, return_date, status, notes)
+                      VALUES (:borrower_name, :occupation, 'room', :room_name, :borrow_date, :return_date, :status, :notes)
                       RETURNING id";
 
             $stmt = $this->conn->prepare($query);
             $stmt->bindParam(':borrower_name', $data['borrower_name']);
             $stmt->bindParam(':occupation', $data['occupation']);
-            $stmt->bindParam(':room_id', $data['room_id']);
+            $stmt->bindParam(':room_name', $data['room_name']);
             $stmt->bindParam(':borrow_date', $data['borrow_date']);
             $stmt->bindParam(':return_date', $data['return_date']);
             
@@ -129,16 +130,10 @@ class BorrowingModel
         } catch (Exception $e) {
             $this->conn->rollBack();
             error_log("Error creating room borrowing: " . $e->getMessage());
-            return false;
+            throw $e; // Re-throw to handle in calling code
         }
     }
 
-    /**
-     * Legacy method for backward compatibility with old form submissions
-     * Automatically routes to createEquipmentBorrowing or createRoomBorrowing based on type
-     * @param array $data Borrowing data with old structure (item_id, item_name)
-     * @return int|false Borrowing ID on success, false on failure
-     */
     public function createBorrowing($data)
     {
         try {
@@ -148,7 +143,7 @@ class BorrowingModel
                 $roomData = [
                     'borrower_name' => $data['borrower_name'],
                     'occupation' => $data['occupation'],
-                    'room_id' => $data['item_id'], // item_id is room_id for room type
+                    'room_name' => $data['item_name'], // item_name is room_name for room type
                     'borrow_date' => $data['borrow_date'],
                     'return_date' => $data['return_date'],
                     'status' => $data['status'] ?? 'active',
@@ -227,16 +222,11 @@ class BorrowingModel
     }
 
     // ========================================================================
-    // READ OPERATIONS (Using Optimized Views)
+    // READ OPERATIONS
     // ========================================================================
 
     /**
      * Get all borrowings using optimized view
-     * @param string $type Filter by type (equipment|room)
-     * @param string $status Filter by status (active|returned|cancelled)
-     * @param int $limit Results per page
-     * @param int $offset Pagination offset
-     * @return array Borrowings with all details
      */
     public function getAllBorrowings($type = null, $status = null, $limit = 100, $offset = 0)
     {
@@ -513,22 +503,6 @@ class BorrowingModel
     /**
      * Check room availability using database function
      */
-    public function checkRoomAvailability($roomId, $borrowDate, $returnDate, $excludeBorrowingId = null)
-    {
-        $stmt = $this->conn->prepare("SELECT check_room_availability(:room_id, :borrow_date, :return_date, :exclude_id)");
-        $stmt->bindParam(':room_id', $roomId, PDO::PARAM_INT);
-        $stmt->bindParam(':borrow_date', $borrowDate);
-        $stmt->bindParam(':return_date', $returnDate);
-        $stmt->bindParam(':exclude_id', $excludeBorrowingId, PDO::PARAM_INT);
-        $stmt->execute();
-        $result = $stmt->fetchColumn();
-        // PostgreSQL returns 't' or 'f' for boolean, or true/false depending on driver
-        return $result === true || $result === 't';
-    }
-
-    /**
-     * Get equipment availability status
-     */
     public function getEquipmentAvailability()
     {
         $stmt = $this->conn->prepare("SELECT * FROM equipment_availability_view WHERE is_active = true ORDER BY display_order, equipment_name");
@@ -537,13 +511,27 @@ class BorrowingModel
     }
 
     /**
-     * Get room availability status
+     * Check if Lab Inlet is available for the given time period
      */
-    public function getRoomAvailability()
+    public function isLabInletAvailable($borrowDate, $returnDate)
     {
-        $stmt = $this->conn->prepare("SELECT * FROM room_availability_view WHERE is_active = true ORDER BY display_order, room_name");
+        $query = "SELECT COUNT(*) FROM $this->table 
+                  WHERE type = 'room' 
+                  AND room_name = 'Lab Inlet'
+                  AND status = 'active'
+                  AND (
+                      (:borrow_date BETWEEN borrow_date AND return_date)
+                      OR (:return_date BETWEEN borrow_date AND return_date)
+                      OR (borrow_date BETWEEN :borrow_date AND :return_date)
+                  )";
+        
+        $stmt = $this->conn->prepare($query);
+        $stmt->bindParam(':borrow_date', $borrowDate);
+        $stmt->bindParam(':return_date', $returnDate);
         $stmt->execute();
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        
+        $count = $stmt->fetchColumn();
+        return $count === 0;
     }
 
     // ========================================================================
@@ -600,25 +588,6 @@ class BorrowingModel
                   JOIN borrowing_equipment be ON e.id = be.equipment_id
                   GROUP BY e.id, e.name
                   ORDER BY borrow_count DESC
-                  LIMIT :limit";
-        
-        $stmt = $this->conn->prepare($query);
-        $stmt->bindParam(':limit', $limit, PDO::PARAM_INT);
-        $stmt->execute();
-        
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
-    }
-
-    /**
-     * Get popular rooms
-     */
-    public function getPopularRooms($limit = 10)
-    {
-        $query = "SELECT r.id, r.name, COUNT(b.id) as booking_count
-                  FROM rooms r
-                  JOIN borrowings b ON r.id = b.room_id
-                  GROUP BY r.id, r.name
-                  ORDER BY booking_count DESC
                   LIMIT :limit";
         
         $stmt = $this->conn->prepare($query);

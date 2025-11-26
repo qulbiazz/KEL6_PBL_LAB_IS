@@ -35,7 +35,7 @@
 
             <!-- Peminjaman Dropdown -->
             <?php
-            $peminjaman_pages = ['borrowing.php', 'equipment.php', 'rooms.php'];
+            $peminjaman_pages = ['borrowing.php', 'equipment.php'];
             $is_peminjaman_active = in_array(basename($_SERVER['PHP_SELF']), $peminjaman_pages);
             ?>
             <div>
@@ -47,7 +47,6 @@
                 <div id="peminjaman-dropdown" class="space-y-1 mt-1 pl-10 <?php echo $is_peminjaman_active ? '' : 'hidden'; ?>">
                     <a href="borrowing.php" class="block px-4 py-2 text-sm rounded-lg transition-colors <?php echo basename($_SERVER['PHP_SELF']) == 'borrowing.php' ? 'text-blue-400 font-medium' : 'text-gray-400 hover:text-white hover:bg-gray-800'; ?>">Kelola Peminjaman</a>
                     <a href="equipment.php" class="block px-4 py-2 text-sm rounded-lg transition-colors <?php echo basename($_SERVER['PHP_SELF']) == 'equipment.php' ? 'text-blue-400 font-medium' : 'text-gray-400 hover:text-white hover:bg-gray-800'; ?>">Kelola Alat</a>
-                    <a href="rooms.php" class="block px-4 py-2 text-sm rounded-lg transition-colors <?php echo basename($_SERVER['PHP_SELF']) == 'rooms.php' ? 'text-blue-400 font-medium' : 'text-gray-400 hover:text-white hover:bg-gray-800'; ?>">Kelola Ruangan</a>
                 </div>
             </div>
 
