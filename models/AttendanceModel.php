@@ -8,62 +8,30 @@ class AttendanceModel {
     }
 
     /**
-     * Catat absensi mahasiswa (menggunakan student_id)
+     * Catat absensi mahasiswa (menggunakan stored procedure via wrapper function)
      */
     public function recordAttendance($student_id, $attendance_type, $ip_address = null, $user_agent = null) {
         try {
-            // Gunakan function dari database untuk validasi
+            // Memanggil wrapper function yang memanggil stored procedure
             if ($attendance_type === 'datang') {
-                $check = $this->conn->prepare("SELECT check_student_checkin_today(:student_id)");
-                $check->bindParam(':student_id', $student_id, PDO::PARAM_INT);
-                $check->execute();
-                $can_checkin = $check->fetchColumn();
-                
-                // PostgreSQL returns 't' for true, 'f' for false
-                // Function returns TRUE if CAN check in
-                if ($can_checkin === 'f' || $can_checkin === false || $can_checkin === 0) {
-                    return [
-                        'success' => false,
-                        'message' => 'Anda sudah melakukan absensi datang hari ini.'
-                    ];
-                }
+                $query = "SELECT * FROM fn_student_checkin(:student_id, :ip_address, :user_agent)";
             } else {
-                $check = $this->conn->prepare("SELECT check_student_checkout_today(:student_id)");
-                $check->bindParam(':student_id', $student_id, PDO::PARAM_INT);
-                $check->execute();
-                $can_checkout = $check->fetchColumn();
-                
-                // Function returns TRUE if CAN check out
-                if ($can_checkout === 'f' || $can_checkout === false || $can_checkout === 0) {
-                    return [
-                        'success' => false,
-                        'message' => 'Anda harus absen datang terlebih dahulu atau sudah absen pulang hari ini.'
-                    ];
-                }
+                $query = "SELECT * FROM fn_student_checkout(:student_id, :ip_address, :user_agent)";
             }
-
-            // Insert absensi
-            $query = "INSERT INTO " . $this->table_name . " 
-                     (student_id, attendance_type, ip_address, user_agent) 
-                     VALUES (:student_id, :attendance_type, :ip_address, :user_agent)";
             
             $stmt = $this->conn->prepare($query);
-            
             $stmt->bindParam(':student_id', $student_id, PDO::PARAM_INT);
-            $stmt->bindParam(':attendance_type', $attendance_type);
             $stmt->bindParam(':ip_address', $ip_address);
             $stmt->bindParam(':user_agent', $user_agent);
             
-            if ($stmt->execute()) {
-                return [
-                    'success' => true,
-                    'message' => 'Absensi ' . $attendance_type . ' berhasil dicatat.'
-                ];
-            }
+            $stmt->execute();
+            
+            // Fetch hasil dari wrapper function
+            $result = $stmt->fetch(PDO::FETCH_ASSOC);
             
             return [
-                'success' => false,
-                'message' => 'Gagal mencatat absensi.'
+                'success' => ($result['p_success'] === 't' || $result['p_success'] === true),
+                'message' => $result['p_message'] ?? 'Gagal mencatat absensi.'
             ];
             
         } catch(PDOException $e) {
@@ -163,37 +131,31 @@ class AttendanceModel {
     }
 
     /**
-     * Ambil statistik absensi (menggunakan stats views)
+     * Ambil statistik absensi (menggunakan stored procedure via wrapper function)
      */
     public function getAttendanceStats($date = null) {
         try {
             $date = $date ?: date('Y-m-d');
             
-            $query = "SELECT * FROM attendance_stats_by_date WHERE attendance_date = :date";
+            // Gunakan wrapper function yang memanggil stored procedure
+            $query = "SELECT * FROM fn_get_attendance_stats(:date)";
             
             $stmt = $this->conn->prepare($query);
             $stmt->bindParam(':date', $date);
+            
             $stmt->execute();
             
+            // Fetch hasil dari wrapper function
             $result = $stmt->fetch(PDO::FETCH_ASSOC);
             
-            if (!$result) {
-                return [
-                    'attendance_date' => $date,
-                    'total_checkins' => 0,
-                    'total_checkouts' => 0,
-                    'unique_students' => 0,
-                    'avg_duration_minutes' => 0
-                ];
-            }
-            
-            // Map field names from view to expected format
             return [
-                'attendance_date' => $result['attendance_date'],
-                'total_checkins' => (int)$result['total_check_in'],
-                'total_checkouts' => (int)$result['total_check_out'],
-                'unique_students' => (int)$result['unique_students'],
-                'avg_duration_minutes' => 0 // View doesn't have this field
+                'attendance_date' => $date,
+                'total_checkins' => (int)($result['p_total_checkins'] ?? 0),
+                'total_checkouts' => (int)($result['p_total_checkouts'] ?? 0),
+                'unique_students' => (int)($result['p_unique_students'] ?? 0),
+                'incomplete_count' => (int)($result['p_incomplete_count'] ?? 0),
+                'complete_count' => (int)($result['p_complete_count'] ?? 0),
+                'avg_duration_minutes' => 0
             ];
             
         } catch(PDOException $e) {
@@ -202,34 +164,37 @@ class AttendanceModel {
                 'total_checkins' => 0,
                 'total_checkouts' => 0,
                 'unique_students' => 0,
+                'incomplete_count' => 0,
+                'complete_count' => 0,
                 'avg_duration_minutes' => 0
             ];
         }
     }
 
     /**
-     * Ambil statistik per mahasiswa
+     * Ambil statistik per mahasiswa (menggunakan stored procedure via wrapper function)
      */
     public function getStudentStats($student_id) {
         try {
-            $query = "SELECT * FROM attendance_stats_by_student WHERE student_id = :student_id";
+            // Gunakan wrapper function yang memanggil stored procedure
+            $query = "SELECT * FROM fn_get_student_attendance_summary(:student_id)";
+            
             $stmt = $this->conn->prepare($query);
             $stmt->bindParam(':student_id', $student_id, PDO::PARAM_INT);
+            
             $stmt->execute();
             
+            // Fetch hasil dari wrapper function
             $result = $stmt->fetch(PDO::FETCH_ASSOC);
             
-            if (!$result) {
-                return [
-                    'total_days' => 0,
-                    'total_complete_days' => 0,
-                    'total_incomplete_days' => 0,
-                    'avg_duration_minutes' => 0,
-                    'total_duration_hours' => 0
-                ];
-            }
+            return [
+                'total_days' => (int)($result['p_total_days'] ?? 0),
+                'total_complete_days' => (int)($result['p_complete_days'] ?? 0),
+                'total_incomplete_days' => (int)($result['p_incomplete_days'] ?? 0),
+                'avg_duration_minutes' => (float)($result['p_avg_duration_minutes'] ?? 0),
+                'total_duration_hours' => (float)($result['p_total_duration_hours'] ?? 0)
+            ];
             
-            return $result;
         } catch(PDOException $e) {
             error_log("Error getting student stats: " . $e->getMessage());
             return [
@@ -243,15 +208,25 @@ class AttendanceModel {
     }
 
     /**
-     * Hapus data absensi
+     * Hapus data absensi (menggunakan stored procedure via wrapper function)
      */
     public function deleteAttendance($id) {
         try {
-            $query = "DELETE FROM " . $this->table_name . " WHERE id = :id";
+            // Gunakan wrapper function yang memanggil stored procedure
+            $query = "SELECT * FROM fn_delete_attendance(:id)";
+            
             $stmt = $this->conn->prepare($query);
             $stmt->bindParam(':id', $id, PDO::PARAM_INT);
-            return $stmt->execute();
+            
+            $stmt->execute();
+            
+            // Fetch hasil dari wrapper function
+            $result = $stmt->fetch(PDO::FETCH_ASSOC);
+            
+            return ($result['p_success'] === 't' || $result['p_success'] === true);
+            
         } catch(PDOException $e) {
+            error_log("Error deleting attendance: " . $e->getMessage());
             return false;
         }
     }
