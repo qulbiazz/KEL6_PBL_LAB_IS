@@ -28,4 +28,13 @@ class NewsModel
         }
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
+
+    public function getOtherNews($current_id, $limit = 3)
+    {
+        $stmt = $this->conn->prepare("SELECT * FROM news WHERE id != :current_id AND is_active = true ORDER BY published_at DESC LIMIT :limit");
+        $stmt->bindValue(':current_id', $current_id, PDO::PARAM_INT);
+        $stmt->bindValue(':limit', $limit, PDO::PARAM_INT);
+        $stmt->execute();
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
 }

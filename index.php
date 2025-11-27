@@ -163,6 +163,9 @@ switch ($page) {
             exit();
         }
 
+        // Get other news for "Another News" section
+        $otherNews = $newsModel->getOtherNews($news_id, 3);
+
         $pageTitle = htmlspecialchars($news['title']) . ' - InLet';
         $view = 'pages/news-detail';
         break;
@@ -185,6 +188,9 @@ switch ($page) {
             header('Location: index.php');
             exit();
         }
+
+        // Get other research for "Another Research" section
+        $otherResearch = $researchModel->getOtherResearch($research_id, 3);
 
         $pageTitle = htmlspecialchars($research['title']) . ' - InLet';
         $view = 'pages/research-detail';

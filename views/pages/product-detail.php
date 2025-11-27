@@ -34,7 +34,7 @@
 
                         <div class="bg-blue-50 p-6 rounded-lg mb-6">
                             <h3 class="text-xl font-bold text-gray-800 mb-3">About This Product</h3>
-                            <p class="text-gray-700 leading-relaxed whitespace-pre-line">
+                            <p class="text-gray-700 leading-relaxed">
                                 <?php
                                 $content = trim($product['full_description'] ?? '');
                                 if ($content === '') {
@@ -52,10 +52,6 @@
                                 <div class="flex items-center">
                                     <i class="fas fa-calendar text-blue-600 mr-3"></i>
                                     <span class="text-gray-700">Added: <?php echo date('F d, Y', strtotime($product['created_at'])); ?></span>
-                                </div>
-                                <div class="flex items-center">
-                                    <i class="fas fa-tag text-blue-600 mr-3"></i>
-                                    <span class="text-gray-700">Category: Product</span>
                                 </div>
                             </div>
                         </div>

@@ -52,6 +52,40 @@
                 <h2 class="text-4xl font-bold text-gray-800 mb-4">Our Products</h2>
                 <p class="text-gray-600">Innovative solutions for modern challenges</p>
             </div>
+            <?php if (count($products) > 3): ?>
+            <!-- Swiper for more than 3 items -->
+            <div class="swiper-container-wrapper">
+                <div class="swiper productsSwiper overflow-visible">
+                    <div class="swiper-wrapper pb-4">
+                        <?php foreach ($products as $product): ?>
+                            <div class="swiper-slide h-auto">
+                                <div class="bg-white rounded-xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 flex flex-col h-full border border-gray-100">
+                                    <div class="relative overflow-hidden group">
+                                        <img src="uploads/products/<?php echo htmlspecialchars($product['image']); ?>" 
+                                             alt="<?php echo htmlspecialchars($product['name']); ?>" 
+                                             class="w-full h-48 object-cover transform group-hover:scale-110 transition-transform duration-500">
+                                        <div class="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                                    </div>
+                                    <div class="p-6 flex flex-col flex-grow">
+                                        <h3 class="text-xl font-bold mb-3 text-gray-800 line-clamp-2 min-h-[3.5rem]"><?php echo htmlspecialchars($product['name']); ?></h3>
+                                        <p class="text-gray-600 mb-4 flex-grow line-clamp-3"><?php echo htmlspecialchars($product['description']); ?></p>
+                                        <a href="index.php?page=product-detail&id=<?php echo $product['id']; ?>" 
+                                           class="inline-flex items-center text-blue-600 hover:text-blue-700 font-semibold mt-auto group/link">
+                                            Learn More 
+                                            <i class="fas fa-arrow-right ml-2 transform group-hover/link:translate-x-1 transition-transform"></i>
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        <?php endforeach; ?>
+                    </div>
+                    <div class="swiper-button-next products-button-next"></div>
+                    <div class="swiper-button-prev products-button-prev"></div>
+                    <div class="swiper-pagination products-pagination mt-4"></div>
+                </div>
+            </div>
+            <?php else: ?>
+            <!-- Grid for 3 or fewer items -->
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                 <?php foreach ($products as $product): ?>
                     <div class="bg-white rounded-lg overflow-hidden shadow-md hover:shadow-xl transition flex flex-col h-full">
@@ -66,6 +100,7 @@
                     </div>
                 <?php endforeach; ?>
             </div>
+            <?php endif; ?>
         </div>
     </section>
 
@@ -173,6 +208,44 @@
                 <h2 class="text-4xl font-bold text-gray-800 mb-4">Latest News</h2>
                 <p class="text-gray-600">Stay updated with our latest activities</p>
             </div>
+            <?php if (count($news) > 3): ?>
+            <!-- Swiper for more than 3 items -->
+            <div class="swiper-container-wrapper">
+                <div class="swiper newsSwiper overflow-visible">
+                    <div class="swiper-wrapper pb-4">
+                        <?php foreach ($news as $item): ?>
+                            <div class="swiper-slide h-auto">
+                                <div class="bg-white rounded-xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 flex flex-col h-full border border-gray-100">
+                                    <div class="relative overflow-hidden group">
+                                        <img src="uploads/news/<?php echo htmlspecialchars($item['image']); ?>" 
+                                             alt="<?php echo htmlspecialchars($item['title']); ?>" 
+                                             class="w-full h-48 object-cover transform group-hover:scale-110 transition-transform duration-500">
+                                        <div class="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                                    </div>
+                                    <div class="p-6 flex flex-col flex-grow">
+                                        <div class="flex items-center text-sm text-gray-500 mb-3">
+                                            <i class="far fa-calendar mr-2"></i>
+                                            <span><?php echo date('F d, Y', strtotime($item['published_at'])); ?></span>
+                                        </div>
+                                        <h3 class="text-xl font-bold mb-3 text-gray-800 line-clamp-2 min-h-[3.5rem]"><?php echo htmlspecialchars($item['title']); ?></h3>
+                                        <p class="text-gray-600 mb-4 flex-grow line-clamp-3"><?php echo substr(htmlspecialchars($item['content']), 0, 120); ?>...</p>
+                                        <a href="index.php?page=news-detail&id=<?php echo $item['id']; ?>" 
+                                           class="inline-flex items-center text-blue-600 hover:text-blue-700 font-semibold mt-auto group/link">
+                                            Read More 
+                                            <i class="fas fa-arrow-right ml-2 transform group-hover/link:translate-x-1 transition-transform"></i>
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        <?php endforeach; ?>
+                    </div>
+                    <div class="swiper-button-next news-button-next"></div>
+                    <div class="swiper-button-prev news-button-prev"></div>
+                    <div class="swiper-pagination news-pagination mt-4"></div>
+                </div>
+            </div>
+            <?php else: ?>
+            <!-- Grid for 3 or fewer items -->
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                 <?php foreach ($news as $item): ?>
                     <div class="bg-white rounded-lg overflow-hidden shadow-md hover:shadow-xl transition flex flex-col h-full">
@@ -190,6 +263,7 @@
                     </div>
                 <?php endforeach; ?>
             </div>
+            <?php endif; ?>
         </div>
     </section>
 
@@ -232,6 +306,44 @@
                 <h2 class="text-4xl font-bold text-gray-800 mb-4">Research Activities</h2>
                 <p class="text-gray-600">Exploring new frontiers in technology</p>
             </div>
+            <?php if (count($research) > 3): ?>
+            <!-- Swiper for more than 3 items -->
+            <div class="swiper-container-wrapper">
+                <div class="swiper researchSwiper overflow-visible">
+                    <div class="swiper-wrapper pb-4">
+                        <?php foreach ($research as $activity): ?>
+                            <div class="swiper-slide h-auto">
+                                <div class="bg-white rounded-xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 flex flex-col h-full border border-gray-100">
+                                    <div class="relative overflow-hidden group">
+                                        <img src="uploads/research/<?php echo htmlspecialchars($activity['image']); ?>" 
+                                             alt="<?php echo htmlspecialchars($activity['title']); ?>" 
+                                             class="w-full h-48 object-cover transform group-hover:scale-110 transition-transform duration-500">
+                                        <div class="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                                    </div>
+                                    <div class="p-6 flex flex-col flex-grow">
+                                        <h3 class="text-xl font-bold mb-3 text-gray-800 line-clamp-2 min-h-[3.5rem]"><?php echo htmlspecialchars($activity['title']); ?></h3>
+                                        <p class="text-gray-600 mb-4 flex-grow line-clamp-3"><?php echo htmlspecialchars($activity['description']); ?></p>
+                                        <div class="flex items-center text-sm text-gray-500 mb-4">
+                                            <i class="far fa-calendar mr-2"></i>
+                                            <span><?php echo date('F Y', strtotime($activity['created_at'])); ?></span>
+                                        </div>
+                                        <a href="index.php?page=research-detail&id=<?php echo $activity['id']; ?>" 
+                                           class="inline-flex items-center text-blue-600 hover:text-blue-700 font-semibold mt-auto group/link">
+                                            Read More 
+                                            <i class="fas fa-arrow-right ml-2 transform group-hover/link:translate-x-1 transition-transform"></i>
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        <?php endforeach; ?>
+                    </div>
+                    <div class="swiper-button-next research-button-next"></div>
+                    <div class="swiper-button-prev research-button-prev"></div>
+                    <div class="swiper-pagination research-pagination mt-4"></div>
+                </div>
+            </div>
+            <?php else: ?>
+            <!-- Grid for 3 or fewer items -->
             <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
                 <?php foreach ($research as $activity): ?>
                     <div class="bg-white rounded-lg overflow-hidden shadow-md hover:shadow-xl transition flex flex-col h-full">
@@ -249,5 +361,6 @@
                     </div>
                 <?php endforeach; ?>
             </div>
+            <?php endif; ?>
         </div>
     </section>
