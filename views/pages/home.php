@@ -53,53 +53,53 @@
                 <p class="text-gray-600">Innovative solutions for modern challenges</p>
             </div>
             <?php if (count($products) > 3): ?>
-            <!-- Swiper for more than 3 items -->
-            <div class="swiper-container-wrapper">
-                <div class="swiper productsSwiper overflow-visible">
-                    <div class="swiper-wrapper pb-4">
-                        <?php foreach ($products as $product): ?>
-                            <div class="swiper-slide h-auto">
-                                <div class="bg-white rounded-xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 flex flex-col h-full border border-gray-100">
-                                    <div class="relative overflow-hidden group">
-                                        <img src="uploads/products/<?php echo htmlspecialchars($product['image']); ?>" 
-                                             alt="<?php echo htmlspecialchars($product['name']); ?>" 
-                                             class="w-full h-48 object-cover transform group-hover:scale-110 transition-transform duration-500">
-                                        <div class="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-                                    </div>
-                                    <div class="p-6 flex flex-col flex-grow">
-                                        <h3 class="text-xl font-bold mb-3 text-gray-800 line-clamp-2 min-h-[3.5rem]"><?php echo htmlspecialchars($product['name']); ?></h3>
-                                        <p class="text-gray-600 mb-4 flex-grow line-clamp-3"><?php echo htmlspecialchars($product['description']); ?></p>
-                                        <a href="index.php?page=product-detail&id=<?php echo $product['id']; ?>" 
-                                           class="inline-flex items-center text-blue-600 hover:text-blue-700 font-semibold mt-auto group/link">
-                                            Learn More 
-                                            <i class="fas fa-arrow-right ml-2 transform group-hover/link:translate-x-1 transition-transform"></i>
-                                        </a>
+                <!-- Swiper for more than 3 items -->
+                <div class="swiper-container-wrapper">
+                    <div class="swiper productsSwiper overflow-visible">
+                        <div class="swiper-wrapper pb-4">
+                            <?php foreach ($products as $product): ?>
+                                <div class="swiper-slide h-auto">
+                                    <div class="bg-white rounded-xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 flex flex-col h-full border border-gray-100">
+                                        <div class="relative overflow-hidden group">
+                                            <img src="uploads/products/<?php echo htmlspecialchars($product['image']); ?>"
+                                                alt="<?php echo htmlspecialchars($product['name']); ?>"
+                                                class="w-full h-48 object-cover transform group-hover:scale-110 transition-transform duration-500">
+                                            <div class="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                                        </div>
+                                        <div class="p-6 flex flex-col flex-grow">
+                                            <h3 class="text-xl font-bold mb-3 text-gray-800 line-clamp-2 min-h-[3.5rem]"><?php echo htmlspecialchars($product['name']); ?></h3>
+                                            <p class="text-gray-600 mb-4 flex-grow line-clamp-3"><?php echo htmlspecialchars($product['description']); ?></p>
+                                            <a href="index.php?page=product-detail&id=<?php echo $product['id']; ?>"
+                                                class="inline-flex items-center text-blue-600 hover:text-blue-700 font-semibold mt-auto group/link">
+                                                Learn More
+                                                <i class="fas fa-arrow-right ml-2 transform group-hover/link:translate-x-1 transition-transform"></i>
+                                            </a>
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
-                        <?php endforeach; ?>
-                    </div>
-                    <div class="swiper-button-next products-button-next"></div>
-                    <div class="swiper-button-prev products-button-prev"></div>
-                    <div class="swiper-pagination products-pagination mt-4"></div>
-                </div>
-            </div>
-            <?php else: ?>
-            <!-- Grid for 3 or fewer items -->
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                <?php foreach ($products as $product): ?>
-                    <div class="bg-white rounded-lg overflow-hidden shadow-md hover:shadow-xl transition flex flex-col h-full">
-                        <img src="uploads/products/<?php echo htmlspecialchars($product['image']); ?>" alt="<?php echo htmlspecialchars($product['name']); ?>" class="w-full h-48 object-cover">
-                        <div class="p-6 flex flex-col flex-grow">
-                            <h3 class="text-xl font-bold mb-2 text-gray-800"><?php echo htmlspecialchars($product['name']); ?></h3>
-                            <p class="text-gray-600 mb-4 flex-grow"><?php echo htmlspecialchars($product['description']); ?></p>
-                            <a href="index.php?page=product-detail&id=<?php echo $product['id']; ?>" class="text-blue-600 hover:text-blue-700 font-semibold mt-auto">
-                                Learn More <i class="fas fa-arrow-right ml-1"></i>
-                            </a>
+                            <?php endforeach; ?>
                         </div>
+                        <div class="swiper-button-next products-button-next"></div>
+                        <div class="swiper-button-prev products-button-prev"></div>
+                        <div class="swiper-pagination products-pagination mt-4"></div>
                     </div>
-                <?php endforeach; ?>
-            </div>
+                </div>
+            <?php else: ?>
+                <!-- Grid for 3 or fewer items -->
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                    <?php foreach ($products as $product): ?>
+                        <div class="bg-white rounded-lg overflow-hidden shadow-md hover:shadow-xl transition flex flex-col h-full">
+                            <img src="uploads/products/<?php echo htmlspecialchars($product['image']); ?>" alt="<?php echo htmlspecialchars($product['name']); ?>" class="w-full h-48 object-cover">
+                            <div class="p-6 flex flex-col flex-grow">
+                                <h3 class="text-xl font-bold mb-2 text-gray-800"><?php echo htmlspecialchars($product['name']); ?></h3>
+                                <p class="text-gray-600 mb-4 flex-grow"><?php echo htmlspecialchars($product['description']); ?></p>
+                                <a href="index.php?page=product-detail&id=<?php echo $product['id']; ?>" class="text-blue-600 hover:text-blue-700 font-semibold mt-auto">
+                                    Learn More <i class="fas fa-arrow-right ml-1"></i>
+                                </a>
+                            </div>
+                        </div>
+                    <?php endforeach; ?>
+                </div>
             <?php endif; ?>
         </div>
     </section>
@@ -209,60 +209,60 @@
                 <p class="text-gray-600">Stay updated with our latest activities</p>
             </div>
             <?php if (count($news) > 3): ?>
-            <!-- Swiper for more than 3 items -->
-            <div class="swiper-container-wrapper">
-                <div class="swiper newsSwiper overflow-visible">
-                    <div class="swiper-wrapper pb-4">
-                        <?php foreach ($news as $item): ?>
-                            <div class="swiper-slide h-auto">
-                                <div class="bg-white rounded-xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 flex flex-col h-full border border-gray-100">
-                                    <div class="relative overflow-hidden group">
-                                        <img src="uploads/news/<?php echo htmlspecialchars($item['image']); ?>" 
-                                             alt="<?php echo htmlspecialchars($item['title']); ?>" 
-                                             class="w-full h-48 object-cover transform group-hover:scale-110 transition-transform duration-500">
-                                        <div class="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-                                    </div>
-                                    <div class="p-6 flex flex-col flex-grow">
-                                        <div class="flex items-center text-sm text-gray-500 mb-3">
-                                            <i class="far fa-calendar mr-2"></i>
-                                            <span><?php echo date('F d, Y', strtotime($item['published_at'])); ?></span>
+                <!-- Swiper for more than 3 items -->
+                <div class="swiper-container-wrapper">
+                    <div class="swiper newsSwiper overflow-visible">
+                        <div class="swiper-wrapper pb-4">
+                            <?php foreach ($news as $item): ?>
+                                <div class="swiper-slide h-auto">
+                                    <div class="bg-white rounded-xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 flex flex-col h-full border border-gray-100">
+                                        <div class="relative overflow-hidden group">
+                                            <img src="uploads/news/<?php echo htmlspecialchars($item['image']); ?>"
+                                                alt="<?php echo htmlspecialchars($item['title']); ?>"
+                                                class="w-full h-48 object-cover transform group-hover:scale-110 transition-transform duration-500">
+                                            <div class="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                                         </div>
-                                        <h3 class="text-xl font-bold mb-3 text-gray-800 line-clamp-2 min-h-[3.5rem]"><?php echo htmlspecialchars($item['title']); ?></h3>
-                                        <p class="text-gray-600 mb-4 flex-grow line-clamp-3"><?php echo substr(htmlspecialchars($item['content']), 0, 120); ?>...</p>
-                                        <a href="index.php?page=news-detail&id=<?php echo $item['id']; ?>" 
-                                           class="inline-flex items-center text-blue-600 hover:text-blue-700 font-semibold mt-auto group/link">
-                                            Read More 
-                                            <i class="fas fa-arrow-right ml-2 transform group-hover/link:translate-x-1 transition-transform"></i>
-                                        </a>
+                                        <div class="p-6 flex flex-col flex-grow">
+                                            <div class="flex items-center text-sm text-gray-500 mb-3">
+                                                <i class="far fa-calendar mr-2"></i>
+                                                <span><?php echo date('F d, Y', strtotime($item['published_at'])); ?></span>
+                                            </div>
+                                            <h3 class="text-xl font-bold mb-3 text-gray-800 line-clamp-2 min-h-[3.5rem]"><?php echo htmlspecialchars($item['title']); ?></h3>
+                                            <p class="text-gray-600 mb-4 flex-grow line-clamp-3"><?php echo substr(htmlspecialchars($item['content']), 0, 120); ?>...</p>
+                                            <a href="index.php?page=news-detail&id=<?php echo $item['id']; ?>"
+                                                class="inline-flex items-center text-blue-600 hover:text-blue-700 font-semibold mt-auto group/link">
+                                                Read More
+                                                <i class="fas fa-arrow-right ml-2 transform group-hover/link:translate-x-1 transition-transform"></i>
+                                            </a>
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
-                        <?php endforeach; ?>
-                    </div>
-                    <div class="swiper-button-next news-button-next"></div>
-                    <div class="swiper-button-prev news-button-prev"></div>
-                    <div class="swiper-pagination news-pagination mt-4"></div>
-                </div>
-            </div>
-            <?php else: ?>
-            <!-- Grid for 3 or fewer items -->
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                <?php foreach ($news as $item): ?>
-                    <div class="bg-white rounded-lg overflow-hidden shadow-md hover:shadow-xl transition flex flex-col h-full">
-                        <img src="uploads/news/<?php echo htmlspecialchars($item['image']); ?>" alt="<?php echo htmlspecialchars($item['title']); ?>" class="w-full h-48 object-cover">
-                        <div class="p-6 flex flex-col flex-grow">
-                            <div class="text-sm text-gray-500 mb-2">
-                                <i class="far fa-calendar"></i> <?php echo date('F d, Y', strtotime($item['published_at'])); ?>
-                            </div>
-                            <h3 class="text-xl font-bold mb-2 text-gray-800"><?php echo htmlspecialchars($item['title']); ?></h3>
-                            <p class="text-gray-600 mb-4 flex-grow"><?php echo substr(htmlspecialchars($item['content']), 0, 100); ?>...</p>
-                            <a href="index.php?page=news-detail&id=<?php echo $item['id']; ?>" class="text-blue-600 hover:text-blue-700 font-semibold mt-auto">
-                                Read More <i class="fas fa-arrow-right ml-1"></i>
-                            </a>
+                            <?php endforeach; ?>
                         </div>
+                        <div class="swiper-button-next news-button-next"></div>
+                        <div class="swiper-button-prev news-button-prev"></div>
+                        <div class="swiper-pagination news-pagination mt-4"></div>
                     </div>
-                <?php endforeach; ?>
-            </div>
+                </div>
+            <?php else: ?>
+                <!-- Grid for 3 or fewer items -->
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                    <?php foreach ($news as $item): ?>
+                        <div class="bg-white rounded-lg overflow-hidden shadow-md hover:shadow-xl transition flex flex-col h-full">
+                            <img src="uploads/news/<?php echo htmlspecialchars($item['image']); ?>" alt="<?php echo htmlspecialchars($item['title']); ?>" class="w-full h-48 object-cover">
+                            <div class="p-6 flex flex-col flex-grow">
+                                <div class="text-sm text-gray-500 mb-2">
+                                    <i class="far fa-calendar"></i> <?php echo date('F d, Y', strtotime($item['published_at'])); ?>
+                                </div>
+                                <h3 class="text-xl font-bold mb-2 text-gray-800"><?php echo htmlspecialchars($item['title']); ?></h3>
+                                <p class="text-gray-600 mb-4 flex-grow"><?php echo substr(htmlspecialchars($item['content']), 0, 100); ?>...</p>
+                                <a href="index.php?page=news-detail&id=<?php echo $item['id']; ?>" class="text-blue-600 hover:text-blue-700 font-semibold mt-auto">
+                                    Read More <i class="fas fa-arrow-right ml-1"></i>
+                                </a>
+                            </div>
+                        </div>
+                    <?php endforeach; ?>
+                </div>
             <?php endif; ?>
         </div>
     </section>
@@ -307,60 +307,330 @@
                 <p class="text-gray-600">Exploring new frontiers in technology</p>
             </div>
             <?php if (count($research) > 3): ?>
-            <!-- Swiper for more than 3 items -->
-            <div class="swiper-container-wrapper">
-                <div class="swiper researchSwiper overflow-visible">
-                    <div class="swiper-wrapper pb-4">
-                        <?php foreach ($research as $activity): ?>
-                            <div class="swiper-slide h-auto">
-                                <div class="bg-white rounded-xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 flex flex-col h-full border border-gray-100">
-                                    <div class="relative overflow-hidden group">
-                                        <img src="uploads/research/<?php echo htmlspecialchars($activity['image']); ?>" 
-                                             alt="<?php echo htmlspecialchars($activity['title']); ?>" 
-                                             class="w-full h-48 object-cover transform group-hover:scale-110 transition-transform duration-500">
-                                        <div class="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-                                    </div>
-                                    <div class="p-6 flex flex-col flex-grow">
-                                        <h3 class="text-xl font-bold mb-3 text-gray-800 line-clamp-2 min-h-[3.5rem]"><?php echo htmlspecialchars($activity['title']); ?></h3>
-                                        <p class="text-gray-600 mb-4 flex-grow line-clamp-3"><?php echo htmlspecialchars($activity['description']); ?></p>
-                                        <div class="flex items-center text-sm text-gray-500 mb-4">
-                                            <i class="far fa-calendar mr-2"></i>
-                                            <span><?php echo date('F Y', strtotime($activity['created_at'])); ?></span>
+                <!-- Swiper for more than 3 items -->
+                <div class="swiper-container-wrapper">
+                    <div class="swiper researchSwiper overflow-visible">
+                        <div class="swiper-wrapper pb-4">
+                            <?php foreach ($research as $activity): ?>
+                                <div class="swiper-slide h-auto">
+                                    <div class="bg-white rounded-xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 flex flex-col h-full border border-gray-100">
+                                        <div class="relative overflow-hidden group">
+                                            <img src="uploads/research/<?php echo htmlspecialchars($activity['image']); ?>"
+                                                alt="<?php echo htmlspecialchars($activity['title']); ?>"
+                                                class="w-full h-48 object-cover transform group-hover:scale-110 transition-transform duration-500">
+                                            <div class="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                                         </div>
-                                        <a href="index.php?page=research-detail&id=<?php echo $activity['id']; ?>" 
-                                           class="inline-flex items-center text-blue-600 hover:text-blue-700 font-semibold mt-auto group/link">
-                                            Read More 
-                                            <i class="fas fa-arrow-right ml-2 transform group-hover/link:translate-x-1 transition-transform"></i>
-                                        </a>
+                                        <div class="p-6 flex flex-col flex-grow">
+                                            <h3 class="text-xl font-bold mb-3 text-gray-800 line-clamp-2 min-h-[3.5rem]"><?php echo htmlspecialchars($activity['title']); ?></h3>
+                                            <p class="text-gray-600 mb-4 flex-grow line-clamp-3"><?php echo htmlspecialchars($activity['description']); ?></p>
+                                            <div class="flex items-center text-sm text-gray-500 mb-4">
+                                                <i class="far fa-calendar mr-2"></i>
+                                                <span><?php echo date('F Y', strtotime($activity['created_at'])); ?></span>
+                                            </div>
+                                            <a href="index.php?page=research-detail&id=<?php echo $activity['id']; ?>"
+                                                class="inline-flex items-center text-blue-600 hover:text-blue-700 font-semibold mt-auto group/link">
+                                                Read More
+                                                <i class="fas fa-arrow-right ml-2 transform group-hover/link:translate-x-1 transition-transform"></i>
+                                            </a>
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
-                        <?php endforeach; ?>
-                    </div>
-                    <div class="swiper-button-next research-button-next"></div>
-                    <div class="swiper-button-prev research-button-prev"></div>
-                    <div class="swiper-pagination research-pagination mt-4"></div>
-                </div>
-            </div>
-            <?php else: ?>
-            <!-- Grid for 3 or fewer items -->
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-                <?php foreach ($research as $activity): ?>
-                    <div class="bg-white rounded-lg overflow-hidden shadow-md hover:shadow-xl transition flex flex-col h-full">
-                        <img src="uploads/research/<?php echo htmlspecialchars($activity['image']); ?>" alt="<?php echo htmlspecialchars($activity['title']); ?>" class="w-full h-48 object-cover">
-                        <div class="p-6 flex flex-col flex-grow">
-                            <h3 class="text-xl font-bold mb-2 text-gray-800"><?php echo htmlspecialchars($activity['title']); ?></h3>
-                            <p class="text-gray-600 mb-4 flex-grow"><?php echo htmlspecialchars($activity['description']); ?></p>
-                            <div class="text-sm text-gray-500 mb-4">
-                                <i class="far fa-calendar"></i> <?php echo date('F Y', strtotime($activity['created_at'])); ?>
-                            </div>
-                            <a href="index.php?page=research-detail&id=<?php echo $activity['id']; ?>" class="text-blue-600 hover:text-blue-700 font-semibold mt-auto">
-                                Read More <i class="fas fa-arrow-right ml-1"></i>
-                            </a>
+                            <?php endforeach; ?>
                         </div>
+                        <div class="swiper-button-next research-button-next"></div>
+                        <div class="swiper-button-prev research-button-prev"></div>
+                        <div class="swiper-pagination research-pagination mt-4"></div>
                     </div>
-                <?php endforeach; ?>
-            </div>
+                </div>
+            <?php else: ?>
+                <!-- Grid for 3 or fewer items -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                    <?php foreach ($research as $activity): ?>
+                        <div class="bg-white rounded-lg overflow-hidden shadow-md hover:shadow-xl transition flex flex-col h-full">
+                            <img src="uploads/research/<?php echo htmlspecialchars($activity['image']); ?>" alt="<?php echo htmlspecialchars($activity['title']); ?>" class="w-full h-48 object-cover">
+                            <div class="p-6 flex flex-col flex-grow">
+                                <h3 class="text-xl font-bold mb-2 text-gray-800"><?php echo htmlspecialchars($activity['title']); ?></h3>
+                                <p class="text-gray-600 mb-4 flex-grow"><?php echo htmlspecialchars($activity['description']); ?></p>
+                                <div class="text-sm text-gray-500 mb-4">
+                                    <i class="far fa-calendar"></i> <?php echo date('F Y', strtotime($activity['created_at'])); ?>
+                                </div>
+                                <a href="index.php?page=research-detail&id=<?php echo $activity['id']; ?>" class="text-blue-600 hover:text-blue-700 font-semibold mt-auto">
+                                    Read More <i class="fas fa-arrow-right ml-1"></i>
+                                </a>
+                            </div>
+                        </div>
+                    <?php endforeach; ?>
+                </div>
             <?php endif; ?>
         </div>
     </section>
+
+    <!-- Guestbook Section -->
+    <section id="guestbook" class="py-20 bg-gradient-to-br from-blue-50 via-white to-indigo-50">
+        <div class="container mx-auto px-6 md:px-8 lg:px-12">
+            <div class="max-w-4xl mx-auto">
+                <!-- Header -->
+                <div class="text-center mb-12">
+                    <div class="inline-block mb-4">
+                        <div class="flex items-center justify-center w-16 h-16 bg-blue-100 rounded-full mx-auto">
+                            <i class="fas fa-book-open text-3xl text-blue-600"></i>
+                        </div>
+                    </div>
+                    <h2 class="text-4xl font-bold text-gray-800 mb-4">Guestbook</h2>
+                    <p class="text-gray-600 text-lg">Share your thoughts and leave a message for us</p>
+                </div>
+
+                <!-- Success Message (Hidden by default) -->
+                <div id="guestbookSuccess" class="hidden mb-6 bg-green-50 border border-green-200 text-green-800 px-6 py-4 rounded-lg flex items-start">
+                    <i class="fas fa-check-circle text-2xl mr-3 mt-1"></i>
+                    <div>
+                        <p class="font-semibold">Thank you for your message!</p>
+                        <p class="text-sm">Your entry has been successfully recorded.</p>
+                    </div>
+                </div>
+
+                <!-- Error Message (Hidden by default) -->
+                <div id="guestbookError" class="hidden mb-6 bg-red-50 border border-red-200 text-red-800 px-6 py-4 rounded-lg flex items-start">
+                    <i class="fas fa-exclamation-circle text-2xl mr-3 mt-1"></i>
+                    <div>
+                        <p class="font-semibold">Oops! Something went wrong</p>
+                        <p class="text-sm" id="errorMessage">Please try again.</p>
+                    </div>
+                </div>
+
+                <!-- Guestbook Form -->
+                <div class="bg-white rounded-2xl shadow-xl p-8 md:p-10 border border-gray-100">
+                    <form id="guestbookForm" class="space-y-6">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <!-- Name Field -->
+                            <div class="form-group">
+                                <label for="guestName" class="block text-sm font-semibold text-gray-700 mb-2">
+                                    Full Name <span class="text-red-500">*</span>
+                                </label>
+                                <div class="relative">
+                                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                        <i class="fas fa-user text-gray-400"></i>
+                                    </div>
+                                    <input type="text"
+                                        id="guestName"
+                                        name="name"
+                                        required
+                                        class="block w-full pl-10 pr-3 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+                                        placeholder="Enter your name">
+                                </div>
+                            </div>
+
+                            <!-- Institution Field -->
+                            <div class="form-group">
+                                <label for="guestInstitution" class="block text-sm font-semibold text-gray-700 mb-2">
+                                    Institution <span class="text-red-500">*</span>
+                                </label>
+                                <div class="relative">
+                                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                        <i class="fas fa-building text-gray-400"></i>
+                                    </div>
+                                    <input type="text"
+                                        id="guestInstitution"
+                                        name="institution"
+                                        required
+                                        class="block w-full pl-10 pr-3 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+                                        placeholder="Your institution/organization">
+                                </div>
+                            </div>
+
+                            <!-- Email Field -->
+                            <div class="form-group">
+                                <label for="guestEmail" class="block text-sm font-semibold text-gray-700 mb-2">
+                                    Email Address <span class="text-red-500">*</span>
+                                </label>
+                                <div class="relative">
+                                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                        <i class="fas fa-envelope text-gray-400"></i>
+                                    </div>
+                                    <input type="email"
+                                        id="guestEmail"
+                                        name="email"
+                                        required
+                                        class="block w-full pl-10 pr-3 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+                                        placeholder="your.email@example.com">
+                                </div>
+                            </div>
+
+                            <!-- Phone Field -->
+                            <div class="form-group">
+                                <label for="guestPhone" class="block text-sm font-semibold text-gray-700 mb-2">
+                                    Phone Number <span class="text-red-500">*</span>
+                                </label>
+                                <div class="relative">
+                                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                        <i class="fas fa-phone text-gray-400"></i>
+                                    </div>
+                                    <input type="tel"
+                                        id="guestPhone"
+                                        name="phone"
+                                        required
+                                        pattern="[0-9+\-\(\)\s]+"
+                                        class="block w-full pl-10 pr-3 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+                                        placeholder="081234567890">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Message Field -->
+                        <div class="form-group">
+                            <label for="guestMessage" class="block text-sm font-semibold text-gray-700 mb-2">
+                                Your Message <span class="text-red-500">*</span>
+                            </label>
+                            <div class="relative">
+                                <div class="absolute top-3 left-3 pointer-events-none">
+                                    <i class="fas fa-comment-dots text-gray-400"></i>
+                                </div>
+                                <textarea id="guestMessage"
+                                    name="message"
+                                    rows="5"
+                                    required
+                                    maxlength="1000"
+                                    class="block w-full pl-10 pr-3 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 resize-none"
+                                    placeholder="Share your thoughts, feedback, or questions..."></textarea>
+                                <div class="text-right mt-1">
+                                    <span id="charCount" class="text-xs text-gray-500">0 / 1000</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Submit Button -->
+                        <div class="flex items-center justify-between pt-4">
+                            <p class="text-sm text-gray-500">
+                                <i class="fas fa-info-circle mr-1"></i>
+                                All fields are required
+                            </p>
+                            <button type="submit"
+                                id="submitGuestbook"
+                                class="inline-flex items-center px-8 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-semibold rounded-lg hover:from-blue-700 hover:to-indigo-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transform hover:scale-105 transition-all duration-200 shadow-lg">
+                                <i class="fas fa-paper-plane mr-2"></i>
+                                Send Message
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <script>
+        // Guestbook Form Handler
+        document.addEventListener('DOMContentLoaded', function() {
+            const form = document.getElementById('guestbookForm');
+            const submitBtn = document.getElementById('submitGuestbook');
+            const successMsg = document.getElementById('guestbookSuccess');
+            const errorMsg = document.getElementById('guestbookError');
+            const errorText = document.getElementById('errorMessage');
+            const messageInput = document.getElementById('guestMessage');
+            const charCount = document.getElementById('charCount');
+
+            // Character counter
+            if (messageInput && charCount) {
+                messageInput.addEventListener('input', function() {
+                    const count = this.value.length;
+                    charCount.textContent = count + ' / 1000';
+                    if (count > 950) {
+                        charCount.classList.add('text-red-500');
+                        charCount.classList.remove('text-gray-500');
+                    } else {
+                        charCount.classList.add('text-gray-500');
+                        charCount.classList.remove('text-red-500');
+                    }
+                });
+            }
+
+            if (form) {
+                form.addEventListener('submit', function(e) {
+                    e.preventDefault();
+
+                    // Hide messages
+                    if (successMsg) successMsg.classList.add('hidden');
+                    if (errorMsg) errorMsg.classList.add('hidden');
+
+                    // Disable button
+                    submitBtn.disabled = true;
+                    submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Sending...';
+
+                    // Get form data
+                    const formData = new FormData(form);
+                    formData.append('ajax', '1');
+
+                    // Send AJAX request
+                    fetch('views/pages/ajax_submit_guestbook.php', {
+                            method: 'POST',
+                            body: formData
+                        })
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.success) {
+                                // Show success message
+                                if (successMsg) {
+                                    successMsg.classList.remove('hidden');
+                                    successMsg.scrollIntoView({
+                                        behavior: 'smooth',
+                                        block: 'center'
+                                    });
+                                }
+
+                                // Reset form
+                                form.reset();
+                                if (charCount) charCount.textContent = '0 / 1000';
+
+                                // Hide success message after 5 seconds
+                                setTimeout(() => {
+                                    if (successMsg) successMsg.classList.add('hidden');
+                                }, 5000);
+                            } else {
+                                // Show error message
+                                if (errorText) errorText.textContent = data.message || 'Please try again.';
+                                if (errorMsg) {
+                                    errorMsg.classList.remove('hidden');
+                                    errorMsg.scrollIntoView({
+                                        behavior: 'smooth',
+                                        block: 'center'
+                                    });
+                                }
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Error:', error);
+                            if (errorText) errorText.textContent = 'Network error. Please check your connection.';
+                            if (errorMsg) {
+                                errorMsg.classList.remove('hidden');
+                                errorMsg.scrollIntoView({
+                                    behavior: 'smooth',
+                                    block: 'center'
+                                });
+                            }
+                        })
+                        .finally(() => {
+                            // Re-enable button
+                            submitBtn.disabled = false;
+                            submitBtn.innerHTML = '<i class="fas fa-paper-plane mr-2"></i>Send Message';
+                        });
+                });
+            }
+
+            // Input validation and styling
+            const inputs = form.querySelectorAll('input, textarea');
+            inputs.forEach(input => {
+                input.addEventListener('blur', function() {
+                    if (this.value.trim() === '' && this.hasAttribute('required')) {
+                        this.classList.add('border-red-300');
+                        this.classList.remove('border-gray-300');
+                    } else {
+                        this.classList.remove('border-red-300');
+                        this.classList.add('border-gray-300');
+                    }
+                });
+
+                input.addEventListener('focus', function() {
+                    this.classList.remove('border-red-300');
+                });
+            });
+        });
+    </script>

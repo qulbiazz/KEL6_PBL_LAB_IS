@@ -89,6 +89,12 @@
                 </div>
             </div>
 
+            <!-- Buku Tamu -->
+            <a href="guestbook.php" class="flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors <?php echo basename($_SERVER['PHP_SELF']) == 'guestbook.php' ? 'bg-blue-600 text-white' : 'text-gray-300 hover:bg-gray-800 hover:text-white'; ?>">
+                <i class="fas fa-book-open w-6 text-center mr-2"></i>
+                Buku Tamu
+            </a>
+
         </nav>
     </div>
 </aside>

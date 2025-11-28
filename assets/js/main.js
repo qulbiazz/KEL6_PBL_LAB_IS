@@ -252,7 +252,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const currentPage = urlParams.get('page') || 'home';
     
     if (currentPage === 'home') {
-        const sections = ['products', 'team', 'news', 'gallery', 'research'];
+        const sections = ['products', 'team', 'news', 'gallery', 'research', 'guestbook'];
         const navLinks = document.querySelectorAll('.nav-section-link');
         const homeLinks = document.querySelectorAll('.nav-home-link');
         
