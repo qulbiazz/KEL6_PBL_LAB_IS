@@ -4,6 +4,10 @@
 .env.*.local
 config/database.php.backup
 
+# Database exports (sensitive data)
+database/exports/
+database/backups/
+
 # Node modules & dependencies
 node_modules/
 package-lock.json
@@ -11,6 +15,12 @@ package-lock.json
 # Uploads Directory
 uploads/*
 !uploads/.gitkeep
+!uploads/*/.gitkeep
+
+# Logs
+error.log
+*.log
+logs/
 
 # Byte-compiled / optimized / compiled files
 __pycache__/
@@ -27,7 +37,7 @@ __pycache__/
 
 test_placeholders.html
 
-#image files except inlet_logo.png and placeholders
+#image files except inlet_logo.png, inlet_logo_only.png and placeholders
 *.png
 *.jpg
 *.jpeg
@@ -35,6 +45,7 @@ test_placeholders.html
 *.bmp
 *.tiff
 !inlet_logo.png
+!inlet_logo_only.png
 !placeholder*.png
 !placeholder*.jpg
 
