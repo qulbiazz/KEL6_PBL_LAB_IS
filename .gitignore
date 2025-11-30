@@ -72,3 +72,5 @@ temp/
 *.sql
 
 database/migrations/
+
+export_database.*

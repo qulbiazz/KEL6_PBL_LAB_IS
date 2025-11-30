@@ -14,6 +14,18 @@
 <body class="<?php echo $bodyClass ?? 'bg-gray-50'; ?>">
     <!-- Navigation -->
     <?php
+    // Load site settings for dynamic logo
+    require_once __DIR__ . '/../../config/database.php';
+    require_once __DIR__ . '/../../models/SiteSettingsModel.php';
+
+    $database = new Database();
+    $db = $database->getConnection();
+    $siteSettingsModel = new SiteSettingsModel($db);
+    $siteSettings = $siteSettingsModel->getSettings();
+
+    $logoPath = $siteSettings['logo_path'] ?? 'assets/images/inlet_logo_only.png';
+    $logoAlt = $siteSettings['logo_alt'] ?? 'INLET Logo';
+
     // Get current page from URL parameter
     $current_page_param = $_GET['page'] ?? 'home';
 
@@ -33,7 +45,7 @@
             <div class="flex justify-between items-center py-3">
                 <div class="flex items-center">
                     <a href="index.php" class="flex items-center">
-                        <img src="assets/images/inlet_logo.png" alt="InLet Logo" class="h-12 md:h-14 lg:h-16 w-auto">
+                        <img src="<?php echo htmlspecialchars($logoPath); ?>" alt="<?php echo htmlspecialchars($logoAlt); ?>" class="h-12 md:h-14 lg:h-16 w-auto object-contain">
                     </a>
                 </div>
                 <div class="hidden md:flex space-x-8 items-center">
@@ -73,4 +85,3 @@
             </div>
         </div>
     </nav>
-    

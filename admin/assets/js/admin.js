@@ -108,16 +108,34 @@ document.addEventListener('keydown', function (event) {
 });
 
 // Sidebar Dropdown Toggle
-function toggleDropdown(dropdownId, button) {
+window.toggleDropdown = function(dropdownId, button) {
+    console.log('toggleDropdown called:', dropdownId);
     const dropdown = document.getElementById(dropdownId);
     const icon = button.querySelector('.fa-chevron-down');
+    
+    console.log('Dropdown element:', dropdown);
+    console.log('Icon element:', icon);
+    console.log('Current display:', dropdown ? window.getComputedStyle(dropdown).display : 'N/A');
 
-    if (dropdown.classList.contains('hidden')) {
-        dropdown.classList.remove('hidden');
-        icon.classList.add('rotate-180');
+    if (dropdown && icon) {
+        // Check current state using computed style
+        const isHidden = window.getComputedStyle(dropdown).display === 'none';
+        
+        if (isHidden || dropdown.classList.contains('hidden')) {
+            // Show dropdown
+            dropdown.classList.remove('hidden');
+            dropdown.style.display = 'block'; // Force display
+            icon.classList.add('rotate-180');
+            console.log('Dropdown shown - display:', window.getComputedStyle(dropdown).display);
+        } else {
+            // Hide dropdown
+            dropdown.classList.add('hidden');
+            dropdown.style.display = 'none'; // Force hide
+            icon.classList.remove('rotate-180');
+            console.log('Dropdown hidden');
+        }
     } else {
-        dropdown.classList.add('hidden');
-        icon.classList.remove('rotate-180');
+        console.error('Dropdown or icon not found!');
     }
 }
 

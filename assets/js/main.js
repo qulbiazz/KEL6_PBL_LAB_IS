@@ -400,3 +400,208 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 });
+
+// ===============================================
+// BENTO GALLERY LIGHTBOX
+// ===============================================
+
+let currentLightboxIndex = 0;
+
+// Open lightbox
+function openBentoLightbox(index) {
+    // Check if galleryData exists
+    if (typeof galleryData === 'undefined' || galleryData.length === 0) {
+        console.error('Gallery data not found');
+        return;
+    }
+    
+    const lightbox = document.getElementById('bentoLightbox');
+    currentLightboxIndex = index;
+    
+    // Show lightbox
+    lightbox.classList.add('active');
+    document.body.style.overflow = 'hidden';
+    
+    // Update content
+    updateLightboxContent();
+    
+    // Build thumbnails
+    buildThumbnails();
+    
+    // Add keyboard listener
+    document.addEventListener('keydown', handleLightboxKeyboard);
+}
+
+// Close lightbox
+function closeBentoLightbox() {
+    const lightbox = document.getElementById('bentoLightbox');
+    if (lightbox) {
+        lightbox.classList.remove('active');
+        document.body.style.overflow = '';
+    }
+    
+    // Remove keyboard listener
+    document.removeEventListener('keydown', handleLightboxKeyboard);
+}
+
+// Navigate lightbox
+function navigateLightbox(direction) {
+    if (typeof galleryData === 'undefined') return;
+    
+    currentLightboxIndex += direction;
+    
+    // Loop around
+    if (currentLightboxIndex < 0) {
+        currentLightboxIndex = galleryData.length - 1;
+    } else if (currentLightboxIndex >= galleryData.length) {
+        currentLightboxIndex = 0;
+    }
+    
+    updateLightboxContent();
+    updateActiveThumbnail();
+}
+
+// Update lightbox content
+function updateLightboxContent() {
+    if (typeof galleryData === 'undefined' || !galleryData[currentLightboxIndex]) {
+        console.error('Gallery data error:', { galleryData, index: currentLightboxIndex });
+        return;
+    }
+    
+    const item = galleryData[currentLightboxIndex];
+    const image = document.getElementById('lightboxImage');
+    const caption = document.getElementById('lightboxCaption');
+    const current = document.getElementById('lightboxCurrent');
+    
+    if (!image || !caption || !current) {
+        console.error('Lightbox elements not found');
+        return;
+    }
+    
+    console.log('Loading image:', item.image);
+    
+    // Set image source directly
+    image.src = item.image;
+    image.alt = item.caption || '';
+    caption.textContent = item.caption || '';
+    current.textContent = currentLightboxIndex + 1;
+}
+
+// Build thumbnail strip
+function buildThumbnails() {
+    if (typeof galleryData === 'undefined') return;
+    
+    const container = document.getElementById('lightboxThumbnails');
+    if (!container) return;
+    
+    container.innerHTML = '';
+    
+    galleryData.forEach((item, index) => {
+        const thumb = document.createElement('img');
+        thumb.src = item.image;
+        thumb.alt = item.caption;
+        thumb.className = 'lightbox-thumb' + (index === currentLightboxIndex ? ' active' : '');
+        thumb.onclick = function(e) {
+            e.stopPropagation();
+            currentLightboxIndex = index;
+            updateLightboxContent();
+            updateActiveThumbnail();
+        };
+        container.appendChild(thumb);
+    });
+    
+    // Scroll to active thumbnail
+    scrollToActiveThumbnail();
+}
+
+// Update active thumbnail
+function updateActiveThumbnail() {
+    const thumbs = document.querySelectorAll('.lightbox-thumb');
+    thumbs.forEach((thumb, index) => {
+        thumb.classList.toggle('active', index === currentLightboxIndex);
+    });
+    scrollToActiveThumbnail();
+}
+
+// Scroll thumbnail strip to active
+function scrollToActiveThumbnail() {
+    const container = document.getElementById('lightboxThumbnails');
+    if (!container) return;
+    
+    const activeThumb = container.querySelector('.lightbox-thumb.active');
+    if (activeThumb) {
+        const containerRect = container.getBoundingClientRect();
+        const thumbRect = activeThumb.getBoundingClientRect();
+        const scrollLeft = activeThumb.offsetLeft - (containerRect.width / 2) + (thumbRect.width / 2);
+        container.scrollTo({ left: scrollLeft, behavior: 'smooth' });
+    }
+}
+
+// Keyboard navigation
+function handleLightboxKeyboard(e) {
+    const lightbox = document.getElementById('bentoLightbox');
+    if (!lightbox || !lightbox.classList.contains('active')) return;
+    
+    switch(e.key) {
+        case 'ArrowLeft':
+            e.preventDefault();
+            navigateLightbox(-1);
+            break;
+        case 'ArrowRight':
+            e.preventDefault();
+            navigateLightbox(1);
+            break;
+        case 'Escape':
+            e.preventDefault();
+            closeBentoLightbox();
+            break;
+    }
+}
+
+// Close lightbox when clicking outside
+document.addEventListener('click', function(e) {
+    const lightbox = document.getElementById('bentoLightbox');
+    if (lightbox && lightbox.classList.contains('active')) {
+        // Check if click is on the lightbox background (not content)
+        if (e.target === lightbox || e.target.classList.contains('bento-lightbox')) {
+            closeBentoLightbox();
+        }
+    }
+});
+
+// Touch swipe support for lightbox
+(function() {
+    let touchStartX = 0;
+    let touchEndX = 0;
+    
+    document.addEventListener('touchstart', function(e) {
+        const lightbox = document.getElementById('bentoLightbox');
+        if (lightbox && lightbox.classList.contains('active')) {
+            touchStartX = e.changedTouches[0].screenX;
+        }
+    }, { passive: true });
+    
+    document.addEventListener('touchend', function(e) {
+        const lightbox = document.getElementById('bentoLightbox');
+        if (lightbox && lightbox.classList.contains('active')) {
+            touchEndX = e.changedTouches[0].screenX;
+            handleSwipe();
+        }
+    }, { passive: true });
+    
+    function handleSwipe() {
+        const swipeThreshold = 50;
+        const diff = touchStartX - touchEndX;
+        
+        if (Math.abs(diff) > swipeThreshold) {
+            if (diff > 0) {
+                // Swipe left - next
+                navigateLightbox(1);
+            } else {
+                // Swipe right - previous
+                navigateLightbox(-1);
+            }
+        }
+    }
+})();
+

@@ -5,11 +5,14 @@
                 <div class="carousel-slide <?php echo $index === 0 ? 'active' : ''; ?> absolute w-full h-full transition-opacity duration-500" style="background-image: url('uploads/banners/<?php echo htmlspecialchars($banner['image']); ?>')">
                     <div class="absolute inset-0 bg-black bg-opacity-50"></div>
                     <div class="relative z-10 container mx-auto px-6 md:px-8 lg:px-24 h-full flex items-center pt-16 md:pt-20">
-                        <div class="text-white max-w-2xl">
-                            <h1 class="text-3xl md:text-5xl font-bold mb-3 md:mb-4"><?php echo htmlspecialchars($banner['title']); ?></h1>
-                            <p class="text-base md:text-xl mb-6 md:mb-8"><?php echo htmlspecialchars($banner['description']); ?></p>
+                        <div class="text-white max-w-2xl banner-content">
+                            <h1 class="text-3xl md:text-5xl font-bold mb-3 md:mb-4 banner-title opacity-0">
+                                <span class="typing-text" data-text="<?php echo htmlspecialchars($banner['title']); ?>"></span>
+                                <span class="typing-cursor">|</span>
+                            </h1>
+                            <p class="text-base md:text-xl mb-6 md:mb-8 banner-description opacity-0"><?php echo htmlspecialchars($banner['description']); ?></p>
                             <?php if ($banner['button_text'] && $banner['button_link']): ?>
-                                <a href="<?php echo htmlspecialchars($banner['button_link']); ?>" class="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 rounded-lg inline-block transition">
+                                <a href="<?php echo htmlspecialchars($banner['button_link']); ?>" class="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 rounded-lg inline-block transition banner-button opacity-0 transform translate-y-4">
                                     <?php echo htmlspecialchars($banner['button_text']); ?>
                                 </a>
                             <?php endif; ?>
@@ -29,7 +32,7 @@
     </section>
 
     <!-- Card Data Section -->
-    <section class="py-16 bg-white">
+    <section class="py-20 bg-white">
         <div class="container mx-auto px-6 md:px-8 lg:px-12">
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
                 <?php foreach ($cards as $card): ?>
@@ -46,7 +49,7 @@
     </section>
 
     <!-- Products Section -->
-    <section id="products" class="py-16 bg-gray-50">
+    <section id="products" class="py-20 bg-gray-50">
         <div class="container mx-auto px-6 md:px-8 lg:px-12">
             <div class="text-center mb-12">
                 <h2 class="text-4xl font-bold text-gray-800 mb-4">Our Products</h2>
@@ -105,7 +108,7 @@
     </section>
 
     <!-- Partners Section -->
-    <section class="py-16 bg-white">
+    <section class="py-20 bg-white">
         <div class="container mx-auto px-6 md:px-8 lg:px-12">
             <div class="text-center mb-12">
                 <h2 class="text-4xl font-bold text-gray-800 mb-4">Our Partners</h2>
@@ -125,7 +128,7 @@
     </section>
 
     <!-- Team Section -->
-    <section id="team" class="py-16 bg-gray-50">
+    <section id="team" class="py-20 bg-gray-50">
         <div class="container mx-auto px-6 md:px-8 lg:px-12">
             <div class="text-center mb-12">
                 <h2 class="text-4xl font-bold text-gray-800 mb-4">Our Team</h2>
@@ -202,7 +205,7 @@
     </section>
 
     <!-- News Section -->
-    <section id="news" class="py-16 bg-white">
+    <section id="news" class="py-20 bg-white">
         <div class="container mx-auto px-6 md:px-8 lg:px-12">
             <div class="text-center mb-12">
                 <h2 class="text-4xl font-bold text-gray-800 mb-4">Latest News</h2>
@@ -268,39 +271,49 @@
     </section>
 
     <!-- Gallery Section -->
-    <section id="gallery" class="py-16 bg-gray-50">
+    <section id="gallery" class="py-20 bg-gray-50">
         <div class="container mx-auto px-6 md:px-8 lg:px-12">
             <div class="text-center mb-12">
                 <h2 class="text-4xl font-bold text-gray-800 mb-4">Gallery</h2>
                 <p class="text-gray-600">Moments captured at InLet</p>
             </div>
+            
+            <!-- Uniform Grid Layout -->
             <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-                <?php
-                $index = 0;
-                foreach ($gallery as $item):
-                ?>
-                    <div class="relative overflow-hidden rounded-lg group cursor-pointer gallery-item"
-                        onclick="openGalleryModal('<?php echo addslashes(htmlspecialchars($item['image'])); ?>', '<?php echo addslashes(htmlspecialchars($item['caption'])); ?>', <?php echo $index; ?>)">
+                <?php foreach ($gallery as $item): ?>
+                    <div class="group relative overflow-hidden rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-500 cursor-pointer aspect-square">
+                        <!-- Image -->
                         <img src="uploads/gallery/<?php echo htmlspecialchars($item['image']); ?>"
                             alt="<?php echo htmlspecialchars($item['caption']); ?>"
-                            class="w-full h-64 object-cover group-hover:scale-110 transition duration-300"
-                            onerror="handleImageError(this)">
-                        <div class="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-70 transition flex flex-col items-center justify-center p-4">
-                            <h3 class="text-white text-center text-sm opacity-0 group-hover:opacity-100 transition font-semibold">
-                                <?php echo htmlspecialchars($item['caption']); ?>
-                            </h3>
+                            class="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-700 ease-out"
+                            loading="lazy">
+                        
+                        <!-- Gradient Overlay on Hover -->
+                        <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-all duration-500"></div>
+                        
+                        <!-- Caption - Show on Hover -->
+                        <div class="absolute inset-x-0 bottom-0 p-4 translate-y-full group-hover:translate-y-0 transition-transform duration-500 ease-out">
+                            <div class="flex items-center gap-2 mb-2">
+                                <div class="w-8 h-[2px] bg-blue-400"></div>
+                                <span class="text-blue-400 text-xs font-semibold uppercase tracking-wider">InLet Lab</span>
+                            </div>
+                            <h3 class="text-white font-bold text-lg leading-tight line-clamp-2"><?php echo htmlspecialchars($item['caption']); ?></h3>
                         </div>
+                        
+                        <!-- Corner Accent -->
+                        <div class="absolute top-3 right-3 w-8 h-8 border-t-2 border-r-2 border-white/0 group-hover:border-white/50 transition-all duration-500 rounded-tr-lg"></div>
+                        <div class="absolute bottom-3 left-3 w-8 h-8 border-b-2 border-l-2 border-white/0 group-hover:border-white/50 transition-all duration-500 rounded-bl-lg"></div>
                     </div>
-                <?php
-                    $index++;
-                endforeach;
-                ?>
+                <?php endforeach; ?>
             </div>
         </div>
     </section>
 
+    <!-- Divider -->
+    <div class="h-px bg-gradient-to-r from-transparent via-gray-300 to-transparent"></div>
+
     <!-- Research Activity Section -->
-    <section id="research" class="py-16 bg-white">
+    <section id="research" class="py-20 bg-white">
         <div class="container mx-auto px-6 md:px-8 lg:px-12">
             <div class="text-center mb-12">
                 <h2 class="text-4xl font-bold text-gray-800 mb-4">Research Activities</h2>
@@ -366,16 +379,12 @@
     </section>
 
     <!-- Guestbook Section -->
-    <section id="guestbook" class="py-20 bg-gradient-to-br from-blue-50 via-white to-indigo-50">
+    <section id="guestbook" class="py-20 bg-gray-50">
         <div class="container mx-auto px-6 md:px-8 lg:px-12">
             <div class="max-w-4xl mx-auto">
                 <!-- Header -->
                 <div class="text-center mb-12">
-                    <div class="inline-block mb-4">
-                        <div class="flex items-center justify-center w-16 h-16 bg-blue-100 rounded-full mx-auto">
-                            <i class="fas fa-book-open text-3xl text-blue-600"></i>
-                        </div>
-                    </div>
+                    <span class="inline-block px-4 py-1 bg-blue-100 text-blue-600 rounded-full text-sm font-semibold mb-4">Get in Touch</span>
                     <h2 class="text-4xl font-bold text-gray-800 mb-4">Guestbook</h2>
                     <p class="text-gray-600 text-lg">Share your thoughts and leave a message for us</p>
                 </div>
