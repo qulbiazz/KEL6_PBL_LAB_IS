@@ -75,3 +75,9 @@ temp/
 database/migrations/
 
 export_database.*
+
+# SEO Files (auto-generated or server-specific)
+sitemap.xml
+sitemap.php
+robots.txt
+.htaccess
