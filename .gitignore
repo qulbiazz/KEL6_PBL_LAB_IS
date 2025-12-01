@@ -15,6 +15,13 @@ package-lock.json
 vendor/
 composer.lock
 
+# Build & Compiled CSS/JS
+assets/css/tailwind.css
+assets/css/*.min.css
+assets/js/*.min.js
+dist/
+build/
+
 # Uploads Directory
 uploads/*
 !uploads/.gitkeep
