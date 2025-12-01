@@ -1,0 +1,91 @@
+<?php
+/**
+ * Sitemap Generator for INLET Website
+ * 
+ * Copy this file to root directory as sitemap.php
+ * Access via: https://your-domain.com/sitemap.php
+ * 
+ * This will auto-generate sitemap.xml
+ */
+
+// Database connection
+require_once __DIR__ . '/config/database.php';
+
+// Set content type
+header('Content-Type: application/xml; charset=utf-8');
+
+// Start XML
+echo '<?xml version="1.0" encoding="UTF-8"?>' . PHP_EOL;
+echo '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">' . PHP_EOL;
+
+// Base URL - UPDATE THIS WITH YOUR ACTUAL DOMAIN
+$baseUrl = 'https://your-domain.com';
+
+// Static pages with priority
+$staticPages = [
+    ['url' => '/', 'priority' => '1.0', 'changefreq' => 'daily'],
+    ['url' => '/about.php', 'priority' => '0.8', 'changefreq' => 'monthly'],
+    ['url' => '/team.php', 'priority' => '0.8', 'changefreq' => 'monthly'],
+    ['url' => '/products.php', 'priority' => '0.9', 'changefreq' => 'weekly'],
+    ['url' => '/gallery.php', 'priority' => '0.7', 'changefreq' => 'weekly'],
+    ['url' => '/news.php', 'priority' => '0.9', 'changefreq' => 'daily'],
+    ['url' => '/research.php', 'priority' => '0.9', 'changefreq' => 'weekly'],
+    ['url' => '/login.php', 'priority' => '0.5', 'changefreq' => 'monthly'],
+];
+
+// Add static pages
+foreach ($staticPages as $page) {
+    echo '  <url>' . PHP_EOL;
+    echo '    <loc>' . $baseUrl . $page['url'] . '</loc>' . PHP_EOL;
+    echo '    <changefreq>' . $page['changefreq'] . '</changefreq>' . PHP_EOL;
+    echo '    <priority>' . $page['priority'] . '</priority>' . PHP_EOL;
+    echo '  </url>' . PHP_EOL;
+}
+
+try {
+    $database = new Database();
+    $db = $database->getConnection();
+    
+    // Add Products
+    $query = "SELECT id, updated_at FROM products WHERE status = 'active' ORDER BY updated_at DESC";
+    $stmt = $db->query($query);
+    while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+        echo '  <url>' . PHP_EOL;
+        echo '    <loc>' . $baseUrl . '/product-detail.php?id=' . $row['id'] . '</loc>' . PHP_EOL;
+        echo '    <lastmod>' . date('Y-m-d', strtotime($row['updated_at'])) . '</lastmod>' . PHP_EOL;
+        echo '    <changefreq>weekly</changefreq>' . PHP_EOL;
+        echo '    <priority>0.8</priority>' . PHP_EOL;
+        echo '  </url>' . PHP_EOL;
+    }
+    
+    // Add News
+    $query = "SELECT id, updated_at FROM news WHERE status = 'published' ORDER BY updated_at DESC";
+    $stmt = $db->query($query);
+    while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+        echo '  <url>' . PHP_EOL;
+        echo '    <loc>' . $baseUrl . '/news-detail.php?id=' . $row['id'] . '</loc>' . PHP_EOL;
+        echo '    <lastmod>' . date('Y-m-d', strtotime($row['updated_at'])) . '</lastmod>' . PHP_EOL;
+        echo '    <changefreq>monthly</changefreq>' . PHP_EOL;
+        echo '    <priority>0.7</priority>' . PHP_EOL;
+        echo '  </url>' . PHP_EOL;
+    }
+    
+    // Add Research
+    $query = "SELECT id, updated_at FROM research WHERE status = 'published' ORDER BY updated_at DESC";
+    $stmt = $db->query($query);
+    while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+        echo '  <url>' . PHP_EOL;
+        echo '    <loc>' . $baseUrl . '/research-detail.php?id=' . $row['id'] . '</loc>' . PHP_EOL;
+        echo '    <lastmod>' . date('Y-m-d', strtotime($row['updated_at'])) . '</lastmod>' . PHP_EOL;
+        echo '    <changefreq>monthly</changefreq>' . PHP_EOL;
+        echo '    <priority>0.7</priority>' . PHP_EOL;
+        echo '  </url>' . PHP_EOL;
+    }
+    
+} catch (Exception $e) {
+    // Silent fail for sitemap generation
+    error_log('Sitemap generation error: ' . $e->getMessage());
+}
+
+// Close XML
+echo '</urlset>';
