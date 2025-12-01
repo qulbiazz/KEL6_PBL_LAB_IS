@@ -1,18 +1,24 @@
-    <!-- Carousel Banner Section -->
-    <section class="relative h-screen overflow-y-hidden -mt-16 md:-mt-20">
-        <div class="carousel-container relative w-full h-full">
+    <!-- Hero Banner Section with SEO optimized content -->
+    <section class="relative h-screen overflow-y-hidden -mt-16 md:-mt-20" aria-label="Banner utama INLET">
+        <div class="carousel-container relative w-full h-full" role="region" aria-roledescription="carousel">
             <?php foreach ($banners as $index => $banner): ?>
-                <div class="carousel-slide <?php echo $index === 0 ? 'active' : ''; ?> absolute w-full h-full transition-opacity duration-500" style="background-image: url('uploads/banners/<?php echo htmlspecialchars($banner['image']); ?>')">
+                <div class="carousel-slide <?php echo $index === 0 ? 'active' : ''; ?> absolute w-full h-full transition-opacity duration-500" 
+                     style="background-image: url('uploads/banners/<?php echo htmlspecialchars($banner['image']); ?>')"
+                     role="group" 
+                     aria-roledescription="slide"
+                     aria-label="Slide <?php echo $index + 1; ?> of <?php echo count($banners); ?>">
                     <div class="absolute inset-0 bg-black bg-opacity-50"></div>
                     <div class="relative z-10 container mx-auto px-6 md:px-8 lg:px-24 h-full flex items-center pt-16 md:pt-20">
                         <div class="text-white max-w-2xl banner-content">
                             <h1 class="text-3xl md:text-5xl font-bold mb-3 md:mb-4 banner-title opacity-0">
                                 <span class="typing-text" data-text="<?php echo htmlspecialchars($banner['title']); ?>"></span>
-                                <span class="typing-cursor">|</span>
+                                <span class="typing-cursor" aria-hidden="true">|</span>
                             </h1>
                             <p class="text-base md:text-xl mb-6 md:mb-8 banner-description opacity-0"><?php echo htmlspecialchars($banner['description']); ?></p>
                             <?php if ($banner['button_text'] && $banner['button_link']): ?>
-                                <a href="<?php echo htmlspecialchars($banner['button_link']); ?>" class="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 rounded-lg inline-block transition banner-button opacity-0 transform translate-y-4">
+                                <a href="<?php echo htmlspecialchars($banner['button_link']); ?>" 
+                                   class="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 rounded-lg inline-block transition banner-button opacity-0 transform translate-y-4"
+                                   role="button">
                                     <?php echo htmlspecialchars($banner['button_text']); ?>
                                 </a>
                             <?php endif; ?>
@@ -21,51 +27,55 @@
                 </div>
             <?php endforeach; ?>
 
-            <!-- Carousel Controls -->
-            <button class="carousel-prev absolute left-4 top-1/2 transform -translate-y-1/2 bg-white bg-opacity-50 hover:bg-opacity-75 text-gray-800 p-3 rounded-full z-20">
-                <i class="fas fa-chevron-left"></i>
+            <!-- Carousel Controls with accessibility -->
+            <button class="carousel-prev absolute left-4 top-1/2 transform -translate-y-1/2 bg-white bg-opacity-50 hover:bg-opacity-75 text-gray-800 p-3 rounded-full z-20" aria-label="Slide sebelumnya">
+                <i class="fas fa-chevron-left" aria-hidden="true"></i>
             </button>
-            <button class="carousel-next absolute right-4 top-1/2 transform -translate-y-1/2 bg-white bg-opacity-50 hover:bg-opacity-75 text-gray-800 p-3 rounded-full z-20">
-                <i class="fas fa-chevron-right"></i>
+            <button class="carousel-next absolute right-4 top-1/2 transform -translate-y-1/2 bg-white bg-opacity-50 hover:bg-opacity-75 text-gray-800 p-3 rounded-full z-20" aria-label="Slide selanjutnya">
+                <i class="fas fa-chevron-right" aria-hidden="true"></i>
             </button>
         </div>
     </section>
 
-    <!-- Card Data Section -->
-    <section class="py-20 bg-white">
+    <!-- Statistics Section -->
+    <section class="py-20 bg-white" aria-label="Statistik INLET">
         <div class="container mx-auto px-6 md:px-8 lg:px-12">
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
                 <?php foreach ($cards as $card): ?>
-                    <div class="text-center p-6 rounded-lg hover:shadow-lg transition">
-                        <div class="text-5xl mb-4">
+                    <article class="text-center p-6 rounded-lg hover:shadow-lg transition">
+                        <div class="text-5xl mb-4" aria-hidden="true">
                             <i class="<?php echo htmlspecialchars($card['icon']); ?> text-blue-600"></i>
                         </div>
                         <h3 class="text-3xl font-bold mb-2 text-gray-800"><?php echo htmlspecialchars($card['value']); ?></h3>
                         <p class="text-gray-600"><?php echo htmlspecialchars($card['label']); ?></p>
-                    </div>
+                    </article>
                 <?php endforeach; ?>
             </div>
         </div>
     </section>
 
     <!-- Products Section -->
-    <section id="products" class="py-20 bg-gray-50">
+    <section id="products" class="py-20 bg-gray-50" aria-labelledby="products-heading">
         <div class="container mx-auto px-6 md:px-8 lg:px-12">
-            <div class="text-center mb-12">
-                <h2 class="text-4xl font-bold text-gray-800 mb-4">Our Products</h2>
+            <header class="text-center mb-12">
+                <h2 id="products-heading" class="text-4xl font-bold text-gray-800 mb-4">Our Products</h2>
                 <p class="text-gray-600">Innovative solutions for modern challenges</p>
-            </div>
+            </header>
             <?php if (count($products) > 3): ?>
                 <!-- Swiper for more than 3 items -->
                 <div class="swiper-container-wrapper">
                     <div class="swiper productsSwiper overflow-visible">
                         <div class="swiper-wrapper pb-4">
                             <?php foreach ($products as $product): ?>
-                                <div class="swiper-slide h-auto">
+                                <article class="swiper-slide h-auto">
                                     <div class="bg-white rounded-xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 flex flex-col h-full border border-gray-100">
                                         <div class="relative overflow-hidden group">
                                             <img src="uploads/products/<?php echo htmlspecialchars($product['image']); ?>"
-                                                alt="<?php echo htmlspecialchars($product['name']); ?>"
+                                                alt="Produk <?php echo htmlspecialchars($product['name']); ?> - INLET Polinema"
+                                                loading="lazy"
+                                                decoding="async"
+                                                width="400"
+                                                height="192"
                                                 class="w-full h-48 object-cover transform group-hover:scale-110 transition-transform duration-500">
                                             <div class="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                                         </div>
@@ -73,17 +83,18 @@
                                             <h3 class="text-xl font-bold mb-3 text-gray-800 line-clamp-2 min-h-[3.5rem]"><?php echo htmlspecialchars($product['name']); ?></h3>
                                             <p class="text-gray-600 mb-4 flex-grow line-clamp-3"><?php echo htmlspecialchars($product['description']); ?></p>
                                             <a href="index.php?page=product-detail&id=<?php echo $product['id']; ?>"
-                                                class="inline-flex items-center text-blue-600 hover:text-blue-700 font-semibold mt-auto group/link">
+                                                class="inline-flex items-center text-blue-600 hover:text-blue-700 font-semibold mt-auto group/link"
+                                                aria-label="Pelajari lebih lanjut tentang <?php echo htmlspecialchars($product['name']); ?>">
                                                 Learn More
-                                                <i class="fas fa-arrow-right ml-2 transform group-hover/link:translate-x-1 transition-transform"></i>
+                                                <i class="fas fa-arrow-right ml-2 transform group-hover/link:translate-x-1 transition-transform" aria-hidden="true"></i>
                                             </a>
                                         </div>
                                     </div>
-                                </div>
+                                </article>
                             <?php endforeach; ?>
                         </div>
-                        <div class="swiper-button-next products-button-next"></div>
-                        <div class="swiper-button-prev products-button-prev"></div>
+                        <div class="swiper-button-next products-button-next" aria-label="Produk selanjutnya"></div>
+                        <div class="swiper-button-prev products-button-prev" aria-label="Produk sebelumnya"></div>
                         <div class="swiper-pagination products-pagination mt-4"></div>
                     </div>
                 </div>
@@ -91,16 +102,24 @@
                 <!-- Grid for 3 or fewer items -->
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                     <?php foreach ($products as $product): ?>
-                        <div class="bg-white rounded-lg overflow-hidden shadow-md hover:shadow-xl transition flex flex-col h-full">
-                            <img src="uploads/products/<?php echo htmlspecialchars($product['image']); ?>" alt="<?php echo htmlspecialchars($product['name']); ?>" class="w-full h-48 object-cover">
+                        <article class="bg-white rounded-lg overflow-hidden shadow-md hover:shadow-xl transition flex flex-col h-full">
+                            <img src="uploads/products/<?php echo htmlspecialchars($product['image']); ?>" 
+                                 alt="Produk <?php echo htmlspecialchars($product['name']); ?> - INLET Polinema" 
+                                 loading="lazy"
+                                 decoding="async"
+                                 width="400"
+                                 height="192"
+                                 class="w-full h-48 object-cover">
                             <div class="p-6 flex flex-col flex-grow">
                                 <h3 class="text-xl font-bold mb-2 text-gray-800"><?php echo htmlspecialchars($product['name']); ?></h3>
                                 <p class="text-gray-600 mb-4 flex-grow"><?php echo htmlspecialchars($product['description']); ?></p>
-                                <a href="index.php?page=product-detail&id=<?php echo $product['id']; ?>" class="text-blue-600 hover:text-blue-700 font-semibold mt-auto">
-                                    Learn More <i class="fas fa-arrow-right ml-1"></i>
+                                <a href="index.php?page=product-detail&id=<?php echo $product['id']; ?>" 
+                                   class="text-blue-600 hover:text-blue-700 font-semibold mt-auto"
+                                   aria-label="Pelajari lebih lanjut tentang <?php echo htmlspecialchars($product['name']); ?>">
+                                    Learn More <i class="fas fa-arrow-right ml-1" aria-hidden="true"></i>
                                 </a>
                             </div>
-                        </div>
+                        </article>
                     <?php endforeach; ?>
                 </div>
             <?php endif; ?>
@@ -108,49 +127,59 @@
     </section>
 
     <!-- Partners Section -->
-    <section class="py-20 bg-white">
+    <section id="partners" class="py-20 bg-white" aria-labelledby="partners-heading" itemscope itemtype="https://schema.org/Organization">
         <div class="container mx-auto px-6 md:px-8 lg:px-12">
-            <div class="text-center mb-12">
-                <h2 class="text-4xl font-bold text-gray-800 mb-4">Our Partners</h2>
+            <header class="text-center mb-12">
+                <h2 id="partners-heading" class="text-4xl font-bold text-gray-800 mb-4">Our Partners</h2>
                 <p class="text-gray-600">Trusted by leading organizations</p>
-            </div>
-            <div class="flex flex-wrap justify-center items-center gap-8">
+            </header>
+            <div class="flex flex-wrap justify-center items-center gap-8" role="list" aria-label="Partner organizations">
                 <?php foreach ($partners as $partner): ?>
-                    <div class="flex items-center justify-center p-4">
+                    <figure class="flex items-center justify-center p-4" role="listitem" itemprop="sponsor" itemscope itemtype="https://schema.org/Organization">
                         <img src="uploads/partners/<?php echo htmlspecialchars($partner['logo']); ?>"
-                            alt="<?php echo htmlspecialchars($partner['name']); ?>"
+                            alt="Logo partner: <?php echo htmlspecialchars($partner['name']); ?> - Mitra kerja sama INLET Politeknik Negeri Malang"
                             class="max-h-20 w-auto grayscale hover:grayscale-0 transition"
+                            loading="lazy"
+                            width="200"
+                            height="80"
+                            itemprop="logo"
                             onerror="handleImageError(this)">
-                    </div>
+                        <meta itemprop="name" content="<?php echo htmlspecialchars($partner['name']); ?>">
+                    </figure>
                 <?php endforeach; ?>
             </div>
         </div>
     </section>
 
     <!-- Team Section -->
-    <section id="team" class="py-20 bg-gray-50">
+    <section id="team" class="py-20 bg-gray-50" aria-labelledby="team-heading">
         <div class="container mx-auto px-6 md:px-8 lg:px-12">
-            <div class="text-center mb-12">
-                <h2 class="text-4xl font-bold text-gray-800 mb-4">Our Team</h2>
+            <header class="text-center mb-12">
+                <h2 id="team-heading" class="text-4xl font-bold text-gray-800 mb-4">Our Team</h2>
                 <p class="text-gray-600">Meet the experts behind InLet</p>
-            </div>
+            </header>
 
             <!-- Team Slider -->
             <div class="relative">
                 <div class="swiper teamSwiper">
-                    <div class="swiper-wrapper">
+                    <div class="swiper-wrapper" role="list" aria-label="Team members">
                         <?php foreach ($team as $member): ?>
-                            <div class="swiper-slide">
+                            <article class="swiper-slide" role="listitem" itemscope itemtype="https://schema.org/Person">
                                 <div class="bg-white rounded-lg overflow-hidden shadow-md hover:shadow-xl transition h-full flex flex-col">
                                     <!-- Profile Image -->
                                     <div class="relative overflow-hidden">
                                         <img src="uploads/team/<?php echo htmlspecialchars($member['photo']); ?>"
-                                            alt="<?php echo htmlspecialchars($member['name']); ?>"
-                                            class="w-full h-64 object-cover">
+                                            alt="Foto profil <?php echo htmlspecialchars($member['name']); ?> - <?php echo htmlspecialchars($member['position']); ?> di INLET Politeknik Negeri Malang"
+                                            class="w-full h-64 object-cover"
+                                            loading="lazy"
+                                            width="400"
+                                            height="256"
+                                            itemprop="image">
                                         <div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 hover:opacity-100 transition-opacity duration-300">
                                             <div class="absolute bottom-4 left-0 right-0 text-center">
                                                 <a href="index.php?page=lecturer-detail&id=<?php echo $member['id']; ?>"
-                                                    class="inline-block bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-semibold transition">
+                                                    class="inline-block bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-semibold transition"
+                                                    aria-label="Lihat profil lengkap <?php echo htmlspecialchars($member['name']); ?>">
                                                     View Profile
                                                 </a>
                                             </div>
@@ -160,42 +189,49 @@
                                     <!-- Member Info -->
                                     <div class="p-6 text-center flex-1 flex flex-col justify-between">
                                         <div>
-                                            <h3 class="text-xl font-bold mb-1 text-gray-800">
+                                            <h3 class="text-xl font-bold mb-1 text-gray-800" itemprop="name">
                                                 <?php echo htmlspecialchars($member['name']); ?>
                                             </h3>
-                                            <p class="text-blue-600 mb-3">
+                                            <p class="text-blue-600 mb-3" itemprop="jobTitle">
                                                 <?php echo htmlspecialchars($member['position']); ?>
                                             </p>
+                                            <meta itemprop="worksFor" content="INLET - Politeknik Negeri Malang">
                                         </div>
 
-                                        <div class="flex justify-center space-x-3 mt-4">
+                                        <nav class="flex justify-center space-x-3 mt-4" aria-label="Social links for <?php echo htmlspecialchars($member['name']); ?>">
                                             <a href="index.php?page=lecturer-detail&id=<?php echo $member['id']; ?>"
-                                                class="text-gray-600 hover:text-blue-600 transition">
-                                                <i class="fas fa-user text-xl"></i>
+                                                class="text-gray-600 hover:text-blue-600 transition"
+                                                aria-label="Profil <?php echo htmlspecialchars($member['name']); ?>">
+                                                <i class="fas fa-user text-xl" aria-hidden="true"></i>
                                             </a>
                                             <?php if ($member['linkedin']): ?>
                                                 <a href="<?php echo htmlspecialchars($member['linkedin']); ?>"
                                                     target="_blank"
-                                                    class="text-gray-600 hover:text-blue-600 transition">
-                                                    <i class="fab fa-linkedin text-xl"></i>
+                                                    rel="noopener noreferrer"
+                                                    class="text-gray-600 hover:text-blue-600 transition"
+                                                    itemprop="sameAs"
+                                                    aria-label="LinkedIn <?php echo htmlspecialchars($member['name']); ?>">
+                                                    <i class="fab fa-linkedin text-xl" aria-hidden="true"></i>
                                                 </a>
                                             <?php endif; ?>
                                             <?php if ($member['email']): ?>
                                                 <a href="mailto:<?php echo htmlspecialchars($member['email']); ?>"
-                                                    class="text-gray-600 hover:text-red-600 transition">
-                                                    <i class="fas fa-envelope text-xl"></i>
+                                                    class="text-gray-600 hover:text-red-600 transition"
+                                                    itemprop="email"
+                                                    aria-label="Email <?php echo htmlspecialchars($member['name']); ?>">
+                                                    <i class="fas fa-envelope text-xl" aria-hidden="true"></i>
                                                 </a>
                                             <?php endif; ?>
-                                        </div>
+                                        </nav>
                                     </div>
                                 </div>
-                            </div>
+                            </article>
                         <?php endforeach; ?>
                     </div>
 
                     <!-- Navigation Buttons -->
-                    <div class="swiper-button-next team-button-next"></div>
-                    <div class="swiper-button-prev team-button-prev"></div>
+                    <div class="swiper-button-next team-button-next" aria-label="Next team member"></div>
+                    <div class="swiper-button-prev team-button-prev" aria-label="Previous team member"></div>
 
                     <!-- Pagination -->
                     <div class="swiper-pagination team-pagination"></div>
@@ -205,65 +241,83 @@
     </section>
 
     <!-- News Section -->
-    <section id="news" class="py-20 bg-white">
+    <section id="news" class="py-20 bg-white" aria-labelledby="news-heading">
         <div class="container mx-auto px-6 md:px-8 lg:px-12">
-            <div class="text-center mb-12">
-                <h2 class="text-4xl font-bold text-gray-800 mb-4">Latest News</h2>
+            <header class="text-center mb-12">
+                <h2 id="news-heading" class="text-4xl font-bold text-gray-800 mb-4">Latest News</h2>
                 <p class="text-gray-600">Stay updated with our latest activities</p>
-            </div>
+            </header>
             <?php if (count($news) > 3): ?>
                 <!-- Swiper for more than 3 items -->
                 <div class="swiper-container-wrapper">
                     <div class="swiper newsSwiper overflow-visible">
-                        <div class="swiper-wrapper pb-4">
+                        <div class="swiper-wrapper pb-4" role="list" aria-label="News articles">
                             <?php foreach ($news as $item): ?>
-                                <div class="swiper-slide h-auto">
+                                <article class="swiper-slide h-auto" role="listitem" itemscope itemtype="https://schema.org/NewsArticle">
                                     <div class="bg-white rounded-xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 flex flex-col h-full border border-gray-100">
                                         <div class="relative overflow-hidden group">
                                             <img src="uploads/news/<?php echo htmlspecialchars($item['image']); ?>"
-                                                alt="<?php echo htmlspecialchars($item['title']); ?>"
-                                                class="w-full h-48 object-cover transform group-hover:scale-110 transition-transform duration-500">
+                                                alt="Berita: <?php echo htmlspecialchars($item['title']); ?>"
+                                                class="w-full h-48 object-cover transform group-hover:scale-110 transition-transform duration-500"
+                                                loading="lazy"
+                                                width="400"
+                                                height="192"
+                                                itemprop="image">
                                             <div class="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                                         </div>
                                         <div class="p-6 flex flex-col flex-grow">
                                             <div class="flex items-center text-sm text-gray-500 mb-3">
-                                                <i class="far fa-calendar mr-2"></i>
-                                                <span><?php echo date('F d, Y', strtotime($item['published_at'])); ?></span>
+                                                <i class="far fa-calendar mr-2" aria-hidden="true"></i>
+                                                <time datetime="<?php echo date('Y-m-d', strtotime($item['published_at'])); ?>" itemprop="datePublished"><?php echo date('F d, Y', strtotime($item['published_at'])); ?></time>
                                             </div>
-                                            <h3 class="text-xl font-bold mb-3 text-gray-800 line-clamp-2 min-h-[3.5rem]"><?php echo htmlspecialchars($item['title']); ?></h3>
-                                            <p class="text-gray-600 mb-4 flex-grow line-clamp-3"><?php echo substr(htmlspecialchars($item['content']), 0, 120); ?>...</p>
+                                            <h3 class="text-xl font-bold mb-3 text-gray-800 line-clamp-2 min-h-[3.5rem]" itemprop="headline"><?php echo htmlspecialchars($item['title']); ?></h3>
+                                            <p class="text-gray-600 mb-4 flex-grow line-clamp-3" itemprop="description"><?php echo substr(htmlspecialchars($item['content']), 0, 120); ?>...</p>
+                                            <meta itemprop="author" content="INLET Politeknik Negeri Malang">
                                             <a href="index.php?page=news-detail&id=<?php echo $item['id']; ?>"
-                                                class="inline-flex items-center text-blue-600 hover:text-blue-700 font-semibold mt-auto group/link">
+                                                class="inline-flex items-center text-blue-600 hover:text-blue-700 font-semibold mt-auto group/link"
+                                                itemprop="url"
+                                                aria-label="Baca selengkapnya: <?php echo htmlspecialchars($item['title']); ?>">
                                                 Read More
-                                                <i class="fas fa-arrow-right ml-2 transform group-hover/link:translate-x-1 transition-transform"></i>
+                                                <i class="fas fa-arrow-right ml-2 transform group-hover/link:translate-x-1 transition-transform" aria-hidden="true"></i>
                                             </a>
                                         </div>
                                     </div>
-                                </div>
+                                </article>
                             <?php endforeach; ?>
                         </div>
-                        <div class="swiper-button-next news-button-next"></div>
-                        <div class="swiper-button-prev news-button-prev"></div>
+                        <div class="swiper-button-next news-button-next" aria-label="Next news"></div>
+                        <div class="swiper-button-prev news-button-prev" aria-label="Previous news"></div>
                         <div class="swiper-pagination news-pagination mt-4"></div>
                     </div>
                 </div>
             <?php else: ?>
                 <!-- Grid for 3 or fewer items -->
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8" role="list" aria-label="News articles">
                     <?php foreach ($news as $item): ?>
-                        <div class="bg-white rounded-lg overflow-hidden shadow-md hover:shadow-xl transition flex flex-col h-full">
-                            <img src="uploads/news/<?php echo htmlspecialchars($item['image']); ?>" alt="<?php echo htmlspecialchars($item['title']); ?>" class="w-full h-48 object-cover">
+                        <article class="bg-white rounded-lg overflow-hidden shadow-md hover:shadow-xl transition flex flex-col h-full" role="listitem" itemscope itemtype="https://schema.org/NewsArticle">
+                            <img src="uploads/news/<?php echo htmlspecialchars($item['image']); ?>" 
+                                alt="Berita: <?php echo htmlspecialchars($item['title']); ?>" 
+                                class="w-full h-48 object-cover"
+                                loading="lazy"
+                                width="400"
+                                height="192"
+                                itemprop="image">
                             <div class="p-6 flex flex-col flex-grow">
                                 <div class="text-sm text-gray-500 mb-2">
-                                    <i class="far fa-calendar"></i> <?php echo date('F d, Y', strtotime($item['published_at'])); ?>
+                                    <i class="far fa-calendar" aria-hidden="true"></i> 
+                                    <time datetime="<?php echo date('Y-m-d', strtotime($item['published_at'])); ?>" itemprop="datePublished"><?php echo date('F d, Y', strtotime($item['published_at'])); ?></time>
                                 </div>
-                                <h3 class="text-xl font-bold mb-2 text-gray-800"><?php echo htmlspecialchars($item['title']); ?></h3>
-                                <p class="text-gray-600 mb-4 flex-grow"><?php echo substr(htmlspecialchars($item['content']), 0, 100); ?>...</p>
-                                <a href="index.php?page=news-detail&id=<?php echo $item['id']; ?>" class="text-blue-600 hover:text-blue-700 font-semibold mt-auto">
-                                    Read More <i class="fas fa-arrow-right ml-1"></i>
+                                <h3 class="text-xl font-bold mb-2 text-gray-800" itemprop="headline"><?php echo htmlspecialchars($item['title']); ?></h3>
+                                <p class="text-gray-600 mb-4 flex-grow" itemprop="description"><?php echo substr(htmlspecialchars($item['content']), 0, 100); ?>...</p>
+                                <meta itemprop="author" content="INLET Politeknik Negeri Malang">
+                                <a href="index.php?page=news-detail&id=<?php echo $item['id']; ?>" 
+                                    class="text-blue-600 hover:text-blue-700 font-semibold mt-auto"
+                                    itemprop="url"
+                                    aria-label="Baca selengkapnya: <?php echo htmlspecialchars($item['title']); ?>">
+                                    Read More <i class="fas fa-arrow-right ml-1" aria-hidden="true"></i>
                                 </a>
                             </div>
-                        </div>
+                        </article>
                     <?php endforeach; ?>
                 </div>
             <?php endif; ?>
@@ -271,39 +325,42 @@
     </section>
 
     <!-- Gallery Section -->
-    <section id="gallery" class="py-20 bg-gray-50">
+    <section id="gallery" class="py-20 bg-gray-50" aria-labelledby="gallery-heading" itemscope itemtype="https://schema.org/ImageGallery">
         <div class="container mx-auto px-6 md:px-8 lg:px-12">
-            <div class="text-center mb-12">
-                <h2 class="text-4xl font-bold text-gray-800 mb-4">Gallery</h2>
-                <p class="text-gray-600">Moments captured at InLet</p>
-            </div>
+            <header class="text-center mb-12">
+                <h2 id="gallery-heading" class="text-4xl font-bold text-gray-800 mb-4" itemprop="name">Gallery</h2>
+                <p class="text-gray-600" itemprop="description">Moments captured at InLet</p>
+            </header>
             
             <!-- Uniform Grid Layout -->
-            <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-                <?php foreach ($gallery as $item): ?>
-                    <div class="group relative overflow-hidden rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-500 cursor-pointer aspect-square">
+            <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4" role="list" aria-label="Photo gallery">
+                <?php foreach ($gallery as $index => $item): ?>
+                    <figure class="group relative overflow-hidden rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-500 cursor-pointer aspect-square" role="listitem" itemprop="image" itemscope itemtype="https://schema.org/ImageObject">
                         <!-- Image -->
                         <img src="uploads/gallery/<?php echo htmlspecialchars($item['image']); ?>"
-                            alt="<?php echo htmlspecialchars($item['caption']); ?>"
+                            alt="Galeri INLET: <?php echo htmlspecialchars($item['caption']); ?> - Dokumentasi kegiatan Lab INLET Politeknik Negeri Malang"
                             class="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-700 ease-out"
-                            loading="lazy">
+                            loading="lazy"
+                            width="400"
+                            height="400"
+                            itemprop="contentUrl">
                         
                         <!-- Gradient Overlay on Hover -->
                         <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-all duration-500"></div>
                         
                         <!-- Caption - Show on Hover -->
-                        <div class="absolute inset-x-0 bottom-0 p-4 translate-y-full group-hover:translate-y-0 transition-transform duration-500 ease-out">
+                        <figcaption class="absolute inset-x-0 bottom-0 p-4 translate-y-full group-hover:translate-y-0 transition-transform duration-500 ease-out">
                             <div class="flex items-center gap-2 mb-2">
                                 <div class="w-8 h-[2px] bg-blue-400"></div>
                                 <span class="text-blue-400 text-xs font-semibold uppercase tracking-wider">InLet Lab</span>
                             </div>
-                            <h3 class="text-white font-bold text-lg leading-tight line-clamp-2"><?php echo htmlspecialchars($item['caption']); ?></h3>
-                        </div>
+                            <h3 class="text-white font-bold text-lg leading-tight line-clamp-2" itemprop="caption"><?php echo htmlspecialchars($item['caption']); ?></h3>
+                        </figcaption>
                         
                         <!-- Corner Accent -->
                         <div class="absolute top-3 right-3 w-8 h-8 border-t-2 border-r-2 border-white/0 group-hover:border-white/50 transition-all duration-500 rounded-tr-lg"></div>
                         <div class="absolute bottom-3 left-3 w-8 h-8 border-b-2 border-l-2 border-white/0 group-hover:border-white/50 transition-all duration-500 rounded-bl-lg"></div>
-                    </div>
+                    </figure>
                 <?php endforeach; ?>
             </div>
         </div>
@@ -313,65 +370,83 @@
     <div class="h-px bg-gradient-to-r from-transparent via-gray-300 to-transparent"></div>
 
     <!-- Research Activity Section -->
-    <section id="research" class="py-20 bg-white">
+    <section id="research" class="py-20 bg-white" aria-labelledby="research-heading">
         <div class="container mx-auto px-6 md:px-8 lg:px-12">
-            <div class="text-center mb-12">
-                <h2 class="text-4xl font-bold text-gray-800 mb-4">Research Activities</h2>
+            <header class="text-center mb-12">
+                <h2 id="research-heading" class="text-4xl font-bold text-gray-800 mb-4">Research Activities</h2>
                 <p class="text-gray-600">Exploring new frontiers in technology</p>
-            </div>
+            </header>
             <?php if (count($research) > 3): ?>
                 <!-- Swiper for more than 3 items -->
                 <div class="swiper-container-wrapper">
                     <div class="swiper researchSwiper overflow-visible">
-                        <div class="swiper-wrapper pb-4">
+                        <div class="swiper-wrapper pb-4" role="list" aria-label="Research publications">
                             <?php foreach ($research as $activity): ?>
-                                <div class="swiper-slide h-auto">
+                                <article class="swiper-slide h-auto" role="listitem" itemscope itemtype="https://schema.org/ScholarlyArticle">
                                     <div class="bg-white rounded-xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 flex flex-col h-full border border-gray-100">
                                         <div class="relative overflow-hidden group">
                                             <img src="uploads/research/<?php echo htmlspecialchars($activity['image']); ?>"
-                                                alt="<?php echo htmlspecialchars($activity['title']); ?>"
-                                                class="w-full h-48 object-cover transform group-hover:scale-110 transition-transform duration-500">
+                                                alt="Riset: <?php echo htmlspecialchars($activity['title']); ?>"
+                                                class="w-full h-48 object-cover transform group-hover:scale-110 transition-transform duration-500"
+                                                loading="lazy"
+                                                width="400"
+                                                height="192"
+                                                itemprop="image">
                                             <div class="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                                         </div>
                                         <div class="p-6 flex flex-col flex-grow">
-                                            <h3 class="text-xl font-bold mb-3 text-gray-800 line-clamp-2 min-h-[3.5rem]"><?php echo htmlspecialchars($activity['title']); ?></h3>
-                                            <p class="text-gray-600 mb-4 flex-grow line-clamp-3"><?php echo htmlspecialchars($activity['description']); ?></p>
+                                            <h3 class="text-xl font-bold mb-3 text-gray-800 line-clamp-2 min-h-[3.5rem]" itemprop="headline"><?php echo htmlspecialchars($activity['title']); ?></h3>
+                                            <p class="text-gray-600 mb-4 flex-grow line-clamp-3" itemprop="description"><?php echo htmlspecialchars($activity['description']); ?></p>
                                             <div class="flex items-center text-sm text-gray-500 mb-4">
-                                                <i class="far fa-calendar mr-2"></i>
-                                                <span><?php echo date('F Y', strtotime($activity['created_at'])); ?></span>
+                                                <i class="far fa-calendar mr-2" aria-hidden="true"></i>
+                                                <time datetime="<?php echo date('Y-m', strtotime($activity['created_at'])); ?>" itemprop="datePublished"><?php echo date('F Y', strtotime($activity['created_at'])); ?></time>
                                             </div>
+                                            <meta itemprop="author" content="INLET Politeknik Negeri Malang">
                                             <a href="index.php?page=research-detail&id=<?php echo $activity['id']; ?>"
-                                                class="inline-flex items-center text-blue-600 hover:text-blue-700 font-semibold mt-auto group/link">
+                                                class="inline-flex items-center text-blue-600 hover:text-blue-700 font-semibold mt-auto group/link"
+                                                itemprop="url"
+                                                aria-label="Baca selengkapnya: <?php echo htmlspecialchars($activity['title']); ?>">
                                                 Read More
-                                                <i class="fas fa-arrow-right ml-2 transform group-hover/link:translate-x-1 transition-transform"></i>
+                                                <i class="fas fa-arrow-right ml-2 transform group-hover/link:translate-x-1 transition-transform" aria-hidden="true"></i>
                                             </a>
                                         </div>
                                     </div>
-                                </div>
+                                </article>
                             <?php endforeach; ?>
                         </div>
-                        <div class="swiper-button-next research-button-next"></div>
-                        <div class="swiper-button-prev research-button-prev"></div>
+                        <div class="swiper-button-next research-button-next" aria-label="Next research"></div>
+                        <div class="swiper-button-prev research-button-prev" aria-label="Previous research"></div>
                         <div class="swiper-pagination research-pagination mt-4"></div>
                     </div>
                 </div>
             <?php else: ?>
                 <!-- Grid for 3 or fewer items -->
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-8" role="list" aria-label="Research publications">
                     <?php foreach ($research as $activity): ?>
-                        <div class="bg-white rounded-lg overflow-hidden shadow-md hover:shadow-xl transition flex flex-col h-full">
-                            <img src="uploads/research/<?php echo htmlspecialchars($activity['image']); ?>" alt="<?php echo htmlspecialchars($activity['title']); ?>" class="w-full h-48 object-cover">
+                        <article class="bg-white rounded-lg overflow-hidden shadow-md hover:shadow-xl transition flex flex-col h-full" role="listitem" itemscope itemtype="https://schema.org/ScholarlyArticle">
+                            <img src="uploads/research/<?php echo htmlspecialchars($activity['image']); ?>" 
+                                alt="Riset: <?php echo htmlspecialchars($activity['title']); ?>" 
+                                class="w-full h-48 object-cover"
+                                loading="lazy"
+                                width="400"
+                                height="192"
+                                itemprop="image">
                             <div class="p-6 flex flex-col flex-grow">
-                                <h3 class="text-xl font-bold mb-2 text-gray-800"><?php echo htmlspecialchars($activity['title']); ?></h3>
-                                <p class="text-gray-600 mb-4 flex-grow"><?php echo htmlspecialchars($activity['description']); ?></p>
+                                <h3 class="text-xl font-bold mb-2 text-gray-800" itemprop="headline"><?php echo htmlspecialchars($activity['title']); ?></h3>
+                                <p class="text-gray-600 mb-4 flex-grow" itemprop="description"><?php echo htmlspecialchars($activity['description']); ?></p>
                                 <div class="text-sm text-gray-500 mb-4">
-                                    <i class="far fa-calendar"></i> <?php echo date('F Y', strtotime($activity['created_at'])); ?>
+                                    <i class="far fa-calendar" aria-hidden="true"></i> 
+                                    <time datetime="<?php echo date('Y-m', strtotime($activity['created_at'])); ?>" itemprop="datePublished"><?php echo date('F Y', strtotime($activity['created_at'])); ?></time>
                                 </div>
-                                <a href="index.php?page=research-detail&id=<?php echo $activity['id']; ?>" class="text-blue-600 hover:text-blue-700 font-semibold mt-auto">
-                                    Read More <i class="fas fa-arrow-right ml-1"></i>
+                                <meta itemprop="author" content="INLET Politeknik Negeri Malang">
+                                <a href="index.php?page=research-detail&id=<?php echo $activity['id']; ?>" 
+                                    class="text-blue-600 hover:text-blue-700 font-semibold mt-auto"
+                                    itemprop="url"
+                                    aria-label="Baca selengkapnya: <?php echo htmlspecialchars($activity['title']); ?>">
+                                    Read More <i class="fas fa-arrow-right ml-1" aria-hidden="true"></i>
                                 </a>
                             </div>
-                        </div>
+                        </article>
                     <?php endforeach; ?>
                 </div>
             <?php endif; ?>
@@ -379,19 +454,19 @@
     </section>
 
     <!-- Guestbook Section -->
-    <section id="guestbook" class="py-20 bg-gray-50">
+    <section id="guestbook" class="py-20 bg-gray-50" aria-labelledby="guestbook-heading" itemscope itemtype="https://schema.org/ContactPage">
         <div class="container mx-auto px-6 md:px-8 lg:px-12">
             <div class="max-w-4xl mx-auto">
                 <!-- Header -->
-                <div class="text-center mb-12">
+                <header class="text-center mb-12">
                     <span class="inline-block px-4 py-1 bg-blue-100 text-blue-600 rounded-full text-sm font-semibold mb-4">Get in Touch</span>
-                    <h2 class="text-4xl font-bold text-gray-800 mb-4">Guestbook</h2>
-                    <p class="text-gray-600 text-lg">Share your thoughts and leave a message for us</p>
-                </div>
+                    <h2 id="guestbook-heading" class="text-4xl font-bold text-gray-800 mb-4" itemprop="name">Guestbook</h2>
+                    <p class="text-gray-600 text-lg" itemprop="description">Share your thoughts and leave a message for us</p>
+                </header>
 
                 <!-- Success Message (Hidden by default) -->
-                <div id="guestbookSuccess" class="hidden mb-6 bg-green-50 border border-green-200 text-green-800 px-6 py-4 rounded-lg flex items-start">
-                    <i class="fas fa-check-circle text-2xl mr-3 mt-1"></i>
+                <div id="guestbookSuccess" class="hidden mb-6 bg-green-50 border border-green-200 text-green-800 px-6 py-4 rounded-lg flex items-start" role="alert" aria-live="polite">
+                    <i class="fas fa-check-circle text-2xl mr-3 mt-1" aria-hidden="true"></i>
                     <div>
                         <p class="font-semibold">Thank you for your message!</p>
                         <p class="text-sm">Your entry has been successfully recorded.</p>
@@ -399,8 +474,8 @@
                 </div>
 
                 <!-- Error Message (Hidden by default) -->
-                <div id="guestbookError" class="hidden mb-6 bg-red-50 border border-red-200 text-red-800 px-6 py-4 rounded-lg flex items-start">
-                    <i class="fas fa-exclamation-circle text-2xl mr-3 mt-1"></i>
+                <div id="guestbookError" class="hidden mb-6 bg-red-50 border border-red-200 text-red-800 px-6 py-4 rounded-lg flex items-start" role="alert" aria-live="assertive">
+                    <i class="fas fa-exclamation-circle text-2xl mr-3 mt-1" aria-hidden="true"></i>
                     <div>
                         <p class="font-semibold">Oops! Something went wrong</p>
                         <p class="text-sm" id="errorMessage">Please try again.</p>
@@ -409,21 +484,24 @@
 
                 <!-- Guestbook Form -->
                 <div class="bg-white rounded-2xl shadow-xl p-8 md:p-10 border border-gray-100">
-                    <form id="guestbookForm" class="space-y-6">
+                    <form id="guestbookForm" class="space-y-6" aria-label="Guestbook submission form" novalidate>
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <!-- Name Field -->
                             <div class="form-group">
                                 <label for="guestName" class="block text-sm font-semibold text-gray-700 mb-2">
-                                    Full Name <span class="text-red-500">*</span>
+                                    Full Name <span class="text-red-500" aria-hidden="true">*</span>
+                                    <span class="sr-only">(required)</span>
                                 </label>
                                 <div class="relative">
                                     <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                        <i class="fas fa-user text-gray-400"></i>
+                                        <i class="fas fa-user text-gray-400" aria-hidden="true"></i>
                                     </div>
                                     <input type="text"
                                         id="guestName"
                                         name="name"
                                         required
+                                        autocomplete="name"
+                                        aria-required="true"
                                         class="block w-full pl-10 pr-3 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
                                         placeholder="Enter your name">
                                 </div>
@@ -432,16 +510,19 @@
                             <!-- Institution Field -->
                             <div class="form-group">
                                 <label for="guestInstitution" class="block text-sm font-semibold text-gray-700 mb-2">
-                                    Institution <span class="text-red-500">*</span>
+                                    Institution <span class="text-red-500" aria-hidden="true">*</span>
+                                    <span class="sr-only">(required)</span>
                                 </label>
                                 <div class="relative">
                                     <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                        <i class="fas fa-building text-gray-400"></i>
+                                        <i class="fas fa-building text-gray-400" aria-hidden="true"></i>
                                     </div>
                                     <input type="text"
                                         id="guestInstitution"
                                         name="institution"
                                         required
+                                        autocomplete="organization"
+                                        aria-required="true"
                                         class="block w-full pl-10 pr-3 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
                                         placeholder="Your institution/organization">
                                 </div>
@@ -450,16 +531,19 @@
                             <!-- Email Field -->
                             <div class="form-group">
                                 <label for="guestEmail" class="block text-sm font-semibold text-gray-700 mb-2">
-                                    Email Address <span class="text-red-500">*</span>
+                                    Email Address <span class="text-red-500" aria-hidden="true">*</span>
+                                    <span class="sr-only">(required)</span>
                                 </label>
                                 <div class="relative">
                                     <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                        <i class="fas fa-envelope text-gray-400"></i>
+                                        <i class="fas fa-envelope text-gray-400" aria-hidden="true"></i>
                                     </div>
                                     <input type="email"
                                         id="guestEmail"
                                         name="email"
                                         required
+                                        autocomplete="email"
+                                        aria-required="true"
                                         class="block w-full pl-10 pr-3 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
                                         placeholder="your.email@example.com">
                                 </div>
@@ -468,16 +552,19 @@
                             <!-- Phone Field -->
                             <div class="form-group">
                                 <label for="guestPhone" class="block text-sm font-semibold text-gray-700 mb-2">
-                                    Phone Number <span class="text-red-500">*</span>
+                                    Phone Number <span class="text-red-500" aria-hidden="true">*</span>
+                                    <span class="sr-only">(required)</span>
                                 </label>
                                 <div class="relative">
                                     <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                        <i class="fas fa-phone text-gray-400"></i>
+                                        <i class="fas fa-phone text-gray-400" aria-hidden="true"></i>
                                     </div>
                                     <input type="tel"
                                         id="guestPhone"
                                         name="phone"
                                         required
+                                        autocomplete="tel"
+                                        aria-required="true"
                                         pattern="[0-9+\-\(\)\s]+"
                                         class="block w-full pl-10 pr-3 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
                                         placeholder="081234567890">
@@ -488,21 +575,24 @@
                         <!-- Message Field -->
                         <div class="form-group">
                             <label for="guestMessage" class="block text-sm font-semibold text-gray-700 mb-2">
-                                Your Message <span class="text-red-500">*</span>
+                                Your Message <span class="text-red-500" aria-hidden="true">*</span>
+                                <span class="sr-only">(required)</span>
                             </label>
                             <div class="relative">
                                 <div class="absolute top-3 left-3 pointer-events-none">
-                                    <i class="fas fa-comment-dots text-gray-400"></i>
+                                    <i class="fas fa-comment-dots text-gray-400" aria-hidden="true"></i>
                                 </div>
                                 <textarea id="guestMessage"
                                     name="message"
                                     rows="5"
                                     required
                                     maxlength="1000"
+                                    aria-required="true"
+                                    aria-describedby="charCount"
                                     class="block w-full pl-10 pr-3 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 resize-none"
                                     placeholder="Share your thoughts, feedback, or questions..."></textarea>
                                 <div class="text-right mt-1">
-                                    <span id="charCount" class="text-xs text-gray-500">0 / 1000</span>
+                                    <span id="charCount" class="text-xs text-gray-500" aria-live="polite">0 / 1000</span>
                                 </div>
                             </div>
                         </div>
@@ -510,13 +600,13 @@
                         <!-- Submit Button -->
                         <div class="flex items-center justify-between pt-4">
                             <p class="text-sm text-gray-500">
-                                <i class="fas fa-info-circle mr-1"></i>
+                                <i class="fas fa-info-circle mr-1" aria-hidden="true"></i>
                                 All fields are required
                             </p>
                             <button type="submit"
                                 id="submitGuestbook"
                                 class="inline-flex items-center px-8 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-semibold rounded-lg hover:from-blue-700 hover:to-indigo-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transform hover:scale-105 transition-all duration-200 shadow-lg">
-                                <i class="fas fa-paper-plane mr-2"></i>
+                                <i class="fas fa-paper-plane mr-2" aria-hidden="true"></i>
                                 Send Message
                             </button>
                         </div>

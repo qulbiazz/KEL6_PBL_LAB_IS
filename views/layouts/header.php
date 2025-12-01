@@ -1,13 +1,61 @@
 <!DOCTYPE html>
-<html lang="id">
+<html lang="id" dir="ltr">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><?php echo $pageTitle ?? 'InLet - Information and Learning Engineering Technology'; ?></title>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    
+    <title><?php echo $pageTitle ?? 'INLET - Information and Learning Engineering Technology | Politeknik Negeri Malang'; ?></title>
+    
+    <?php
+    // Load SEO Helper
+    require_once __DIR__ . '/../../includes/SEOHelper.php';
+    
+    // Initialize SEO Helper with site URL
+    $protocol = isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? 'https' : 'http';
+    $siteUrl = $protocol . '://' . $_SERVER['HTTP_HOST'] . dirname($_SERVER['SCRIPT_NAME']);
+    SEOHelper::init($siteUrl);
+    
+    // Get current page
+    $currentPage = $_GET['page'] ?? 'home';
+    
+    // Get page-specific SEO data
+    $seoData = SEOHelper::getPageSEO($currentPage, $pageData ?? []);
+    
+    // Output meta tags
+    echo SEOHelper::generateMetaTags($seoData);
+    
+    // Output preload hints for performance
+    echo SEOHelper::getPreloadHints();
+    
+    // Output structured data
+    echo SEOHelper::getOrganizationSchema();
+    echo SEOHelper::getWebSiteSchema();
+    ?>
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="assets/images/inlet_logo_only.png">
+    <link rel="apple-touch-icon" href="assets/images/inlet_logo_only.png">
+    
+    <!-- Critical CSS - Inline for faster FCP -->
+    <style>
+        /* Critical above-the-fold styles */
+        body{margin:0;font-family:system-ui,-apple-system,sans-serif;background:#f9fafb}
+        .loading-skeleton{background:linear-gradient(90deg,#f0f0f0 25%,#e0e0e0 50%,#f0f0f0 75%);background-size:200% 100%;animation:loading 1.5s infinite}
+        @keyframes loading{0%{background-position:200% 0}100%{background-position:-200% 0}}
+        /* Only top navigation bar */
+        body > nav, header nav{background:#fff;box-shadow:0 1px 3px rgba(0,0,0,0.1)}
+        /* Footer nav should be transparent */
+        footer nav{background:transparent!important;box-shadow:none!important}
+    </style>
+    
+    <!-- Main Stylesheets with async loading -->
     <link rel="stylesheet" href="assets/css/tailwind.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" media="print" onload="this.media='all'">
+    <noscript><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"></noscript>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" media="print" onload="this.media='all'">
+    <noscript><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css"></noscript>
     <link rel="stylesheet" href="assets/css/style.css">
 </head>
 

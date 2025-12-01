@@ -802,8 +802,8 @@ video {
   grid-column: span 2 / span 2;
 }
 
-.row-span-2 {
-  grid-row: span 2 / span 2;
+.m-0 {
+  margin: 0px;
 }
 
 .mx-3 {
@@ -1111,12 +1111,12 @@ video {
   height: 100%;
 }
 
-.h-screen {
-  height: 100vh;
-}
-
 .h-px {
   height: 1px;
+}
+
+.h-screen {
+  height: 100vh;
 }
 
 .max-h-20 {
@@ -1135,16 +1135,8 @@ video {
   max-height: 80vh;
 }
 
-.min-h-\[180px\] {
-  min-height: 180px;
-}
-
 .min-h-\[3\.5rem\] {
   min-height: 3.5rem;
-}
-
-.min-h-\[300px\] {
-  min-height: 300px;
 }
 
 .min-h-screen {
@@ -1347,16 +1339,16 @@ video {
   animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
 }
 
+.cursor-move {
+  cursor: move;
+}
+
 .cursor-not-allowed {
   cursor: not-allowed;
 }
 
 .cursor-pointer {
   cursor: pointer;
-}
-
-.cursor-move {
-  cursor: move;
 }
 
 .resize-none {
@@ -1377,6 +1369,10 @@ video {
 
 .list-disc {
   list-style-type: disc;
+}
+
+.list-none {
+  list-style-type: none;
 }
 
 .appearance-none {
@@ -2107,30 +2103,19 @@ video {
   --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to);
 }
 
-.from-green-600 {
-  --tw-gradient-from: #16a34a var(--tw-gradient-from-position);
-  --tw-gradient-to: rgb(22 163 74 / 0) var(--tw-gradient-to-position);
-  --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to);
-}
-
 .via-black\/20 {
   --tw-gradient-to: rgb(0 0 0 / 0)  var(--tw-gradient-to-position);
   --tw-gradient-stops: var(--tw-gradient-from), rgb(0 0 0 / 0.2) var(--tw-gradient-via-position), var(--tw-gradient-to);
 }
 
-.via-white {
-  --tw-gradient-to: rgb(255 255 255 / 0)  var(--tw-gradient-to-position);
-  --tw-gradient-stops: var(--tw-gradient-from), #fff var(--tw-gradient-via-position), var(--tw-gradient-to);
+.via-gray-300 {
+  --tw-gradient-to: rgb(209 213 219 / 0)  var(--tw-gradient-to-position);
+  --tw-gradient-stops: var(--tw-gradient-from), #d1d5db var(--tw-gradient-via-position), var(--tw-gradient-to);
 }
 
 .via-white\/40 {
   --tw-gradient-to: rgb(255 255 255 / 0)  var(--tw-gradient-to-position);
   --tw-gradient-stops: var(--tw-gradient-from), rgb(255 255 255 / 0.4) var(--tw-gradient-via-position), var(--tw-gradient-to);
-}
-
-.via-gray-300 {
-  --tw-gradient-to: rgb(209 213 219 / 0)  var(--tw-gradient-to-position);
-  --tw-gradient-stops: var(--tw-gradient-from), #d1d5db var(--tw-gradient-via-position), var(--tw-gradient-to);
 }
 
 .to-blue-100 {
@@ -2189,10 +2174,6 @@ video {
   --tw-gradient-to: #ca8a04 var(--tw-gradient-to-position);
 }
 
-.to-teal-600 {
-  --tw-gradient-to: #0d9488 var(--tw-gradient-to-position);
-}
-
 .object-contain {
   -o-object-fit: contain;
      object-fit: contain;
@@ -2241,6 +2222,10 @@ video {
 
 .p-8 {
   padding: 2rem;
+}
+
+.p-0 {
+  padding: 0px;
 }
 
 .px-1 {
@@ -2394,10 +2379,6 @@ video {
   padding-top: 2rem;
 }
 
-.pt-3 {
-  padding-top: 0.75rem;
-}
-
 .text-left {
   text-align: left;
 }
@@ -2495,6 +2476,10 @@ video {
 
 .italic {
   font-style: italic;
+}
+
+.not-italic {
+  font-style: normal;
 }
 
 .leading-5 {
@@ -3192,6 +3177,11 @@ video {
   color: rgb(220 38 38 / var(--tw-text-opacity, 1));
 }
 
+.hover\:text-red-700:hover {
+  --tw-text-opacity: 1;
+  color: rgb(185 28 28 / var(--tw-text-opacity, 1));
+}
+
 .hover\:text-red-800:hover {
   --tw-text-opacity: 1;
   color: rgb(153 27 27 / var(--tw-text-opacity, 1));
@@ -3210,11 +3200,6 @@ video {
 .hover\:text-yellow-900:hover {
   --tw-text-opacity: 1;
   color: rgb(113 63 18 / var(--tw-text-opacity, 1));
-}
-
-.hover\:text-red-700:hover {
-  --tw-text-opacity: 1;
-  color: rgb(185 28 28 / var(--tw-text-opacity, 1));
 }
 
 .hover\:underline:hover {
@@ -3315,11 +3300,6 @@ video {
 .focus\:ring-green-300:focus {
   --tw-ring-opacity: 1;
   --tw-ring-color: rgb(134 239 172 / var(--tw-ring-opacity, 1));
-}
-
-.focus\:ring-green-500:focus {
-  --tw-ring-opacity: 1;
-  --tw-ring-color: rgb(34 197 94 / var(--tw-ring-opacity, 1));
 }
 
 .focus\:ring-offset-2:focus {
@@ -3525,14 +3505,6 @@ video {
 
   .md\:max-h-\[500px\] {
     max-height: 500px;
-  }
-
-  .md\:min-h-\[220px\] {
-    min-height: 220px;
-  }
-
-  .md\:min-h-\[400px\] {
-    min-height: 400px;
   }
 
   .md\:w-2\/5 {

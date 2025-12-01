@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+        xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">
+    
+    <!-- Homepage - Highest Priority -->
+    <url>
+        <loc>https://pbl-inlet.alwaysdata.net/inlet-web/</loc>
+        <changefreq>daily</changefreq>
+        <priority>1.0</priority>
+    </url>
+    
+    <!-- About Page -->
+    <url>
+        <loc>https://pbl-inlet.alwaysdata.net/inlet-web/index.php?page=about</loc>
+        <changefreq>monthly</changefreq>
+        <priority>0.8</priority>
+    </url>
+    
+    <!-- Products Page -->
+    <url>
+        <loc>https://pbl-inlet.alwaysdata.net/inlet-web/index.php?page=products</loc>
+        <changefreq>weekly</changefreq>
+        <priority>0.9</priority>
+    </url>
+    
+    <!-- Gallery Page -->
+    <url>
+        <loc>https://pbl-inlet.alwaysdata.net/inlet-web/index.php?page=gallery</loc>
+        <changefreq>weekly</changefreq>
+        <priority>0.7</priority>
+    </url>
+    
+    <!-- News Page -->
+    <url>
+        <loc>https://pbl-inlet.alwaysdata.net/inlet-web/index.php?page=news</loc>
+        <changefreq>daily</changefreq>
+        <priority>0.8</priority>
+    </url>
+    
+    <!-- Team Page -->
+    <url>
+        <loc>https://pbl-inlet.alwaysdata.net/inlet-web/index.php?page=team</loc>
+        <changefreq>monthly</changefreq>
+        <priority>0.6</priority>
+    </url>
+    
+    <!-- Research Page -->
+    <url>
+        <loc>https://pbl-inlet.alwaysdata.net/inlet-web/index.php?page=research</loc>
+        <changefreq>weekly</changefreq>
+        <priority>0.7</priority>
+    </url>
+    
+    <!-- Contact Page -->
+    <url>
+        <loc>https://pbl-inlet.alwaysdata.net/inlet-web/index.php?page=contact</loc>
+        <changefreq>monthly</changefreq>
+        <priority>0.5</priority>
+    </url>
+    
+</urlset>

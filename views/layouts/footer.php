@@ -15,16 +15,17 @@
     $contactInfo = $siteSettingsModel->getContactInfo();
     $socialLinks = $siteSettingsModel->getSocialLinks();
     ?>
-    <footer class="bg-gray-800 text-white py-12">
+    <footer class="bg-gray-800 text-white py-12" itemscope itemtype="https://schema.org/WPFooter" role="contentinfo">
         <div class="container mx-auto px-6 md:px-8 lg:px-12">
             <div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-8 mb-8">
-                <div class="lg:col-span-2">
-                    <h3 class="text-2xl font-bold mb-4"><?php echo htmlspecialchars($footerAbout['title']); ?></h3>
-                    <p class="text-gray-400"><?php echo htmlspecialchars($footerAbout['text']); ?></p>
+                <div class="lg:col-span-2" itemscope itemtype="https://schema.org/Organization">
+                    <h3 class="text-2xl font-bold mb-4" itemprop="name"><?php echo htmlspecialchars($footerAbout['title']); ?></h3>
+                    <p class="text-gray-400" itemprop="description"><?php echo htmlspecialchars($footerAbout['text']); ?></p>
+                    <meta itemprop="url" content="https://pbl-inlet.alwaysdata.net/inlet-web/">
                 </div>
-                <div>
+                <nav aria-label="Footer quick links" class="bg-transparent">
                     <h4 class="text-lg font-semibold mb-4">Quick Links</h4>
-                    <ul class="space-y-2">
+                    <ul class="space-y-2 list-none p-0 m-0 bg-transparent">
                         <?php
                         $quickLinks = $siteSettingsModel->getSetting('quick_links');
                         
@@ -52,43 +53,63 @@
                         endforeach;
                         ?>
                     </ul>
-                </div>
-                <div>
+                </nav>
+                <address class="not-italic" itemscope itemtype="https://schema.org/PostalAddress">
                     <h4 class="text-lg font-semibold mb-4">Contact</h4>
                     <ul class="space-y-2 text-gray-400">
                         <?php if (!empty($contactInfo['email'])): ?>
-                            <li><i class="fas fa-envelope mr-2"></i> <?php echo htmlspecialchars($contactInfo['email']); ?></li>
+                            <li>
+                                <i class="fas fa-envelope mr-2" aria-hidden="true"></i>
+                                <a href="mailto:<?php echo htmlspecialchars($contactInfo['email']); ?>" class="hover:text-white transition" itemprop="email">
+                                    <?php echo htmlspecialchars($contactInfo['email']); ?>
+                                </a>
+                            </li>
                         <?php endif; ?>
                         <?php if (!empty($contactInfo['phone'])): ?>
-                            <li><i class="fas fa-phone mr-2"></i> <?php echo htmlspecialchars($contactInfo['phone']); ?></li>
+                            <li>
+                                <i class="fas fa-phone mr-2" aria-hidden="true"></i>
+                                <a href="tel:<?php echo htmlspecialchars(preg_replace('/[^0-9+]/', '', $contactInfo['phone'])); ?>" class="hover:text-white transition" itemprop="telephone">
+                                    <?php echo htmlspecialchars($contactInfo['phone']); ?>
+                                </a>
+                            </li>
                         <?php endif; ?>
                         <?php if (!empty($contactInfo['address'])): ?>
-                            <li><i class="fas fa-map-marker-alt mr-2"></i> <?php echo htmlspecialchars($contactInfo['address']); ?></li>
+                            <li itemprop="streetAddress"><i class="fas fa-map-marker-alt mr-2" aria-hidden="true"></i> <?php echo htmlspecialchars($contactInfo['address']); ?></li>
                         <?php endif; ?>
                     </ul>
-                </div>
+                </address>
                 <div>
                     <h4 class="text-lg font-semibold mb-4">Follow Us</h4>
-                    <div class="flex space-x-4 mb-4">
+                    <nav class="flex space-x-4 mb-4" aria-label="Social media links">
                         <?php if (!empty($socialLinks['facebook'])): ?>
-                            <a href="<?php echo htmlspecialchars($socialLinks['facebook']); ?>" target="_blank" rel="noopener noreferrer" class="text-gray-400 hover:text-white text-2xl"><i class="fab fa-facebook"></i></a>
+                            <a href="<?php echo htmlspecialchars($socialLinks['facebook']); ?>" target="_blank" rel="noopener noreferrer" class="text-gray-400 hover:text-white text-2xl" aria-label="Facebook">
+                                <i class="fab fa-facebook" aria-hidden="true"></i>
+                            </a>
                         <?php endif; ?>
                         <?php if (!empty($socialLinks['twitter'])): ?>
-                            <a href="<?php echo htmlspecialchars($socialLinks['twitter']); ?>" target="_blank" rel="noopener noreferrer" class="text-gray-400 hover:text-white text-2xl"><i class="fab fa-twitter"></i></a>
+                            <a href="<?php echo htmlspecialchars($socialLinks['twitter']); ?>" target="_blank" rel="noopener noreferrer" class="text-gray-400 hover:text-white text-2xl" aria-label="Twitter">
+                                <i class="fab fa-twitter" aria-hidden="true"></i>
+                            </a>
                         <?php endif; ?>
                         <?php if (!empty($socialLinks['instagram'])): ?>
-                            <a href="<?php echo htmlspecialchars($socialLinks['instagram']); ?>" target="_blank" rel="noopener noreferrer" class="text-gray-400 hover:text-white text-2xl"><i class="fab fa-instagram"></i></a>
+                            <a href="<?php echo htmlspecialchars($socialLinks['instagram']); ?>" target="_blank" rel="noopener noreferrer" class="text-gray-400 hover:text-white text-2xl" aria-label="Instagram">
+                                <i class="fab fa-instagram" aria-hidden="true"></i>
+                            </a>
                         <?php endif; ?>
                         <?php if (!empty($socialLinks['youtube'])): ?>
-                            <a href="<?php echo htmlspecialchars($socialLinks['youtube']); ?>" target="_blank" rel="noopener noreferrer" class="text-gray-400 hover:text-white text-2xl"><i class="fab fa-youtube"></i></a>
+                            <a href="<?php echo htmlspecialchars($socialLinks['youtube']); ?>" target="_blank" rel="noopener noreferrer" class="text-gray-400 hover:text-white text-2xl" aria-label="YouTube">
+                                <i class="fab fa-youtube" aria-hidden="true"></i>
+                            </a>
                         <?php endif; ?>
                         <?php if (!empty($socialLinks['linkedin'])): ?>
-                            <a href="<?php echo htmlspecialchars($socialLinks['linkedin']); ?>" target="_blank" rel="noopener noreferrer" class="text-gray-400 hover:text-white text-2xl"><i class="fab fa-linkedin"></i></a>
+                            <a href="<?php echo htmlspecialchars($socialLinks['linkedin']); ?>" target="_blank" rel="noopener noreferrer" class="text-gray-400 hover:text-white text-2xl" aria-label="LinkedIn">
+                                <i class="fab fa-linkedin" aria-hidden="true"></i>
+                            </a>
                         <?php endif; ?>
-                    </div>
+                    </nav>
                     <!-- Simple Visitor Counter -->
                     <div class="text-gray-400 text-sm">
-                        <i class="fas fa-eye mr-1"></i>
+                        <i class="fas fa-eye mr-1" aria-hidden="true"></i>
                         Total Page Views: <span class="font-semibold"><?php echo number_format($visitorStats['total_views'] ?? 0); ?></span>
                     </div>
                 </div>
