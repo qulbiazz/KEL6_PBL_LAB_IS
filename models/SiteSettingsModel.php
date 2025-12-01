@@ -46,7 +46,8 @@ class SiteSettingsModel {
                 'footer_about_title', 'footer_about_text', 'footer_copyright',
                 'contact_email', 'contact_phone', 'contact_address',
                 'social_facebook', 'social_instagram', 'social_youtube',
-                'social_linkedin', 'social_twitter', 'quick_links'
+                'social_linkedin', 'social_twitter', 'quick_links',
+                'borrowing_notification_email'
             ];
             
             $update_fields = [];

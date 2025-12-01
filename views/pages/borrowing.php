@@ -2,6 +2,8 @@
 require_once __DIR__ . '/../../config/database.php';
 require_once __DIR__ . '/../../models/BorrowingModel.php';
 require_once __DIR__ . '/../../models/EquipmentModel.php';
+require_once __DIR__ . '/../../models/SiteSettingsModel.php';
+require_once __DIR__ . '/../../helpers/EmailHelper.php';
 
 $response = ['success' => false, 'message' => ''];
 
@@ -11,6 +13,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     try {
         // Ambil input
         $borrower_name = trim($_POST['nama'] ?? '');
+        $borrower_email = trim($_POST['email'] ?? '');
         $occupation = trim($_POST['pekerjaan'] ?? '');
         if ($occupation === 'lainnya') {
             $occupation = trim($_POST['pekerjaan_lainnya'] ?? '');
@@ -18,6 +21,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $type = $_POST['jenis'] ?? '';
         $borrow_date = trim($_POST['waktu_pinjam'] ?? '');
         $return_date = trim($_POST['waktu_kembali'] ?? '');
+        $notes = trim($_POST['keperluan'] ?? $_POST['notes'] ?? '');
 
         // Handle item based on type
         $item_name = '';
@@ -47,6 +51,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         // -----------------------------
         if (empty($borrower_name)) {
             $response['message'] = 'Nama lengkap wajib diisi!';
+
+        } elseif (empty($borrower_email)) {
+            $response['message'] = 'Email wajib diisi!';
+
+        } elseif (!filter_var($borrower_email, FILTER_VALIDATE_EMAIL)) {
+            $response['message'] = 'Format email tidak valid!';
 
         } elseif (empty($occupation)) {
             $response['message'] = 'Pekerjaan wajib diisi!';
@@ -102,6 +112,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
             $data = [
                 'borrower_name' => $borrower_name,
+                'borrower_email' => $borrower_email,
                 'occupation' => $occupation,
                 'type' => $type,
                 'item_name' => $item_name,
@@ -109,12 +120,42 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 'item_type' => $type,
                 'borrow_date' => $borrow_date,
                 'return_date' => $return_date,
-                'status' => 'active'
+                'status' => 'active',
+                'approval_status' => 'pending'
             ];
 
             if ($borrowModel->createBorrowing($data)) {
+                // Send email notification to admin
+                try {
+                    error_log("Borrowing: Starting email notification process");
+                    file_put_contents(__DIR__ . '/../../logs/email_debug.txt', date('Y-m-d H:i:s') . " - Email process started\n", FILE_APPEND);
+                    
+                    $siteSettingsModel = new SiteSettingsModel($conn);
+                    $settings = $siteSettingsModel->getSettings();
+                    $adminEmail = $settings['borrowing_notification_email'] ?? 'inlet@polinema.ac.id';
+                    
+                    error_log("Borrowing: Admin email = {$adminEmail}");
+                    file_put_contents(__DIR__ . '/../../logs/email_debug.txt', date('Y-m-d H:i:s') . " - Admin email: {$adminEmail}\n", FILE_APPEND);
+                    
+                    // Add notes to data for email
+                    $data['notes'] = $notes;
+                    
+                    error_log("Borrowing: Calling EmailHelper::sendBorrowingNotificationToAdmin");
+                    file_put_contents(__DIR__ . '/../../logs/email_debug.txt', date('Y-m-d H:i:s') . " - Calling EmailHelper\n", FILE_APPEND);
+                    
+                    $emailResult = EmailHelper::sendBorrowingNotificationToAdmin($data, $adminEmail);
+                    
+                    error_log("Borrowing: Email result = " . ($emailResult ? 'SUCCESS' : 'FAILED'));
+                    file_put_contents(__DIR__ . '/../../logs/email_debug.txt', date('Y-m-d H:i:s') . " - Email result: " . ($emailResult ? 'SUCCESS' : 'FAILED') . "\n", FILE_APPEND);
+                } catch (Exception $emailEx) {
+                    // Log email error but don't fail the borrowing
+                    error_log('Email notification failed: ' . $emailEx->getMessage());
+                    error_log('Email exception trace: ' . $emailEx->getTraceAsString());
+                    file_put_contents(__DIR__ . '/../../logs/email_debug.txt', date('Y-m-d H:i:s') . " - EXCEPTION: " . $emailEx->getMessage() . "\n", FILE_APPEND);
+                }
+                
                 $response['success'] = true;
-                $response['message'] = 'Peminjaman berhasil dicatat!';
+                $response['message'] = 'Peminjaman berhasil dicatat! Kami akan mengirimkan email konfirmasi ke ' . $borrower_email . ' setelah peminjaman disetujui.';
             } else {
                 $response['message'] = 'Gagal menyimpan data peminjaman!';
             }
@@ -197,6 +238,19 @@ try {
                         <input type="text" id="nama" name="nama" required
                             class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition"
                             placeholder="Masukkan nama lengkap">
+                    </div>
+
+                    <!-- Email -->
+                    <div class="mb-6">
+                        <label for="email" class="block text-gray-700 font-semibold mb-2">
+                            <i class="fas fa-envelope mr-2 text-blue-600"></i>Email *
+                        </label>
+                        <input type="email" id="email" name="email" required
+                            class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition"
+                            placeholder="Masukkan email aktif untuk notifikasi">
+                        <p class="text-sm text-gray-500 mt-1">
+                            <i class="fas fa-info-circle mr-1"></i>Email akan digunakan untuk mengirim status persetujuan peminjaman
+                        </p>
                     </div>
 
                     <!-- Pekerjaan -->
@@ -475,20 +529,27 @@ try {
 
                 // console.log("Fetching from: views/pages/ajax_check_equipment.php");
                 
-                // Fetch equipment
-                fetch(`views/pages/ajax_check_equipment.php`)
+                // Fetch equipment with cache busting
+                fetch(`views/pages/ajax_check_equipment.php?_t=${Date.now()}`, {
+                    cache: 'no-store',
+                    headers: {
+                        'Cache-Control': 'no-cache, no-store, must-revalidate',
+                        'Pragma': 'no-cache'
+                    }
+                })
                     .then(response => {
-                        // console.log("Response received:", response);
+                        console.log("Response received:", response);
                         return response.json();
                     })
                     .then(data => {
-                        // console.log('Equipment data:', data);
+                        console.log('Equipment data:', data);
                         if (data.success && data.equipment) {
                             if (data.equipment.length === 0) {
                                 equipmentContainer.innerHTML = '<p class="text-gray-500 col-span-2 text-center py-4">Tidak ada alat tersedia</p>';
                             } else {
                                 equipmentContainer.innerHTML = '';
                                 data.equipment.forEach(equipment => {
+                                    console.log('Equipment item:', equipment.name, 'Available:', equipment.available_quantity, 'Total:', equipment.quantity);
                                     const isAvailable = equipment.is_active && equipment.available_quantity > 0;
                                     const label = document.createElement('label');
                                     label.className = `flex items-center p-3 border rounded-lg transition ${isAvailable ? 'border-gray-200 hover:bg-blue-50 cursor-pointer' : 'border-gray-300 bg-gray-100 cursor-not-allowed opacity-60'}`;

@@ -12,6 +12,8 @@ database/backups/
 # Node modules & dependencies
 node_modules/
 package-lock.json
+vendor/
+composer.lock
 
 # Uploads Directory
 uploads/*
@@ -81,3 +83,6 @@ sitemap.xml
 sitemap.php
 robots.txt
 .htaccess
+
+test_email.php
+test_borrowing_email.php

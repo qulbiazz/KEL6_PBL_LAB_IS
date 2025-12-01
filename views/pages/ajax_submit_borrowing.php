@@ -13,6 +13,8 @@ try {
     require_once __DIR__ . '/../../config/database.php';
     require_once __DIR__ . '/../../models/BorrowingModel.php';
     require_once __DIR__ . '/../../models/EquipmentModel.php';
+    require_once __DIR__ . '/../../models/SiteSettingsModel.php';
+    require_once __DIR__ . '/../../helpers/EmailHelper.php';
 
     // Ambil input
     $borrower_name = trim($_POST['nama'] ?? '');
@@ -101,6 +103,7 @@ try {
         // Room borrowing - Lab Inlet only
         $data = [
             'borrower_name' => $borrower_name,
+            'borrower_email' => $_POST['email'] ?? null,
             'occupation' => $occupation,
             'room_name' => 'Lab Inlet',
             'borrow_date' => $borrow_date,
@@ -160,6 +163,7 @@ try {
         
         $data = [
             'borrower_name' => $borrower_name,
+            'borrower_email' => $_POST['email'] ?? null,
             'occupation' => $occupation,
             'borrow_date' => $borrow_date,
             'return_date' => $return_date,
@@ -173,9 +177,48 @@ try {
     }
 
     if ($result) {
+        // Send email notification to admin
+        try {
+            $siteSettingsModel = new SiteSettingsModel($conn);
+            $settings = $siteSettingsModel->getSettings();
+            $adminEmail = $settings['borrowing_notification_email'] ?? 'inlet@polinema.ac.id';
+            
+            // Prepare email data
+            $emailData = [
+                'borrower_name' => $borrower_name,
+                'borrower_email' => $_POST['email'] ?? 'N/A',
+                'occupation' => $occupation,
+                'type' => $type,
+                'item_name' => ($type === 'room') ? 'Lab Inlet' : $item_name,
+                'borrow_date' => $borrow_date,
+                'return_date' => $return_date,
+                'notes' => ($type === 'room') ? $purpose : ($_POST['keperluan'] ?? '')
+            ];
+            
+            // If equipment, get equipment names instead of IDs
+            if ($type === 'equipment') {
+                $equipmentModel = new EquipmentModel($conn);
+                $equipmentNames = [];
+                foreach ($equipmentItems as $item) {
+                    $eq = $equipmentModel->getEquipmentById($item['equipment_id']);
+                    if ($eq) {
+                        $equipmentNames[] = $eq['name'];
+                    }
+                }
+                $emailData['item_name'] = implode(', ', $equipmentNames);
+            }
+            
+            // Send email
+            EmailHelper::sendBorrowingNotificationToAdmin($emailData, $adminEmail);
+            
+        } catch (Exception $emailEx) {
+            // Log email error but don't fail the borrowing
+            error_log('Email notification failed: ' . $emailEx->getMessage());
+        }
+        
         echo json_encode([
             'success' => true,
-            'message' => 'Peminjaman berhasil diajukan! Silakan hubungi admin untuk konfirmasi.'
+            'message' => 'Peminjaman berhasil diajukan! Silakan menunggu email konfirmasi dari admin.'
         ]);
     } else {
         throw new Exception('Gagal menyimpan data peminjaman!');

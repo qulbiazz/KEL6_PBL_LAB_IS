@@ -37,6 +37,39 @@
                     </div>
                 </div>
 
+                <?php 
+                // YouTube Embed Section
+                $youtube_url = $research['youtube_url'] ?? '';
+                if (!empty($youtube_url)):
+                    // Extract YouTube video ID from various URL formats
+                    $video_id = '';
+                    if (preg_match('/(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})/', $youtube_url, $matches)) {
+                        $video_id = $matches[1];
+                    }
+                    
+                    if (!empty($video_id)):
+                ?>
+                <div class="bg-white rounded-xl shadow-md p-8 mb-8 border border-gray-100">
+                    <h3 class="text-2xl font-bold text-gray-800 mb-6 flex items-center">
+                        <i class="fab fa-youtube text-red-600 mr-3"></i>
+                        Video Presentation
+                    </h3>
+                    <div class="relative w-full overflow-hidden rounded-xl shadow-lg" style="padding-top: 56.25%;">
+                        <iframe 
+                            class="absolute top-0 left-0 w-full h-full"
+                            src="https://www.youtube.com/embed/<?php echo htmlspecialchars($video_id); ?>?rel=0&modestbranding=1" 
+                            title="<?php echo htmlspecialchars($research['title']); ?> - Video"
+                            frameborder="0" 
+                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
+                            allowfullscreen>
+                        </iframe>
+                    </div>
+                </div>
+                <?php 
+                    endif;
+                endif; 
+                ?>
+
                 <!-- Another Research Section -->
                 <?php if (!empty($otherResearch)): ?>
                 <div class="bg-white rounded-xl shadow-md p-8 mb-8 border border-gray-100">

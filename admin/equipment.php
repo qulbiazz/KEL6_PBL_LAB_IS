@@ -73,8 +73,8 @@ $total_pages = ceil($total_items / $per_page);
 $equipments = array_slice($all_equipments, $offset, $per_page);
 
 // Statistics
-$total_quantity = array_sum(array_column($all_equipments, 'quantity'));
-$total_available = array_sum(array_column($all_equipments, 'available_quantity'));
+$total_quantity = array_sum(array_map('intval', array_column($all_equipments, 'quantity')));
+$total_available = array_sum(array_map('intval', array_column($all_equipments, 'available_quantity')));
 $total_borrowed = $total_quantity - $total_available;
 ?>
 
@@ -215,14 +215,14 @@ $total_borrowed = $total_quantity - $total_available;
                                         <p class="text-xs text-gray-500 mb-1">Total</p>
                                         <p class="text-lg font-bold text-gray-900">
                                             <i class="fas fa-box text-blue-600 mr-1"></i>
-                                            <?php echo $equipment['quantity']; ?>
+                                            <?php echo (int)$equipment['quantity']; ?>
                                         </p>
                                     </div>
                                     <div class="text-center">
                                         <p class="text-xs text-gray-500 mb-1">Tersedia</p>
                                         <p class="text-lg font-bold <?php echo $equipment['available_quantity'] > 0 ? 'text-green-600' : 'text-red-600'; ?>">
                                             <i class="fas fa-check-circle mr-1"></i>
-                                            <?php echo $equipment['available_quantity']; ?>
+                                            <?php echo (int)$equipment['available_quantity']; ?>
                                         </p>
                                     </div>
                                 </div>

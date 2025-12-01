@@ -62,13 +62,13 @@
                 <p class="text-gray-600">Innovative solutions for modern challenges</p>
             </header>
             <?php if (count($products) > 3): ?>
-                <!-- Swiper for more than 3 items -->
-                <div class="swiper-container-wrapper">
-                    <div class="swiper productsSwiper overflow-visible">
-                        <div class="swiper-wrapper pb-4">
+                <!-- Splide Slider for more than 3 items -->
+                <div class="splide products-slider" role="region" aria-label="Products carousel">
+                    <div class="splide__track">
+                        <ul class="splide__list" role="list">
                             <?php foreach ($products as $product): ?>
-                                <article class="swiper-slide h-auto">
-                                    <div class="bg-white rounded-xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 flex flex-col h-full border border-gray-100">
+                                <li class="splide__slide" role="listitem">
+                                    <article class="bg-white rounded-xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 flex flex-col h-full border border-gray-100">
                                         <div class="relative overflow-hidden group">
                                             <img src="uploads/products/<?php echo htmlspecialchars($product['image']); ?>"
                                                 alt="Produk <?php echo htmlspecialchars($product['name']); ?> - INLET Polinema"
@@ -89,13 +89,10 @@
                                                 <i class="fas fa-arrow-right ml-2 transform group-hover/link:translate-x-1 transition-transform" aria-hidden="true"></i>
                                             </a>
                                         </div>
-                                    </div>
-                                </article>
+                                    </article>
+                                </li>
                             <?php endforeach; ?>
-                        </div>
-                        <div class="swiper-button-next products-button-next" aria-label="Produk selanjutnya"></div>
-                        <div class="swiper-button-prev products-button-prev" aria-label="Produk sebelumnya"></div>
-                        <div class="swiper-pagination products-pagination mt-4"></div>
+                        </ul>
                     </div>
                 </div>
             <?php else: ?>
@@ -161,80 +158,75 @@
 
             <!-- Team Slider -->
             <div class="relative">
-                <div class="swiper teamSwiper">
-                    <div class="swiper-wrapper" role="list" aria-label="Team members">
-                        <?php foreach ($team as $member): ?>
-                            <article class="swiper-slide" role="listitem" itemscope itemtype="https://schema.org/Person">
-                                <div class="bg-white rounded-lg overflow-hidden shadow-md hover:shadow-xl transition h-full flex flex-col">
-                                    <!-- Profile Image -->
-                                    <div class="relative overflow-hidden">
-                                        <img src="uploads/team/<?php echo htmlspecialchars($member['photo']); ?>"
-                                            alt="Foto profil <?php echo htmlspecialchars($member['name']); ?> - <?php echo htmlspecialchars($member['position']); ?> di INLET Politeknik Negeri Malang"
-                                            class="w-full h-64 object-cover"
-                                            loading="lazy"
-                                            width="400"
-                                            height="256"
-                                            itemprop="image">
-                                        <div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 hover:opacity-100 transition-opacity duration-300">
-                                            <div class="absolute bottom-4 left-0 right-0 text-center">
-                                                <a href="index.php?page=lecturer-detail&id=<?php echo $member['id']; ?>"
-                                                    class="inline-block bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-semibold transition"
-                                                    aria-label="Lihat profil lengkap <?php echo htmlspecialchars($member['name']); ?>">
-                                                    View Profile
-                                                </a>
+                <div class="splide team-slider" role="region" aria-label="Team members carousel">
+                    <div class="splide__track">
+                        <ul class="splide__list" role="list">
+                            <?php foreach ($team as $member): ?>
+                                <li class="splide__slide" role="listitem">
+                                    <article class="bg-white rounded-lg overflow-hidden shadow-md hover:shadow-xl transition h-full flex flex-col" itemscope itemtype="https://schema.org/Person">
+                                        <!-- Profile Image -->
+                                        <div class="relative overflow-hidden">
+                                            <img src="uploads/team/<?php echo htmlspecialchars($member['photo']); ?>"
+                                                alt="Foto profil <?php echo htmlspecialchars($member['name']); ?> - <?php echo htmlspecialchars($member['position']); ?> di INLET Politeknik Negeri Malang"
+                                                class="w-full h-64 object-cover"
+                                                loading="lazy"
+                                                width="400"
+                                                height="256"
+                                                itemprop="image">
+                                            <div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 hover:opacity-100 transition-opacity duration-300">
+                                                <div class="absolute bottom-4 left-0 right-0 text-center">
+                                                    <a href="index.php?page=lecturer-detail&id=<?php echo $member['id']; ?>"
+                                                        class="inline-block bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-semibold transition"
+                                                        aria-label="Lihat profil lengkap <?php echo htmlspecialchars($member['name']); ?>">
+                                                        View Profile
+                                                    </a>
+                                                </div>
                                             </div>
                                         </div>
-                                    </div>
 
-                                    <!-- Member Info -->
-                                    <div class="p-6 text-center flex-1 flex flex-col justify-between">
-                                        <div>
-                                            <h3 class="text-xl font-bold mb-1 text-gray-800" itemprop="name">
-                                                <?php echo htmlspecialchars($member['name']); ?>
-                                            </h3>
-                                            <p class="text-blue-600 mb-3" itemprop="jobTitle">
-                                                <?php echo htmlspecialchars($member['position']); ?>
-                                            </p>
-                                            <meta itemprop="worksFor" content="INLET - Politeknik Negeri Malang">
-                                        </div>
+                                        <!-- Member Info -->
+                                        <div class="p-6 text-center flex-1 flex flex-col justify-between">
+                                            <div>
+                                                <h3 class="text-xl font-bold mb-1 text-gray-800" itemprop="name">
+                                                    <?php echo htmlspecialchars($member['name']); ?>
+                                                </h3>
+                                                <p class="text-blue-600 mb-3" itemprop="jobTitle">
+                                                    <?php echo htmlspecialchars($member['position']); ?>
+                                                </p>
+                                                <meta itemprop="worksFor" content="INLET - Politeknik Negeri Malang">
+                                            </div>
 
-                                        <nav class="flex justify-center space-x-2 mt-4" aria-label="Social links for <?php echo htmlspecialchars($member['name']); ?>">
-                                            <a href="index.php?page=lecturer-detail&id=<?php echo $member['id']; ?>"
-                                                class="text-gray-600 hover:text-blue-600 transition p-2 min-w-[44px] min-h-[44px] flex items-center justify-center"
-                                                aria-label="Profil <?php echo htmlspecialchars($member['name']); ?>">
-                                                <i class="fas fa-user text-xl" aria-hidden="true"></i>
-                                            </a>
-                                            <?php if ($member['linkedin']): ?>
-                                                <a href="<?php echo htmlspecialchars($member['linkedin']); ?>"
-                                                    target="_blank"
-                                                    rel="noopener noreferrer"
+                                            <nav class="flex justify-center space-x-2 mt-4" aria-label="Social links for <?php echo htmlspecialchars($member['name']); ?>">
+                                                <a href="index.php?page=lecturer-detail&id=<?php echo $member['id']; ?>"
                                                     class="text-gray-600 hover:text-blue-600 transition p-2 min-w-[44px] min-h-[44px] flex items-center justify-center"
-                                                    itemprop="sameAs"
-                                                    aria-label="LinkedIn <?php echo htmlspecialchars($member['name']); ?>">
-                                                    <i class="fab fa-linkedin text-xl" aria-hidden="true"></i>
+                                                    aria-label="Profil <?php echo htmlspecialchars($member['name']); ?>">
+                                                    <i class="fas fa-user text-xl" aria-hidden="true"></i>
                                                 </a>
-                                            <?php endif; ?>
-                                            <?php if ($member['email']): ?>
-                                                <a href="mailto:<?php echo htmlspecialchars($member['email']); ?>"
-                                                    class="text-gray-600 hover:text-red-600 transition p-2 min-w-[44px] min-h-[44px] flex items-center justify-center"
-                                                    itemprop="email"
-                                                    aria-label="Email <?php echo htmlspecialchars($member['name']); ?>">
-                                                    <i class="fas fa-envelope text-xl" aria-hidden="true"></i>
-                                                </a>
-                                            <?php endif; ?>
-                                        </nav>
-                                    </div>
-                                </div>
-                            </article>
-                        <?php endforeach; ?>
+                                                <?php if ($member['linkedin']): ?>
+                                                    <a href="<?php echo htmlspecialchars($member['linkedin']); ?>"
+                                                        target="_blank"
+                                                        rel="noopener noreferrer"
+                                                        class="text-gray-600 hover:text-blue-600 transition p-2 min-w-[44px] min-h-[44px] flex items-center justify-center"
+                                                        itemprop="sameAs"
+                                                        aria-label="LinkedIn <?php echo htmlspecialchars($member['name']); ?>">
+                                                        <i class="fab fa-linkedin text-xl" aria-hidden="true"></i>
+                                                    </a>
+                                                <?php endif; ?>
+                                                <?php if ($member['email']): ?>
+                                                    <a href="mailto:<?php echo htmlspecialchars($member['email']); ?>"
+                                                        class="text-gray-600 hover:text-red-600 transition p-2 min-w-[44px] min-h-[44px] flex items-center justify-center"
+                                                        itemprop="email"
+                                                        aria-label="Email <?php echo htmlspecialchars($member['name']); ?>">
+                                                        <i class="fas fa-envelope text-xl" aria-hidden="true"></i>
+                                                    </a>
+                                                <?php endif; ?>
+                                            </nav>
+                                        </div>
+                                    </article>
+                                </li>
+                            <?php endforeach; ?>
+                        </ul>
                     </div>
-
-                    <!-- Navigation Buttons -->
-                    <div class="swiper-button-next team-button-next" aria-label="Next team member"></div>
-                    <div class="swiper-button-prev team-button-prev" aria-label="Previous team member"></div>
-
-                    <!-- Pagination -->
-                    <div class="swiper-pagination team-pagination"></div>
                 </div>
             </div>
         </div>
@@ -248,13 +240,13 @@
                 <p class="text-gray-600">Stay updated with our latest activities</p>
             </header>
             <?php if (count($news) > 3): ?>
-                <!-- Swiper for more than 3 items -->
-                <div class="swiper-container-wrapper">
-                    <div class="swiper newsSwiper overflow-visible">
-                        <div class="swiper-wrapper pb-4" role="list" aria-label="News articles">
+                <!-- Splide Slider for more than 3 items -->
+                <div class="splide news-slider" role="region" aria-label="Latest news carousel">
+                    <div class="splide__track">
+                        <ul class="splide__list" role="list">
                             <?php foreach ($news as $item): ?>
-                                <article class="swiper-slide h-auto" role="listitem" itemscope itemtype="https://schema.org/NewsArticle">
-                                    <div class="bg-white rounded-xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 flex flex-col h-full border border-gray-100">
+                                <li class="splide__slide" role="listitem">
+                                    <article class="bg-white rounded-xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 flex flex-col h-full border border-gray-100" itemscope itemtype="https://schema.org/NewsArticle">
                                         <div class="relative overflow-hidden group">
                                             <img src="uploads/news/<?php echo htmlspecialchars($item['image']); ?>"
                                                 alt="Berita: <?php echo htmlspecialchars($item['title']); ?>"
@@ -281,13 +273,10 @@
                                                 <i class="fas fa-arrow-right ml-2 transform group-hover/link:translate-x-1 transition-transform" aria-hidden="true"></i>
                                             </a>
                                         </div>
-                                    </div>
-                                </article>
+                                    </article>
+                                </li>
                             <?php endforeach; ?>
-                        </div>
-                        <div class="swiper-button-next news-button-next" aria-label="Next news"></div>
-                        <div class="swiper-button-prev news-button-prev" aria-label="Previous news"></div>
-                        <div class="swiper-pagination news-pagination mt-4"></div>
+                        </ul>
                     </div>
                 </div>
             <?php else: ?>
@@ -377,13 +366,13 @@
                 <p class="text-gray-600">Exploring new frontiers in technology</p>
             </header>
             <?php if (count($research) > 3): ?>
-                <!-- Swiper for more than 3 items -->
-                <div class="swiper-container-wrapper">
-                    <div class="swiper researchSwiper overflow-visible">
-                        <div class="swiper-wrapper pb-4" role="list" aria-label="Research publications">
+                <!-- Splide Slider for more than 3 items -->
+                <div class="splide research-slider" role="region" aria-label="Research activities carousel">
+                    <div class="splide__track">
+                        <ul class="splide__list" role="list">
                             <?php foreach ($research as $activity): ?>
-                                <article class="swiper-slide h-auto" role="listitem" itemscope itemtype="https://schema.org/ScholarlyArticle">
-                                    <div class="bg-white rounded-xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 flex flex-col h-full border border-gray-100">
+                                <li class="splide__slide" role="listitem">
+                                    <article class="bg-white rounded-xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 flex flex-col h-full border border-gray-100" itemscope itemtype="https://schema.org/ScholarlyArticle">
                                         <div class="relative overflow-hidden group">
                                             <img src="uploads/research/<?php echo htmlspecialchars($activity['image']); ?>"
                                                 alt="Riset: <?php echo htmlspecialchars($activity['title']); ?>"
@@ -410,13 +399,10 @@
                                                 <i class="fas fa-arrow-right ml-2 transform group-hover/link:translate-x-1 transition-transform" aria-hidden="true"></i>
                                             </a>
                                         </div>
-                                    </div>
-                                </article>
+                                    </article>
+                                </li>
                             <?php endforeach; ?>
-                        </div>
-                        <div class="swiper-button-next research-button-next" aria-label="Next research"></div>
-                        <div class="swiper-button-prev research-button-prev" aria-label="Previous research"></div>
-                        <div class="swiper-pagination research-pagination mt-4"></div>
+                        </ul>
                     </div>
                 </div>
             <?php else: ?>

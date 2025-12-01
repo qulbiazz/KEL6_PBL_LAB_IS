@@ -6,10 +6,88 @@ if (!isset($_SESSION['admin_logged_in'])) {
 }
 require_once '../config/database.php';
 require_once '../models/BorrowingModel.php';
+require_once '../models/SiteSettingsModel.php';
+require_once '../helpers/EmailHelper.php';
 
 $db = new Database();
 $conn = $db->getConnection();
 $borrowingModel = new BorrowingModel($conn);
+
+// Handle approve borrowing
+if (isset($_GET['approve'])) {
+    $id = intval($_GET['approve']);
+    $adminNotes = $_GET['notes'] ?? 'Peminjaman Anda telah disetujui.';
+    
+    if ($borrowingModel->updateApprovalStatus($id, 'approved', $adminNotes)) {
+        // Send email notification to borrower
+        try {
+            error_log("Approval: Getting borrowing data for ID: {$id}");
+            $borrowingData = $borrowingModel->getBorrowingForEmail($id);
+            
+            error_log("Approval: Borrowing data retrieved: " . json_encode($borrowingData));
+            
+            if ($borrowingData && !empty($borrowingData['borrower_email'])) {
+                error_log("Approval: Sending approval email to: " . $borrowingData['borrower_email']);
+                $emailResult = EmailHelper::sendApprovalNotification($borrowingData, 'approved', $adminNotes);
+                error_log("Approval: Email result = " . ($emailResult ? 'SUCCESS' : 'FAILED'));
+            } else {
+                error_log("Approval: No email to send - borrower_email empty or data null");
+            }
+        } catch (Exception $e) {
+            error_log('Failed to send approval email: ' . $e->getMessage());
+            error_log('Exception trace: ' . $e->getTraceAsString());
+        }
+        
+        $redirectParams = http_build_query([
+            'success' => 'approved',
+            'page' => $_GET['page'] ?? 1,
+            'type' => $_GET['type'] ?? '',
+            'status' => $_GET['status'] ?? ''
+        ]);
+        header('Location: borrowing.php?' . $redirectParams);
+        exit();
+    } else {
+        $error = 'Gagal menyetujui peminjaman.';
+    }
+}
+
+// Handle reject borrowing
+if (isset($_GET['reject'])) {
+    $id = intval($_GET['reject']);
+    $adminNotes = $_GET['notes'] ?? 'Maaf, peminjaman Anda tidak dapat disetujui.';
+    
+    if ($borrowingModel->updateApprovalStatus($id, 'rejected', $adminNotes)) {
+        // Send email notification to borrower
+        try {
+            error_log("Rejection: Getting borrowing data for ID: {$id}");
+            $borrowingData = $borrowingModel->getBorrowingForEmail($id);
+            
+            error_log("Rejection: Borrowing data retrieved: " . json_encode($borrowingData));
+            
+            if ($borrowingData && !empty($borrowingData['borrower_email'])) {
+                error_log("Rejection: Sending rejection email to: " . $borrowingData['borrower_email']);
+                $emailResult = EmailHelper::sendApprovalNotification($borrowingData, 'rejected', $adminNotes);
+                error_log("Rejection: Email result = " . ($emailResult ? 'SUCCESS' : 'FAILED'));
+            } else {
+                error_log("Rejection: No email to send - borrower_email empty or data null");
+            }
+        } catch (Exception $e) {
+            error_log('Failed to send rejection email: ' . $e->getMessage());
+            error_log('Exception trace: ' . $e->getTraceAsString());
+        }
+        
+        $redirectParams = http_build_query([
+            'success' => 'rejected',
+            'page' => $_GET['page'] ?? 1,
+            'type' => $_GET['type'] ?? '',
+            'status' => $_GET['status'] ?? ''
+        ]);
+        header('Location: borrowing.php?' . $redirectParams);
+        exit();
+    } else {
+        $error = 'Gagal menolak peminjaman.';
+    }
+}
 
 // Handle return borrowing
 if (isset($_GET['return'])) {
@@ -45,6 +123,34 @@ if (isset($_GET['delete'])) {
     }
 }
 
+// Handle update notification email
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_notification_email'])) {
+    $newEmail = trim($_POST['borrowing_notification_email'] ?? '');
+    
+    if (!empty($newEmail) && filter_var($newEmail, FILTER_VALIDATE_EMAIL)) {
+        $siteSettingsModel = new SiteSettingsModel($conn);
+        $result = $siteSettingsModel->updateSettings(['borrowing_notification_email' => $newEmail], $_SESSION['admin_id'] ?? 1);
+        
+        if ($result['success']) {
+            // Clear any output buffers
+            if (ob_get_length()) ob_end_clean();
+            
+            $redirectParams = http_build_query([
+                'success' => 'email_updated',
+                'page' => $_GET['page'] ?? 1,
+                'type' => $_GET['type'] ?? '',
+                'status' => $_GET['status'] ?? ''
+            ]);
+            header('Location: borrowing.php?' . $redirectParams);
+            exit();
+        } else {
+            $error = 'Gagal mengupdate email notifikasi: ' . ($result['message'] ?? 'Unknown error');
+        }
+    } else {
+        $error = 'Format email tidak valid.';
+    }
+}
+
 // Get filters
 $filterType = $_GET['type'] ?? '';
 $filterStatus = $_GET['status'] ?? '';
@@ -62,6 +168,11 @@ $totalPages = ceil($totalBorrowings / $perPage);
 // Count by status
 $activeCount = $borrowingModel->countBorrowings('', 'active');
 $returnedCount = $borrowingModel->countBorrowings('', 'returned');
+
+// Get notification email setting
+$siteSettingsModel = new SiteSettingsModel($conn);
+$settings = $siteSettingsModel->getSettings();
+$notificationEmail = $settings['borrowing_notification_email'] ?? 'inlet@polinema.ac.id';
 ?>
 
 <!DOCTYPE html>
@@ -120,10 +231,29 @@ $returnedCount = $borrowingModel->countBorrowings('', 'returned');
                                 Peminjaman berhasil dikembalikan!
                             <?php elseif ($_GET['success'] === 'deleted'): ?>
                                 Data peminjaman berhasil dihapus!
+                            <?php elseif ($_GET['success'] === 'approved'): ?>
+                                Peminjaman berhasil disetujui! Email notifikasi telah dikirim ke peminjam.
+                            <?php elseif ($_GET['success'] === 'rejected'): ?>
+                                Peminjaman berhasil ditolak. Email notifikasi telah dikirim ke peminjam.
+                            <?php elseif ($_GET['success'] === 'email_updated'): ?>
+                                Email notifikasi berhasil diupdate!
                             <?php endif; ?>
                         </span>
                     </div>
                     <button onclick="this.parentElement.remove()" class="text-green-700 hover:text-green-900">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+            <?php endif; ?>
+
+            <!-- Error Message -->
+            <?php if (isset($error)): ?>
+                <div class="mb-6 bg-red-50 border-l-4 border-red-500 text-red-700 p-4 rounded-r shadow-sm flex justify-between items-center">
+                    <div class="flex items-center">
+                        <i class="fas fa-exclamation-circle text-xl mr-3"></i>
+                        <span><?php echo htmlspecialchars($error); ?></span>
+                    </div>
+                    <button onclick="this.parentElement.remove()" class="text-red-700 hover:text-red-900">
                         <i class="fas fa-times"></i>
                     </button>
                 </div>
@@ -166,6 +296,47 @@ $returnedCount = $borrowingModel->countBorrowings('', 'returned');
                         </div>
                     </div>
                 </div>
+            </div>
+
+            <!-- Email Notification Settings -->
+            <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-4 md:p-6 mb-8">
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="text-base md:text-lg font-semibold text-gray-800">
+                        <i class="fas fa-bell text-orange-500 mr-2"></i>Pengaturan Email Notifikasi
+                    </h3>
+                    <button type="button" onclick="toggleEmailSettings()" class="text-sm text-blue-600 hover:text-blue-800">
+                        <i class="fas fa-cog mr-1"></i>Ubah
+                    </button>
+                </div>
+                <div id="emailSettingsDisplay" class="flex items-center gap-3">
+                    <div class="flex-1">
+                        <p class="text-sm text-gray-600">Email penerima notifikasi peminjaman:</p>
+                        <p class="font-medium text-gray-900"><i class="fas fa-envelope mr-2 text-gray-400"></i><?php echo htmlspecialchars($notificationEmail); ?></p>
+                    </div>
+                </div>
+                <form id="emailSettingsForm" method="POST" action="" class="hidden mt-4">
+                    <input type="hidden" name="update_notification_email" value="1">
+                    <div class="flex flex-col sm:flex-row gap-3">
+                        <div class="flex-1">
+                            <label for="borrowing_notification_email" class="block text-sm font-medium text-gray-700 mb-1">
+                                Email Penerima Notifikasi
+                            </label>
+                            <input type="email" id="borrowing_notification_email" name="borrowing_notification_email" 
+                                   value="<?php echo htmlspecialchars($notificationEmail); ?>"
+                                   class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                   placeholder="inlet@polinema.ac.id" required>
+                            <p class="text-xs text-gray-500 mt-1">Email ini akan menerima notifikasi setiap ada peminjaman baru.</p>
+                        </div>
+                        <div class="flex items-end gap-2">
+                            <button type="submit" class="px-4 py-2 bg-orange-600 hover:bg-orange-700 text-white font-medium rounded-lg transition text-sm whitespace-nowrap">
+                                <i class="fas fa-save mr-1"></i>Simpan
+                            </button>
+                            <button type="button" onclick="toggleEmailSettings()" class="px-4 py-2 bg-gray-200 hover:bg-gray-300 text-gray-700 font-medium rounded-lg transition text-sm whitespace-nowrap">
+                                Batal
+                            </button>
+                        </div>
+                    </div>
+                </form>
             </div>
 
             <!-- Filter Section -->
@@ -220,9 +391,11 @@ $returnedCount = $borrowingModel->countBorrowings('', 'returned');
                                     Waktu Pinjam</th>
                                 <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-36">
                                     Waktu Kembali</th>
-                                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-28">
-                                    Status</th>
                                 <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-32">
+                                    Status</th>
+                                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-40">
+                                    Email Peminjam</th>
+                                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-36">
                                     Aksi</th>
                             </tr>
                         </thead>
@@ -286,25 +459,74 @@ $returnedCount = $borrowingModel->countBorrowings('', 'returned');
                                             </span>
                                         </td>
                                         <td class="px-4 py-3">
-                                            <?php 
-                                            $status = $borrow['status'] ?? 'active';
-                                            $statusClass = $status === 'active' ? 'bg-yellow-100 text-yellow-800' : 'bg-green-100 text-green-800';
-                                            $statusText = $status === 'active' ? 'Dipinjam' : 'Dikembalikan';
-                                            ?>
-                                            <span class="px-2 py-1 inline-flex text-xs font-semibold rounded-full whitespace-nowrap <?php echo $statusClass; ?>">
-                                                <?php echo $statusText; ?>
-                                            </span>
+                                            <div class="flex flex-col gap-1">
+                                                <?php 
+                                                $status = $borrow['status'] ?? 'active';
+                                                $approvalStatus = $borrow['approval_status'] ?? 'pending';
+                                                
+                                                // Status peminjaman
+                                                if ($status === 'returned') {
+                                                    echo '<span class="px-2 py-1 inline-flex items-center text-xs font-semibold rounded-full whitespace-nowrap bg-green-100 text-green-800">';
+                                                    echo '<i class="fas fa-check-circle mr-1"></i><span class="align-middle">Dikembalikan</span>';
+                                                    echo '</span>';
+                                                } else {
+                                                    // Show approval status for active items
+                                                    if ($approvalStatus === 'approved') {
+                                                        echo '<span class="px-2 py-1 inline-flex items-center text-xs font-semibold rounded-full whitespace-nowrap bg-blue-100 text-blue-800">';
+                                                        echo '<i class="fas fa-check-circle mr-1"></i><span class="align-middle">Disetujui</span>';
+                                                        echo '</span>';
+                                                    } elseif ($approvalStatus === 'rejected') {
+                                                        echo '<span class="px-2 py-1 inline-flex items-center text-xs font-semibold rounded-full whitespace-nowrap bg-red-100 text-red-800">';
+                                                        echo '<i class="fas fa-times-circle mr-1"></i><span class="align-middle">Ditolak</span>';
+                                                        echo '</span>';
+                                                    } else {
+                                                        echo '<span class="px-2 py-1 inline-flex items-center text-xs font-semibold rounded-full whitespace-nowrap bg-yellow-100 text-yellow-800">';
+                                                        echo '<i class="fas fa-clock mr-1"></i><span class="align-middle">Menunggu Persetujuan</span>';
+                                                        echo '</span>';
+                                                    }
+                                                }
+                                                ?>
+                                            </div>
                                         </td>
                                         <td class="px-4 py-3">
-                                            <div class="flex items-center gap-1.5">
-                                                <?php if (($borrow['status'] ?? 'active') === 'active'): ?>
+                                            <?php if (!empty($borrow['borrower_email'])): ?>
+                                                <div class="text-sm text-gray-900 break-all truncate max-w-[130px]" title="<?php echo htmlspecialchars($borrow['borrower_email']); ?>">
+                                                    <i class="fas fa-envelope text-gray-400 mr-1"></i>
+                                                    <?php echo htmlspecialchars($borrow['borrower_email']); ?>
+                                                </div>
+                                            <?php else: ?>
+                                                <span class="text-xs text-gray-400 italic">-</span>
+                                            <?php endif; ?>
+                                        </td>
+                                        <td class="px-4 py-3">
+                                            <div class="flex items-center gap-1.5 flex-wrap">
+                                                <?php 
+                                                $approvalStatus = $borrow['approval_status'] ?? 'pending';
+                                                $status = $borrow['status'] ?? 'active';
+                                                ?>
+                                                
+                                                <?php if ($approvalStatus === 'pending'): ?>
+                                                    <button onclick="showApprovalModal(<?php echo $borrow['borrowing_id'] ?? $borrow['id']; ?>, 'approve')" 
+                                                        class="bg-green-50 hover:bg-green-100 text-green-700 px-2 py-1 rounded text-xs font-medium transition-colors flex items-center whitespace-nowrap"
+                                                        title="Setujui">
+                                                        <i class="fas fa-check mr-1"></i>Setujui
+                                                    </button>
+                                                    <button onclick="showApprovalModal(<?php echo $borrow['borrowing_id'] ?? $borrow['id']; ?>, 'reject')" 
+                                                        class="bg-red-50 hover:bg-red-100 text-red-700 px-2 py-1 rounded text-xs font-medium transition-colors flex items-center whitespace-nowrap"
+                                                        title="Tolak">
+                                                        <i class="fas fa-times mr-1"></i>Tolak
+                                                    </button>
+                                                <?php endif; ?>
+                                                
+                                                <?php if ($status === 'active' && $approvalStatus === 'approved'): ?>
                                                     <a href="?return=<?php echo $borrow['borrowing_id'] ?? $borrow['id']; ?>&page=<?php echo $page; ?>&type=<?php echo $filterType; ?>&status=<?php echo $filterStatus; ?>" 
                                                         onclick="return confirm('Tandai peminjaman ini sebagai sudah dikembalikan?')"
-                                                        class="bg-green-50 hover:bg-green-100 text-green-700 px-2 py-1 rounded text-xs font-medium transition-colors flex items-center whitespace-nowrap"
+                                                        class="bg-blue-50 hover:bg-blue-100 text-blue-700 px-2 py-1 rounded text-xs font-medium transition-colors flex items-center whitespace-nowrap"
                                                         title="Kembalikan">
-                                                        <i class="fas fa-undo"></i>
+                                                        <i class="fas fa-undo mr-1"></i>Kembalikan
                                                     </a>
                                                 <?php endif; ?>
+                                                
                                                 <a href="?delete=<?php echo $borrow['borrowing_id'] ?? $borrow['id']; ?>&page=<?php echo $page; ?>&type=<?php echo $filterType; ?>&status=<?php echo $filterStatus; ?>" 
                                                     onclick="return confirm('Hapus peminjaman ini?')"
                                                     class="bg-red-50 hover:bg-red-100 text-red-700 px-2 py-1 rounded text-xs font-medium transition-colors flex items-center whitespace-nowrap"
@@ -382,25 +604,70 @@ $returnedCount = $borrowingModel->countBorrowings('', 'returned');
                                 <div class="flex items-center justify-between gap-3 mb-3">
                                     <?php 
                                     $status = $borrow['status'] ?? 'active';
-                                    $statusClass = $status === 'active' ? 'bg-yellow-100 text-yellow-800' : 'bg-green-100 text-green-800';
-                                    $statusText = $status === 'active' ? 'Dipinjam' : 'Dikembalikan';
+                                    $approvalStatus = $borrow['approval_status'] ?? 'pending';
+                                    
+                                    // Show combined status
+                                    if ($status === 'returned') {
+                                        echo '<span class="px-2 py-1 text-xs font-semibold rounded-full whitespace-nowrap bg-green-100 text-green-800">';
+                                        echo '<i class="fas fa-check-circle mr-1"></i>Dikembalikan';
+                                        echo '</span>';
+                                    } else {
+                                        // Show approval status for active items
+                                        if ($approvalStatus === 'approved') {
+                                            echo '<span class="px-2 py-1 text-xs font-semibold rounded-full whitespace-nowrap bg-blue-100 text-blue-800">';
+                                            echo '<i class="fas fa-check-circle mr-1"></i>Disetujui';
+                                            echo '</span>';
+                                        } elseif ($approvalStatus === 'rejected') {
+                                            echo '<span class="px-2 py-1 text-xs font-semibold rounded-full whitespace-nowrap bg-red-100 text-red-800">';
+                                            echo '<i class="fas fa-times-circle mr-1"></i>Ditolak';
+                                            echo '</span>';
+                                        } else {
+                                            echo '<span class="px-2 py-1 text-xs font-semibold rounded-full whitespace-nowrap bg-yellow-100 text-yellow-800">';
+                                            echo '<i class="fas fa-clock mr-1"></i>Dipinjam';
+                                            echo '</span>';
+                                        }
+                                    }
                                     ?>
-                                    <span class="px-2 py-1 text-xs font-semibold rounded-full whitespace-nowrap <?php echo $statusClass; ?>">
-                                        <?php echo $statusText; ?>
-                                    </span>
                                 </div>
+                                
+                                <?php if (!empty($borrow['borrower_email'])): ?>
+                                <div class="mb-3 pb-3 border-b border-gray-200">
+                                    <div class="flex items-center gap-2 text-xs text-gray-600">
+                                        <i class="fas fa-envelope text-gray-400"></i>
+                                        <span class="break-all"><?php echo htmlspecialchars($borrow['borrower_email']); ?></span>
+                                    </div>
+                                </div>
+                                <?php endif; ?>
                                     
                                 <div class="grid grid-cols-2 gap-2">
-                                    <?php if (($borrow['status'] ?? 'active') === 'active'): ?>
+                                    <?php 
+                                    $approvalPending = ($borrow['approval_status'] ?? 'pending') === 'pending';
+                                    $isApproved = ($borrow['approval_status'] ?? 'pending') === 'approved';
+                                    $isActive = ($borrow['status'] ?? 'active') === 'active';
+                                    ?>
+                                    
+                                    <?php if ($approvalPending): ?>
+                                        <button onclick="showApprovalModal(<?php echo $borrow['borrowing_id'] ?? $borrow['id']; ?>, 'approve')" 
+                                            class="bg-green-50 hover:bg-green-100 text-green-700 px-3 py-2 rounded-lg text-xs font-medium transition-colors flex items-center justify-center gap-1.5">
+                                            <i class="fas fa-check"></i> Setujui
+                                        </button>
+                                        <button onclick="showApprovalModal(<?php echo $borrow['borrowing_id'] ?? $borrow['id']; ?>, 'reject')" 
+                                            class="bg-red-50 hover:bg-red-100 text-red-700 px-3 py-2 rounded-lg text-xs font-medium transition-colors flex items-center justify-center gap-1.5">
+                                            <i class="fas fa-times"></i> Tolak
+                                        </button>
+                                    <?php endif; ?>
+                                    
+                                    <?php if ($isActive && $isApproved): ?>
                                         <a href="?return=<?php echo $borrow['borrowing_id'] ?? $borrow['id']; ?>&page=<?php echo $page; ?>&type=<?php echo $filterType; ?>&status=<?php echo $filterStatus; ?>" 
                                             onclick="return confirm('Tandai peminjaman ini sebagai sudah dikembalikan?')"
-                                            class="bg-green-50 hover:bg-green-100 text-green-700 px-3 py-2 rounded-lg text-xs font-medium transition-colors flex items-center justify-center gap-1.5">
+                                            class="bg-blue-50 hover:bg-blue-100 text-blue-700 px-3 py-2 rounded-lg text-xs font-medium transition-colors flex items-center justify-center gap-1.5 <?php echo $approvalPending ? '' : 'col-span-2'; ?>">
                                             <i class="fas fa-undo"></i> Kembalikan
                                         </a>
                                     <?php endif; ?>
+                                    
                                     <a href="?delete=<?php echo $borrow['borrowing_id'] ?? $borrow['id']; ?>&page=<?php echo $page; ?>&type=<?php echo $filterType; ?>&status=<?php echo $filterStatus; ?>" 
                                         onclick="return confirm('Hapus peminjaman ini?')"
-                                        class="bg-red-50 hover:bg-red-100 text-red-700 px-3 py-2 rounded-lg text-xs font-medium transition-colors flex items-center justify-center gap-1.5 <?php echo ($borrow['status'] ?? 'active') === 'active' ? '' : 'col-span-2'; ?>">
+                                        class="bg-red-50 hover:bg-red-100 text-red-700 px-3 py-2 rounded-lg text-xs font-medium transition-colors flex items-center justify-center gap-1.5 <?php echo (!$approvalPending && (!$isActive || !$isApproved)) ? 'col-span-2' : ''; ?>">
                                         <i class="fas fa-trash"></i> Hapus
                                     </a>
                                 </div>
@@ -491,6 +758,47 @@ $returnedCount = $borrowingModel->countBorrowings('', 'returned');
         </div>
     </div>
 
+    <!-- Modal Persetujuan/Penolakan -->
+    <div id="approvalModal" class="hidden fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
+        <div class="relative top-20 mx-auto p-5 border w-11/12 md:w-[450px] shadow-lg rounded-lg bg-white">
+            <div class="flex items-center justify-between mb-4">
+                <h3 id="approvalModalTitle" class="text-lg font-semibold text-gray-900">
+                    <i id="approvalModalIcon" class="fas fa-check-circle text-green-600 mr-2"></i>
+                    <span id="approvalModalTitleText">Setujui Peminjaman</span>
+                </h3>
+                <button onclick="closeApprovalModal()" class="text-gray-400 hover:text-gray-600 transition-colors">
+                    <i class="fas fa-times text-xl"></i>
+                </button>
+            </div>
+            <form id="approvalForm" method="GET" action="">
+                <input type="hidden" id="approvalAction" name="approve" value="">
+                <input type="hidden" name="page" value="<?php echo $page; ?>">
+                <input type="hidden" name="type" value="<?php echo $filterType; ?>">
+                <input type="hidden" name="status" value="<?php echo $filterStatus; ?>">
+                
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                        Catatan untuk Peminjam (opsional)
+                    </label>
+                    <textarea id="approvalNotes" name="notes" rows="3" 
+                        class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+                        placeholder="Tambahkan catatan yang akan dikirim ke email peminjam..."></textarea>
+                </div>
+                
+                <div class="flex gap-3">
+                    <button type="button" onclick="closeApprovalModal()" 
+                        class="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-700 font-medium py-2 px-4 rounded-lg transition-colors">
+                        Batal
+                    </button>
+                    <button type="submit" id="approvalSubmitBtn"
+                        class="flex-1 bg-green-600 hover:bg-green-700 text-white font-medium py-2 px-4 rounded-lg transition-colors">
+                        <i class="fas fa-check mr-2"></i>Setujui
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
     <script>
         function showPurposeModal(purpose) {
             document.getElementById('purposeContent').textContent = purpose;
@@ -500,6 +808,56 @@ $returnedCount = $borrowingModel->countBorrowings('', 'returned');
         function closePurposeModal() {
             document.getElementById('purposeModal').classList.add('hidden');
         }
+        
+        function toggleEmailSettings() {
+            const display = document.getElementById('emailSettingsDisplay');
+            const form = document.getElementById('emailSettingsForm');
+            
+            if (form.classList.contains('hidden')) {
+                display.classList.add('hidden');
+                form.classList.remove('hidden');
+            } else {
+                display.classList.remove('hidden');
+                form.classList.add('hidden');
+            }
+        }
+        
+        function showApprovalModal(borrowingId, action) {
+            const modal = document.getElementById('approvalModal');
+            const form = document.getElementById('approvalForm');
+            const icon = document.getElementById('approvalModalIcon');
+            const titleText = document.getElementById('approvalModalTitleText');
+            const submitBtn = document.getElementById('approvalSubmitBtn');
+            const actionInput = document.getElementById('approvalAction');
+            const notesInput = document.getElementById('approvalNotes');
+            
+            // Reset notes
+            notesInput.value = '';
+            
+            if (action === 'approve') {
+                icon.className = 'fas fa-check-circle text-green-600 mr-2';
+                titleText.textContent = 'Setujui Peminjaman';
+                submitBtn.className = 'flex-1 bg-green-600 hover:bg-green-700 text-white font-medium py-2 px-4 rounded-lg transition-colors';
+                submitBtn.innerHTML = '<i class="fas fa-check mr-2"></i>Setujui';
+                actionInput.name = 'approve';
+                actionInput.value = borrowingId;
+                notesInput.placeholder = 'Contoh: Silakan ambil alat di Lab Inlet pada jam kerja (08:00-16:00)';
+            } else {
+                icon.className = 'fas fa-times-circle text-red-600 mr-2';
+                titleText.textContent = 'Tolak Peminjaman';
+                submitBtn.className = 'flex-1 bg-red-600 hover:bg-red-700 text-white font-medium py-2 px-4 rounded-lg transition-colors';
+                submitBtn.innerHTML = '<i class="fas fa-times mr-2"></i>Tolak';
+                actionInput.name = 'reject';
+                actionInput.value = borrowingId;
+                notesInput.placeholder = 'Contoh: Maaf, alat sedang dalam perawatan. Silakan coba minggu depan.';
+            }
+            
+            modal.classList.remove('hidden');
+        }
+        
+        function closeApprovalModal() {
+            document.getElementById('approvalModal').classList.add('hidden');
+        }
 
         // Close modal when clicking outside
         document.getElementById('purposeModal').addEventListener('click', function(e) {
@@ -507,12 +865,41 @@ $returnedCount = $borrowingModel->countBorrowings('', 'returned');
                 closePurposeModal();
             }
         });
+        
+        document.getElementById('approvalModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeApprovalModal();
+            }
+        });
 
         // Close modal with ESC key
         document.addEventListener('keydown', function(e) {
             if (e.key === 'Escape') {
                 closePurposeModal();
+                closeApprovalModal();
             }
+        });
+
+        // Add loading indicator on approval form submit
+        document.getElementById('approvalForm').addEventListener('submit', function(e) {
+            const submitBtn = document.getElementById('approvalSubmitBtn');
+            const cancelBtn = submitBtn.previousElementSibling;
+            const actionType = document.getElementById('approvalAction').name;
+            
+            // Disable buttons
+            submitBtn.disabled = true;
+            cancelBtn.disabled = true;
+            
+            // Change button appearance based on action
+            if (actionType === 'approve') {
+                submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Menyetujui...';
+                submitBtn.className = 'flex-1 bg-green-400 text-white font-semibold py-3 px-6 rounded-lg cursor-not-allowed transition-all duration-300 flex items-center justify-center';
+            } else {
+                submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Menolak...';
+                submitBtn.className = 'flex-1 bg-red-400 text-white font-semibold py-3 px-6 rounded-lg cursor-not-allowed transition-all duration-300 flex items-center justify-center';
+            }
+            
+            // Don't prevent default - let form submit
         });
     </script>
 

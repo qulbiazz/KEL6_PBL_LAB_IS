@@ -20,18 +20,22 @@ class BorrowingModel
 
             // Insert main borrowing record
             $query = "INSERT INTO $this->table 
-                      (borrower_name, occupation, type, borrow_date, return_date, status, notes)
-                      VALUES (:borrower_name, :occupation, 'equipment', :borrow_date, :return_date, :status, :notes)
+                      (borrower_name, borrower_email, occupation, type, borrow_date, return_date, status, approval_status, notes)
+                      VALUES (:borrower_name, :borrower_email, :occupation, 'equipment', :borrow_date, :return_date, :status, :approval_status, :notes)
                       RETURNING id";
 
             $stmt = $this->conn->prepare($query);
             $stmt->bindParam(':borrower_name', $data['borrower_name']);
+            $stmt->bindParam(':borrower_email', $data['borrower_email']);
             $stmt->bindParam(':occupation', $data['occupation']);
             $stmt->bindParam(':borrow_date', $data['borrow_date']);
             $stmt->bindParam(':return_date', $data['return_date']);
             
             $status = $data['status'] ?? 'active';
             $stmt->bindParam(':status', $status);
+            
+            $approvalStatus = $data['approval_status'] ?? 'pending';
+            $stmt->bindParam(':approval_status', $approvalStatus);
             
             $notes = $data['notes'] ?? null;
             $stmt->bindParam(':notes', $notes);
@@ -104,12 +108,13 @@ class BorrowingModel
             }
 
             $query = "INSERT INTO $this->table 
-                      (borrower_name, occupation, type, room_name, borrow_date, return_date, status, notes)
-                      VALUES (:borrower_name, :occupation, 'room', :room_name, :borrow_date, :return_date, :status, :notes)
+                      (borrower_name, borrower_email, occupation, type, room_name, borrow_date, return_date, status, approval_status, notes)
+                      VALUES (:borrower_name, :borrower_email, :occupation, 'room', :room_name, :borrow_date, :return_date, :status, :approval_status, :notes)
                       RETURNING id";
 
             $stmt = $this->conn->prepare($query);
             $stmt->bindParam(':borrower_name', $data['borrower_name']);
+            $stmt->bindParam(':borrower_email', $data['borrower_email']);
             $stmt->bindParam(':occupation', $data['occupation']);
             $stmt->bindParam(':room_name', $data['room_name']);
             $stmt->bindParam(':borrow_date', $data['borrow_date']);
@@ -117,6 +122,9 @@ class BorrowingModel
             
             $status = $data['status'] ?? 'active';
             $stmt->bindParam(':status', $status);
+            
+            $approvalStatus = $data['approval_status'] ?? 'pending';
+            $stmt->bindParam(':approval_status', $approvalStatus);
             
             $notes = $data['notes'] ?? null;
             $stmt->bindParam(':notes', $notes);
@@ -142,11 +150,13 @@ class BorrowingModel
                 // Convert old structure to new structure
                 $roomData = [
                     'borrower_name' => $data['borrower_name'],
+                    'borrower_email' => $data['borrower_email'] ?? null,
                     'occupation' => $data['occupation'],
                     'room_name' => $data['item_name'], // item_name is room_name for room type
                     'borrow_date' => $data['borrow_date'],
                     'return_date' => $data['return_date'],
                     'status' => $data['status'] ?? 'active',
+                    'approval_status' => $data['approval_status'] ?? 'pending',
                     'notes' => $data['notes'] ?? null
                 ];
                 
@@ -202,10 +212,12 @@ class BorrowingModel
                 
                 $equipmentData = [
                     'borrower_name' => $data['borrower_name'],
+                    'borrower_email' => $data['borrower_email'] ?? null,
                     'occupation' => $data['occupation'],
                     'borrow_date' => $data['borrow_date'],
                     'return_date' => $data['return_date'],
                     'status' => $data['status'] ?? 'active',
+                    'approval_status' => $data['approval_status'] ?? 'pending',
                     'notes' => $data['notes'] ?? null
                 ];
                 
@@ -405,6 +417,44 @@ class BorrowingModel
         $stmt->bindParam(':status', $status);
         $stmt->bindParam(':id', $id);
         return $stmt->execute();
+    }
+
+    /**
+     * Update approval status (approved/rejected)
+     */
+    public function updateApprovalStatus($id, $approvalStatus, $adminNotes = null)
+    {
+        $query = "UPDATE $this->table 
+                  SET approval_status = :approval_status, 
+                      admin_notes = :admin_notes,
+                      updated_at = CURRENT_TIMESTAMP 
+                  WHERE id = :id";
+        $stmt = $this->conn->prepare($query);
+        $stmt->bindParam(':approval_status', $approvalStatus);
+        $stmt->bindParam(':admin_notes', $adminNotes);
+        $stmt->bindParam(':id', $id);
+        return $stmt->execute();
+    }
+
+    /**
+     * Get borrowing data for email notification
+     */
+    public function getBorrowingForEmail($id)
+    {
+        $query = "SELECT b.*, 
+                  CASE WHEN b.type = 'equipment' THEN 
+                    (SELECT string_agg(e.name, ', ') 
+                     FROM borrowing_equipment be 
+                     JOIN equipment e ON be.equipment_id = e.id 
+                     WHERE be.borrowing_id = b.id)
+                  ELSE b.room_name 
+                  END as item_names
+                  FROM $this->table b 
+                  WHERE b.id = :id";
+        $stmt = $this->conn->prepare($query);
+        $stmt->bindParam(':id', $id);
+        $stmt->execute();
+        return $stmt->fetch(PDO::FETCH_ASSOC);
     }
 
     /**

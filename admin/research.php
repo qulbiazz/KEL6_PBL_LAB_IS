@@ -23,6 +23,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $title = $_POST['title'];
     $description = $_POST['description'];
     $full_description = $_POST['full_description'];
+    $youtube_url = trim($_POST['youtube_url'] ?? '');
     $is_active = isset($_POST['is_active']) ? 1 : 0;
     
     $image = '';
@@ -35,16 +36,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     
     if ($id) {
         if ($image) {
-            $stmt = $conn->prepare("UPDATE research_activities SET title = :title, description = :description, image = :image, full_description = :full_description, is_active = :is_active WHERE id = :id");
-            $stmt->execute(['title' => $title, 'description' => $description, 'image' => $image, 'full_description' => $full_description, 'is_active' => $is_active, 'id' => $id]);
+            $stmt = $conn->prepare("UPDATE research_activities SET title = :title, description = :description, image = :image, full_description = :full_description, youtube_url = :youtube_url, is_active = :is_active WHERE id = :id");
+            $stmt->execute(['title' => $title, 'description' => $description, 'image' => $image, 'full_description' => $full_description, 'youtube_url' => $youtube_url ?: null, 'is_active' => $is_active, 'id' => $id]);
         } else {
-            $stmt = $conn->prepare("UPDATE research_activities SET title = :title, description = :description, full_description = :full_description, is_active = :is_active WHERE id = :id");
-            $stmt->execute(['title' => $title, 'description' => $description, 'full_description' => $full_description, 'is_active' => $is_active, 'id' => $id]);
+            $stmt = $conn->prepare("UPDATE research_activities SET title = :title, description = :description, full_description = :full_description, youtube_url = :youtube_url, is_active = :is_active WHERE id = :id");
+            $stmt->execute(['title' => $title, 'description' => $description, 'full_description' => $full_description, 'youtube_url' => $youtube_url ?: null, 'is_active' => $is_active, 'id' => $id]);
         }
         $success = 'Research activity updated successfully';
     } else {
-        $stmt = $conn->prepare("INSERT INTO research_activities (title, description, image, full_description, is_active) VALUES (:title, :description, :image, :full_description, :is_active)");
-        $stmt->execute(['title' => $title, 'description' => $description, 'image' => $image, 'full_description' => $full_description, 'is_active' => $is_active]);
+        $stmt = $conn->prepare("INSERT INTO research_activities (title, description, image, full_description, youtube_url, is_active) VALUES (:title, :description, :image, :full_description, :youtube_url, :is_active)");
+        $stmt->execute(['title' => $title, 'description' => $description, 'image' => $image, 'full_description' => $full_description, 'youtube_url' => $youtube_url ?: null, 'is_active' => $is_active]);
         $success = 'Research activity added successfully';
     }
 }
@@ -134,6 +135,16 @@ if (isset($_GET['edit'])) {
                     <div class="mb-6">
                         <label class="block text-sm font-medium text-gray-700 mb-2">Full Description</label>
                         <textarea name="full_description" rows="6" class="w-full px-4 py-2.5 bg-gray-50 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"><?php echo $edit_item ? htmlspecialchars($edit_item['full_description']) : ''; ?></textarea>
+                    </div>
+                    
+                    <div class="mb-6">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">
+                            <i class="fab fa-youtube text-red-600 mr-1"></i>YouTube Video URL
+                        </label>
+                        <input type="url" name="youtube_url" placeholder="https://www.youtube.com/watch?v=xxxxx atau https://youtu.be/xxxxx"
+                            value="<?php echo $edit_item ? htmlspecialchars($edit_item['youtube_url'] ?? '') : ''; ?>"
+                            class="w-full px-4 py-2.5 bg-gray-50 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                        <p class="text-xs text-gray-500 mt-1">Masukkan link YouTube untuk embed video pada halaman research detail. Kosongkan jika tidak ada video.</p>
                     </div>
                     
                     <div class="mb-6">
