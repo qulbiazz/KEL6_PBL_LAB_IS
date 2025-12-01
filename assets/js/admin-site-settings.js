@@ -25,6 +25,11 @@ $(document).ready(function() {
         $('#previewText').text($(this).val());
     });
 
+    // Live preview for footer copyright
+    $('#footer_copyright').on('input', function() {
+        $('#previewCopyright').text($(this).val());
+    });
+
     // Live preview for contact
     $('#contact_email').on('input', function() {
         $('#previewEmail').html('<i class="fas fa-envelope mr-2"></i>' + $(this).val());
@@ -114,7 +119,8 @@ $(document).ready(function() {
         const data = {
             action: 'update_footer_about',
             footer_about_title: $('#footer_about_title').val(),
-            footer_about_text: $('#footer_about_text').val()
+            footer_about_text: $('#footer_about_text').val(),
+            footer_copyright: $('#footer_copyright').val()
         };
         
         submitForm(this, data, 'Footer about section updated successfully!');

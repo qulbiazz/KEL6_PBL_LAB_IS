@@ -80,29 +80,29 @@
                 </address>
                 <div>
                     <h4 class="text-lg font-semibold mb-4">Follow Us</h4>
-                    <nav class="flex space-x-4 mb-4" aria-label="Social media links">
+                    <nav class="flex space-x-2 mb-4" aria-label="Social media links">
                         <?php if (!empty($socialLinks['facebook'])): ?>
-                            <a href="<?php echo htmlspecialchars($socialLinks['facebook']); ?>" target="_blank" rel="noopener noreferrer" class="text-gray-400 hover:text-white text-2xl" aria-label="Facebook">
+                            <a href="<?php echo htmlspecialchars($socialLinks['facebook']); ?>" target="_blank" rel="noopener noreferrer" class="text-gray-400 hover:text-white text-2xl p-2 min-w-[44px] min-h-[44px] flex items-center justify-center" aria-label="Kunjungi Facebook INLET">
                                 <i class="fab fa-facebook" aria-hidden="true"></i>
                             </a>
                         <?php endif; ?>
                         <?php if (!empty($socialLinks['twitter'])): ?>
-                            <a href="<?php echo htmlspecialchars($socialLinks['twitter']); ?>" target="_blank" rel="noopener noreferrer" class="text-gray-400 hover:text-white text-2xl" aria-label="Twitter">
+                            <a href="<?php echo htmlspecialchars($socialLinks['twitter']); ?>" target="_blank" rel="noopener noreferrer" class="text-gray-400 hover:text-white text-2xl p-2 min-w-[44px] min-h-[44px] flex items-center justify-center" aria-label="Kunjungi Twitter INLET">
                                 <i class="fab fa-twitter" aria-hidden="true"></i>
                             </a>
                         <?php endif; ?>
                         <?php if (!empty($socialLinks['instagram'])): ?>
-                            <a href="<?php echo htmlspecialchars($socialLinks['instagram']); ?>" target="_blank" rel="noopener noreferrer" class="text-gray-400 hover:text-white text-2xl" aria-label="Instagram">
+                            <a href="<?php echo htmlspecialchars($socialLinks['instagram']); ?>" target="_blank" rel="noopener noreferrer" class="text-gray-400 hover:text-white text-2xl p-2 min-w-[44px] min-h-[44px] flex items-center justify-center" aria-label="Kunjungi Instagram INLET">
                                 <i class="fab fa-instagram" aria-hidden="true"></i>
                             </a>
                         <?php endif; ?>
                         <?php if (!empty($socialLinks['youtube'])): ?>
-                            <a href="<?php echo htmlspecialchars($socialLinks['youtube']); ?>" target="_blank" rel="noopener noreferrer" class="text-gray-400 hover:text-white text-2xl" aria-label="YouTube">
+                            <a href="<?php echo htmlspecialchars($socialLinks['youtube']); ?>" target="_blank" rel="noopener noreferrer" class="text-gray-400 hover:text-white text-2xl p-2 min-w-[44px] min-h-[44px] flex items-center justify-center" aria-label="Kunjungi YouTube INLET">
                                 <i class="fab fa-youtube" aria-hidden="true"></i>
                             </a>
                         <?php endif; ?>
                         <?php if (!empty($socialLinks['linkedin'])): ?>
-                            <a href="<?php echo htmlspecialchars($socialLinks['linkedin']); ?>" target="_blank" rel="noopener noreferrer" class="text-gray-400 hover:text-white text-2xl" aria-label="LinkedIn">
+                            <a href="<?php echo htmlspecialchars($socialLinks['linkedin']); ?>" target="_blank" rel="noopener noreferrer" class="text-gray-400 hover:text-white text-2xl p-2 min-w-[44px] min-h-[44px] flex items-center justify-center" aria-label="Kunjungi LinkedIn INLET">
                                 <i class="fab fa-linkedin" aria-hidden="true"></i>
                             </a>
                         <?php endif; ?>
@@ -116,7 +116,15 @@
             </div>
 
             <div class="border-t border-gray-700 mt-8 pt-8 text-center text-gray-400">
-                <p>&copy; <?php echo date('Y'); ?> <?php echo htmlspecialchars($footerAbout['title']); ?> Laboratory. All rights reserved.</p>
+                <?php 
+                $copyrightText = '';
+                if (!empty($siteSettings['footer_copyright'])) {
+                    $copyrightText = $siteSettings['footer_copyright'];
+                } else {
+                    $copyrightText = '© ' . date('Y') . ' ' . $footerAbout['title'] . ' Laboratory. All rights reserved.';
+                }
+                ?>
+                <p><?php echo htmlspecialchars($copyrightText); ?></p>
             </div>
         </div>
     </footer>

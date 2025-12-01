@@ -28,11 +28,11 @@
             <?php endforeach; ?>
 
             <!-- Carousel Controls with accessibility -->
-            <button class="carousel-prev absolute left-4 top-1/2 transform -translate-y-1/2 bg-white bg-opacity-50 hover:bg-opacity-75 text-gray-800 p-3 rounded-full z-20" aria-label="Slide sebelumnya">
-                <i class="fas fa-chevron-left" aria-hidden="true"></i>
+            <button class="carousel-prev absolute left-4 top-1/2 transform -translate-y-1/2 bg-white bg-opacity-50 hover:bg-opacity-75 text-gray-800 p-4 min-w-[48px] min-h-[48px] rounded-full z-20 flex items-center justify-center" aria-label="Slide sebelumnya">
+                <i class="fas fa-chevron-left text-lg" aria-hidden="true"></i>
             </button>
-            <button class="carousel-next absolute right-4 top-1/2 transform -translate-y-1/2 bg-white bg-opacity-50 hover:bg-opacity-75 text-gray-800 p-3 rounded-full z-20" aria-label="Slide selanjutnya">
-                <i class="fas fa-chevron-right" aria-hidden="true"></i>
+            <button class="carousel-next absolute right-4 top-1/2 transform -translate-y-1/2 bg-white bg-opacity-50 hover:bg-opacity-75 text-gray-800 p-4 min-w-[48px] min-h-[48px] rounded-full z-20 flex items-center justify-center" aria-label="Slide selanjutnya">
+                <i class="fas fa-chevron-right text-lg" aria-hidden="true"></i>
             </button>
         </div>
     </section>
@@ -198,9 +198,9 @@
                                             <meta itemprop="worksFor" content="INLET - Politeknik Negeri Malang">
                                         </div>
 
-                                        <nav class="flex justify-center space-x-3 mt-4" aria-label="Social links for <?php echo htmlspecialchars($member['name']); ?>">
+                                        <nav class="flex justify-center space-x-2 mt-4" aria-label="Social links for <?php echo htmlspecialchars($member['name']); ?>">
                                             <a href="index.php?page=lecturer-detail&id=<?php echo $member['id']; ?>"
-                                                class="text-gray-600 hover:text-blue-600 transition"
+                                                class="text-gray-600 hover:text-blue-600 transition p-2 min-w-[44px] min-h-[44px] flex items-center justify-center"
                                                 aria-label="Profil <?php echo htmlspecialchars($member['name']); ?>">
                                                 <i class="fas fa-user text-xl" aria-hidden="true"></i>
                                             </a>
@@ -208,7 +208,7 @@
                                                 <a href="<?php echo htmlspecialchars($member['linkedin']); ?>"
                                                     target="_blank"
                                                     rel="noopener noreferrer"
-                                                    class="text-gray-600 hover:text-blue-600 transition"
+                                                    class="text-gray-600 hover:text-blue-600 transition p-2 min-w-[44px] min-h-[44px] flex items-center justify-center"
                                                     itemprop="sameAs"
                                                     aria-label="LinkedIn <?php echo htmlspecialchars($member['name']); ?>">
                                                     <i class="fab fa-linkedin text-xl" aria-hidden="true"></i>
@@ -216,7 +216,7 @@
                                             <?php endif; ?>
                                             <?php if ($member['email']): ?>
                                                 <a href="mailto:<?php echo htmlspecialchars($member['email']); ?>"
-                                                    class="text-gray-600 hover:text-red-600 transition"
+                                                    class="text-gray-600 hover:text-red-600 transition p-2 min-w-[44px] min-h-[44px] flex items-center justify-center"
                                                     itemprop="email"
                                                     aria-label="Email <?php echo htmlspecialchars($member['name']); ?>">
                                                     <i class="fas fa-envelope text-xl" aria-hidden="true"></i>
@@ -459,7 +459,6 @@
             <div class="max-w-4xl mx-auto">
                 <!-- Header -->
                 <header class="text-center mb-12">
-                    <span class="inline-block px-4 py-1 bg-blue-100 text-blue-600 rounded-full text-sm font-semibold mb-4">Get in Touch</span>
                     <h2 id="guestbook-heading" class="text-4xl font-bold text-gray-800 mb-4" itemprop="name">Guestbook</h2>
                     <p class="text-gray-600 text-lg" itemprop="description">Share your thoughts and leave a message for us</p>
                 </header>

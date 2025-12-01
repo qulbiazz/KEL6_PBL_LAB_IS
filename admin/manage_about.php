@@ -157,8 +157,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !isset($_POST['ajax'])) {
     }
 }
 
-// Fetch all versions for list view
-$stmt = $db->query("SELECT * FROM about_settings ORDER BY is_active DESC, updated_at DESC");
+// Fetch all versions for list view - ordered by id only to maintain consistent position
+$stmt = $db->query("SELECT * FROM about_settings ORDER BY id ASC");
 $versions = $stmt->fetchAll();
 
 // Fetch specific version for editing

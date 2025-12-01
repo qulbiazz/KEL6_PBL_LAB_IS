@@ -43,7 +43,7 @@ class SiteSettingsModel {
             // Build update query dynamically based on provided fields
             $allowed_fields = [
                 'logo_path', 'logo_alt',
-                'footer_about_title', 'footer_about_text',
+                'footer_about_title', 'footer_about_text', 'footer_copyright',
                 'contact_email', 'contact_phone', 'contact_address',
                 'social_facebook', 'social_instagram', 'social_youtube',
                 'social_linkedin', 'social_twitter', 'quick_links'
@@ -241,6 +241,7 @@ class SiteSettingsModel {
             'logo_alt' => 'INLET Logo',
             'footer_about_title' => 'INLET',
             'footer_about_text' => 'Innovation and Laboratory of Electrical Techniques',
+            'footer_copyright' => '© ' . date('Y') . ' Information and Learning Engineering Technology Laboratory. All rights reserved.',
             'contact_email' => 'inlet@polinema.ac.id',
             'contact_phone' => '+62 341 404424',
             'contact_address' => 'Jl. Soekarno Hatta No.9, Jatimulyo, Kec. Lowokwaru, Kota Malang, Jawa Timur 65141',

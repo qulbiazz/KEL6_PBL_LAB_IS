@@ -40,7 +40,8 @@ try {
         case 'update_footer_about':
             $data = [
                 'footer_about_title' => $_POST['footer_about_title'] ?? '',
-                'footer_about_text' => $_POST['footer_about_text'] ?? ''
+                'footer_about_text' => $_POST['footer_about_text'] ?? '',
+                'footer_copyright' => $_POST['footer_copyright'] ?? ''
             ];
             $result = $siteSettingsModel->updateSettings($data, $user_id);
             echo json_encode($result);

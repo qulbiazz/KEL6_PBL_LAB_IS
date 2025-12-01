@@ -6,7 +6,16 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     
+    <!-- Primary Meta Tags for SEO -->
     <title><?php echo $pageTitle ?? 'INLET - Information and Learning Engineering Technology | Politeknik Negeri Malang'; ?></title>
+    <meta name="title" content="<?php echo $pageTitle ?? 'INLET - Information and Learning Engineering Technology'; ?>">
+    <meta name="description" content="<?php echo $pageDescription ?? 'INLET adalah laboratorium riset dan inovasi Teknik Elektro di Politeknik Negeri Malang. Mengembangkan teknologi IoT, sistem cerdas, dan solusi inovatif.'; ?>">
+    
+    <!-- Preconnect to external resources for faster loading -->
+    <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
+    <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+    <link rel="dns-prefetch" href="https://cdnjs.cloudflare.com">
+    <link rel="dns-prefetch" href="https://cdn.jsdelivr.net">
     
     <?php
     // Load SEO Helper
@@ -50,13 +59,25 @@
         footer nav{background:transparent!important;box-shadow:none!important}
     </style>
     
-    <!-- Main Stylesheets with async loading -->
+    <!-- Main Stylesheets with optimized loading -->
     <link rel="stylesheet" href="assets/css/tailwind.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" media="print" onload="this.media='all'">
+    <link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
     <noscript><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"></noscript>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" media="print" onload="this.media='all'">
+    <link rel="preload" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
     <noscript><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css"></noscript>
     <link rel="stylesheet" href="assets/css/style.css">
+    
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="<?php echo (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? 'https' : 'http') . '://' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI']; ?>">
+    <meta property="og:title" content="<?php echo $pageTitle ?? 'INLET - Politeknik Negeri Malang'; ?>">
+    <meta property="og:description" content="<?php echo $pageDescription ?? 'Laboratorium riset dan inovasi Teknik Elektro Politeknik Negeri Malang'; ?>">
+    <meta property="og:image" content="<?php echo (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? 'https' : 'http') . '://' . $_SERVER['HTTP_HOST']; ?>/inlet-web/assets/images/inlet_logo_only.png">
+    
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="<?php echo $pageTitle ?? 'INLET - Politeknik Negeri Malang'; ?>">
+    <meta name="twitter:description" content="<?php echo $pageDescription ?? 'Laboratorium riset dan inovasi Teknik Elektro'; ?>">
 </head>
 
 <body class="<?php echo $bodyClass ?? 'bg-gray-50'; ?>">

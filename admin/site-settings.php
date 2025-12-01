@@ -154,6 +154,17 @@ $pageTitle = "Site Settings - INLET Admin";
                                                   placeholder="Innovation and Learning Engineering Technology Laboratory"><?php echo htmlspecialchars($settings['footer_about_text']); ?></textarea>
                                     </div>
 
+                                    <div>
+                                        <label for="footer_copyright" class="block text-sm font-medium text-gray-700 mb-2">
+                                            <i class="fas fa-copyright mr-2 text-gray-500"></i>Copyright Text
+                                        </label>
+                                        <input type="text" id="footer_copyright" name="footer_copyright" 
+                                               value="<?php echo htmlspecialchars($settings['footer_copyright'] ?? '© 2025 Information and Learning Engineering Technology Laboratory. All rights reserved.'); ?>"
+                                               class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                               placeholder="© 2025 Information and Learning Engineering Technology Laboratory. All rights reserved.">
+                                        <p class="text-xs text-gray-500 mt-1">Text yang akan ditampilkan di bagian bawah footer</p>
+                                    </div>
+
                                     <button type="submit" 
                                             class="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-lg transition duration-200 flex items-center justify-center">
                                         <i class="fas fa-save mr-2"></i>
@@ -342,7 +353,7 @@ $pageTitle = "Site Settings - INLET Admin";
                                         <div id="previewPhone"><i class="fas fa-phone mr-2"></i><?php echo htmlspecialchars($settings['contact_phone']); ?></div>
                                     </div>
 
-                                    <div id="previewSocial" class="flex space-x-3">
+                                    <div id="previewSocial" class="flex space-x-3 mb-4">
                                         <?php if (!empty($settings['social_facebook'])): ?>
                                         <i class="fab fa-facebook text-lg"></i>
                                         <?php endif; ?>
@@ -358,6 +369,10 @@ $pageTitle = "Site Settings - INLET Admin";
                                         <?php if (!empty($settings['social_twitter'])): ?>
                                         <i class="fab fa-twitter text-lg"></i>
                                         <?php endif; ?>
+                                    </div>
+                                    
+                                    <div class="border-t border-gray-700 pt-3 mt-3">
+                                        <p id="previewCopyright" class="text-xs text-gray-500 text-center"><?php echo htmlspecialchars($settings['footer_copyright'] ?? '© 2025 Information and Learning Engineering Technology Laboratory. All rights reserved.'); ?></p>
                                     </div>
                                 </div>
                             </div>
