@@ -7,9 +7,10 @@
 class SEOHelper {
     private static $defaultMeta = [
         'title' => 'INLET - Information and Learning Engineering Technology',
-        'description' => 'Innovation and Learning Engineering Technology Laboratory - Politeknik Negeri Malang',
-        'keywords' => 'INLET, Polinema, Laboratorium, Teknik Informatika, IoT, Riset, Teknologi, Politeknik Negeri Malang, Research, Innovation',
-        'author' => 'INLET - Politeknik Negeri Malang',
+        'description' => 'Innovation and Learning Engineering Technology Laboratory at State Polytechnic of Malang. Research center focused on IoT, AI, smart systems, and innovative technology solutions for industry and education.',
+        'keywords' => 'INLET, Polinema, Laboratory, Computer Engineering, IoT, Research, Technology, State Polytechnic of Malang, Innovation, AI, Smart Systems',
+        'author' => 'INLET - State Polytechnic of Malang',
+        'language' => 'en-US',
         'robots' => 'index, follow',
         'og_type' => 'website',
         'og_locale' => 'id_ID',
@@ -39,9 +40,10 @@ class SEOHelper {
         $output .= '<meta name="keywords" content="' . htmlspecialchars($meta['keywords']) . '">' . "\n";
         $output .= '<meta name="author" content="' . htmlspecialchars($meta['author']) . '">' . "\n";
         $output .= '<meta name="robots" content="' . htmlspecialchars($meta['robots']) . '">' . "\n";
+        $output .= '<meta name="language" content="' . htmlspecialchars($meta['language'] ?? 'en-US') . '">' . "\n";
         
-        // Canonical URL
-        $canonicalUrl = $meta['canonical'] ?? self::getCurrentUrl();
+        // Canonical URL (use clean URL without tracking parameters)
+        $canonicalUrl = $meta['canonical'] ?? self::getCanonicalUrl();
         $output .= '<link rel="canonical" href="' . htmlspecialchars($canonicalUrl) . '">' . "\n";
         
         // Open Graph Tags
@@ -239,7 +241,35 @@ class SEOHelper {
      */
     public static function getCurrentUrl() {
         $protocol = isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? 'https' : 'http';
-        return $protocol . '://' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
+        $host = $_SERVER['HTTP_HOST'];
+        $uri = $_SERVER['REQUEST_URI'];
+        
+        // Remove query parameters for cleaner canonical URL
+        $path = strtok($uri, '?');
+        
+        return $protocol . '://' . $host . $path;
+    }
+    
+    /**
+     * Get clean canonical URL (without tracking parameters)
+     */
+    public static function getCanonicalUrl() {
+        $protocol = isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? 'https' : 'http';
+        $host = $_SERVER['HTTP_HOST'];
+        $path = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
+        
+        // Get only allowed parameters (page, id)
+        $allowedParams = [];
+        if (isset($_GET['page'])) {
+            $allowedParams['page'] = $_GET['page'];
+        }
+        if (isset($_GET['id'])) {
+            $allowedParams['id'] = $_GET['id'];
+        }
+        
+        $queryString = !empty($allowedParams) ? '?' . http_build_query($allowedParams) : '';
+        
+        return $protocol . '://' . $host . $path . $queryString;
     }
     
     /**

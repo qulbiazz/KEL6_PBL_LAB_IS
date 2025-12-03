@@ -1,15 +1,10 @@
 <!DOCTYPE html>
-<html lang="id" dir="ltr">
+<html lang="en" xml:lang="en" dir="ltr">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    
-    <!-- Primary Meta Tags for SEO -->
-    <title><?php echo $pageTitle ?? 'INLET - Information and Learning Engineering Technology | Politeknik Negeri Malang'; ?></title>
-    <meta name="title" content="<?php echo $pageTitle ?? 'INLET - Information and Learning Engineering Technology'; ?>">
-    <meta name="description" content="<?php echo $pageDescription ?? 'INLET adalah laboratorium riset dan inovasi Teknik Informatika di Politeknik Negeri Malang. Mengembangkan teknologi IoT, sistem cerdas, dan solusi inovatif.'; ?>">
     
     <!-- Preconnect to external resources for faster loading -->
     <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
@@ -66,18 +61,6 @@
     <link rel="preload" href="https://cdn.jsdelivr.net/npm/@splidejs/splide@4.1.4/dist/css/splide.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
     <noscript><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@splidejs/splide@4.1.4/dist/css/splide.min.css"></noscript>
     <link rel="stylesheet" href="assets/css/style.css">
-    
-    <!-- Open Graph / Facebook -->
-    <meta property="og:type" content="website">
-    <meta property="og:url" content="<?php echo (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? 'https' : 'http') . '://' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI']; ?>">
-    <meta property="og:title" content="<?php echo $pageTitle ?? 'INLET - Politeknik Negeri Malang'; ?>">
-    <meta property="og:description" content="<?php echo $pageDescription ?? 'Laboratorium riset dan inovasi Teknik Informatika Politeknik Negeri Malang'; ?>">
-    <meta property="og:image" content="<?php echo (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? 'https' : 'http') . '://' . $_SERVER['HTTP_HOST']; ?>/inlet-web/assets/images/inlet_logo_only.png">
-    
-    <!-- Twitter Card -->
-    <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="<?php echo $pageTitle ?? 'INLET - Politeknik Negeri Malang'; ?>">
-    <meta name="twitter:description" content="<?php echo $pageDescription ?? 'Laboratorium riset dan inovasi Teknik Informatika'; ?>">
 </head>
 
 <body class="<?php echo $bodyClass ?? 'bg-gray-50'; ?>">

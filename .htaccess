@@ -12,9 +12,14 @@
     RewriteCond %{REQUEST_FILENAME} !-d
     RewriteRule ^(.*)/$ $1 [L,R=301]
     
-    # Redirect www to non-www (or vice versa - choose one)
-    # RewriteCond %{HTTP_HOST} ^www\.(.*)$ [NC]
-    # RewriteRule ^(.*)$ https://%1/$1 [R=301,L]
+    # Redirect www to non-www for better SEO
+    RewriteCond %{HTTP_HOST} ^www\.(.*)$ [NC]
+    RewriteRule ^(.*)$ https://%1/inlet-web/$1 [R=301,L]
+    
+    # Remove tracking parameters to avoid duplicate content
+    RewriteCond %{QUERY_STRING} ^(.*)(?:&|^)(utm_source|utm_medium|utm_campaign|fbclid|gclid)=[^&]*&?(.*)$ [NC]
+    RewriteCond %{REQUEST_URI} !^/inlet-web/admin [NC]
+    RewriteRule ^(.*)$ /$1?%1%3 [R=301,L]
     
     # Sitemap rewrite
     RewriteRule ^sitemap\.xml$ sitemap.php [L]
