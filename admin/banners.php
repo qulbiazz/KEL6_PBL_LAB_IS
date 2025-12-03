@@ -6,8 +6,11 @@ if (!isset($_SESSION['admin_logged_in'])) {
 }
 
 require_once '../config/database.php';
+require_once '../includes/ImageOptimizer.php';
+
 $db = new Database();
 $conn = $db->getConnection();
+$imageOptimizer = new ImageOptimizer();
 
 $success = '';
 $error = '';
@@ -37,10 +40,42 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     
     $image = '';
     if (isset($_FILES['image']) && $_FILES['image']['error'] === 0) {
-        $upload_dir = '../uploads/banners/';
-        if (!file_exists($upload_dir)) mkdir($upload_dir, 0777, true);
-        $image = uniqid() . '.' . pathinfo($_FILES['image']['name'], PATHINFO_EXTENSION);
-        move_uploaded_file($_FILES['image']['tmp_name'], $upload_dir . $image);
+        // Validate image
+        $validation = ImageOptimizer::validateImage($_FILES['image'], 10485760); // 10MB max
+        
+        if (!$validation['valid']) {
+            $error = $validation['message'];
+        } else {
+            $upload_dir = '../uploads/banners/';
+            if (!file_exists($upload_dir)) mkdir($upload_dir, 0777, true);
+            
+            $extension = strtolower(pathinfo($_FILES['image']['name'], PATHINFO_EXTENSION));
+            $image = uniqid() . '.' . $extension;
+            $tempPath = $_FILES['image']['tmp_name'];
+            $finalPath = $upload_dir . $image;
+            
+            // Optimize image (resize to 1920x1080 max, compress quality)
+            $result = $imageOptimizer->optimize($tempPath, $finalPath, [
+                'maxWidth' => 1920,
+                'maxHeight' => 1080,
+                'jpegQuality' => 90,
+            ]);
+            
+            if (!$result['success']) {
+                $error = 'Failed to optimize image: ' . $result['message'];
+                $image = '';
+            } else {
+                // Generate WebP version for modern browsers
+                $webpPath = preg_replace('/\.(jpg|jpeg|png)$/i', '.webp', $finalPath);
+                $imageOptimizer->generateWebP($finalPath, $webpPath);
+                
+                // Add success message with savings info
+                if (isset($result['saved_percent']) && $result['saved_percent'] > 0) {
+                    $savedSize = ImageOptimizer::formatBytes($result['saved_bytes']);
+                    $success = "Image optimized! Saved {$savedSize} ({$result['saved_percent']}% reduction)";
+                }
+            }
+        }
     }
     
     if ($id) {
