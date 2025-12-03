@@ -5,6 +5,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
+
+    <title><?php echo $pageTitle ?? 'INLET - Information and Learning Engineering Technology | Politeknik Negeri Malang'; ?></title>
+    <meta name="title" content="<?php echo $pageTitle ?? 'INLET - Information and Learning Engineering Technology'; ?>">
+    <meta name="description" content="<?php echo $pageDescription ?? 'INLET adalah laboratorium riset dan inovasi Teknik Informatika di Politeknik Negeri Malang. Mengembangkan teknologi IoT, sistem cerdas, dan solusi inovatif.'; ?>">
     
     <!-- Preconnect to external resources for faster loading -->
     <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
