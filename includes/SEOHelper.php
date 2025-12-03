@@ -7,8 +7,8 @@
 class SEOHelper {
     private static $defaultMeta = [
         'title' => 'INLET - Information and Learning Engineering Technology',
-        'description' => 'INLET (Information and Learning Engineering Technology) adalah laboratorium riset dan inovasi di Politeknik Negeri Malang yang fokus pada pengembangan teknologi elektro, IoT, dan sistem cerdas.',
-        'keywords' => 'INLET, Polinema, Laboratorium, Teknik Elektro, IoT, Riset, Teknologi, Politeknik Negeri Malang, Research, Innovation',
+        'description' => 'Innovation and Learning Engineering Technology Laboratory - Politeknik Negeri Malang',
+        'keywords' => 'INLET, Polinema, Laboratorium, Teknik Informatika, IoT, Riset, Teknologi, Politeknik Negeri Malang, Research, Innovation',
         'author' => 'INLET - Politeknik Negeri Malang',
         'robots' => 'index, follow',
         'og_type' => 'website',
@@ -97,7 +97,7 @@ class SEOHelper {
                 '@type' => 'ContactPoint',
                 'telephone' => '+62-341-404424',
                 'contactType' => 'customer service',
-                'email' => 'inlet@polinema.ac.id'
+                'email' => 'inletpolinema@gmail.com'
             ],
             'parentOrganization' => [
                 '@type' => 'CollegeOrUniversity',
@@ -251,11 +251,11 @@ class SEOHelper {
         switch ($page) {
             case 'home':
                 $seo['title'] = 'INLET - Information and Learning Engineering Technology | Politeknik Negeri Malang';
-                $seo['description'] = 'INLET adalah laboratorium riset dan inovasi Teknik Elektro di Politeknik Negeri Malang. Mengembangkan teknologi IoT, sistem cerdas, dan solusi inovatif.';
+                $seo['description'] = 'INLET adalah laboratorium riset dan inovasi Teknik Informatika di Politeknik Negeri Malang. Mengembangkan teknologi IoT, sistem cerdas, dan solusi inovatif.';
                 break;
                 
             case 'about':
-                $seo['title'] = 'Tentang INLET - Laboratorium Riset Teknik Elektro Polinema';
+                $seo['title'] = 'Tentang INLET - Laboratorium Riset Teknik Informatika Polinema';
                 $seo['description'] = 'Pelajari tentang INLET, laboratorium riset yang berfokus pada pengembangan teknologi elektro, IoT, dan sistem pembelajaran inovatif di Politeknik Negeri Malang.';
                 break;
                 
