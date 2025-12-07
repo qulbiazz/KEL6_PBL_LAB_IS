@@ -23,6 +23,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $name = $_POST['name'];
     $description = $_POST['description'];
     $full_description = $_POST['full_description'];
+    $year = $_POST['year'];
+    $demo_link = $_POST['demo_link'] ?? '';
     $is_active = isset($_POST['is_active']) ? 1 : 0;
     
     $image = '';
@@ -35,16 +37,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     
     if ($id) {
         if ($image) {
-            $stmt = $conn->prepare("UPDATE products SET name = :name, description = :description, image = :image, full_description = :full_description, is_active = :is_active WHERE id = :id");
-            $stmt->execute(['name' => $name, 'description' => $description, 'image' => $image, 'full_description' => $full_description, 'is_active' => $is_active, 'id' => $id]);
+            $stmt = $conn->prepare("UPDATE products SET name = :name, description = :description, image = :image, full_description = :full_description, year = :year, demo_link = :demo_link, is_active = :is_active WHERE id = :id");
+            $stmt->execute(['name' => $name, 'description' => $description, 'image' => $image, 'full_description' => $full_description, 'year' => $year, 'demo_link' => $demo_link, 'is_active' => $is_active, 'id' => $id]);
         } else {
-            $stmt = $conn->prepare("UPDATE products SET name = :name, description = :description, full_description = :full_description, is_active = :is_active WHERE id = :id");
-            $stmt->execute(['name' => $name, 'description' => $description, 'full_description' => $full_description, 'is_active' => $is_active, 'id' => $id]);
+            $stmt = $conn->prepare("UPDATE products SET name = :name, description = :description, full_description = :full_description, year = :year, demo_link = :demo_link, is_active = :is_active WHERE id = :id");
+            $stmt->execute(['name' => $name, 'description' => $description, 'full_description' => $full_description, 'year' => $year, 'demo_link' => $demo_link, 'is_active' => $is_active, 'id' => $id]);
         }
         $success = 'Product updated successfully';
     } else {
-        $stmt = $conn->prepare("INSERT INTO products (name, description, image, full_description, is_active) VALUES (:name, :description, :image, :full_description, :is_active)");
-        $stmt->execute(['name' => $name, 'description' => $description, 'image' => $image, 'full_description' => $full_description, 'is_active' => $is_active]);
+        $stmt = $conn->prepare("INSERT INTO products (name, description, image, full_description, year, demo_link, is_active) VALUES (:name, :description, :image, :full_description, :year, :demo_link, :is_active)");
+        $stmt->execute(['name' => $name, 'description' => $description, 'image' => $image, 'full_description' => $full_description, 'year' => $year, 'demo_link' => $demo_link, 'is_active' => $is_active]);
         $success = 'Product added successfully';
     }
 }
@@ -137,6 +139,22 @@ if (isset($_GET['edit'])) {
                     </div>
                     
                     <div class="mb-6">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Year *</label>
+                        <input type="number" name="year" required value="<?php echo $edit_item ? htmlspecialchars($edit_item['year']) : date('Y'); ?>" min="2000" max="2099" step="1"
+                            class="w-full px-4 py-2.5 bg-gray-50 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                            placeholder="<?php echo date('Y'); ?>">
+                        <p class="text-xs text-gray-500 mt-1">Tahun pembuatan produk</p>
+                    </div>
+                    
+                    <div class="mb-6">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Demo Link (Optional)</label>
+                        <input type="url" name="demo_link" value="<?php echo $edit_item ? htmlspecialchars($edit_item['demo_link']) : ''; ?>"
+                            class="w-full px-4 py-2.5 bg-gray-50 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                            placeholder="https://example.com/demo">
+                        <p class="text-xs text-gray-500 mt-1">Link untuk demo produk (opsional)</p>
+                    </div>
+                    
+                    <div class="mb-6">
                         <label class="block text-sm font-medium text-gray-700 mb-2">Image <?php echo !$edit_item ? '*' : ''; ?></label>
                         <input type="file" name="image" accept="image/*" <?php echo !$edit_item ? 'required' : ''; ?> class="w-full px-4 py-2.5 bg-gray-50 border border-gray-300 rounded-lg file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100">
                         <?php if ($edit_item && $edit_item['image']): ?>
@@ -178,15 +196,29 @@ if (isset($_GET['edit'])) {
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-6">
                     <?php foreach ($products as $item): ?>
                     <div class="product-card bg-white rounded-xl overflow-hidden">
-                        <img src="../uploads/products/<?php echo htmlspecialchars($item['image']); ?>" class="w-full h-48 object-cover">
+                        <div class="relative">
+                            <img src="../uploads/products/<?php echo htmlspecialchars($item['image']); ?>" class="w-full h-48 object-cover">
+                            <?php if (!empty($item['year'])): ?>
+                                <div class="absolute top-3 right-3">
+                                    <span class="px-3 py-1 bg-blue-600 text-white text-xs font-semibold rounded-full shadow-lg">
+                                        <?php echo htmlspecialchars($item['year']); ?>
+                                    </span>
+                                </div>
+                            <?php endif; ?>
+                        </div>
                         <div class="p-4">
                             <h3 class="font-bold text-lg text-gray-900 mb-2"><?php echo htmlspecialchars($item['name']); ?></h3>
                             <p class="text-gray-600 text-sm mb-4 line-clamp-3"><?php echo htmlspecialchars($item['description']); ?></p>
                             
-                            <div class="flex justify-center mb-4">
+                            <div class="flex justify-center gap-2 mb-4">
                                 <span class="px-3 py-1 rounded-full text-xs font-semibold <?php echo $item['is_active'] ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'; ?>">
                                     <?php echo $item['is_active'] ? 'Active' : 'Inactive'; ?>
                                 </span>
+                                <?php if (!empty($item['demo_link'])): ?>
+                                    <span class="px-3 py-1 rounded-full text-xs font-semibold bg-purple-100 text-purple-700" title="Has demo link">
+                                        <i class="fas fa-link"></i> Demo
+                                    </span>
+                                <?php endif; ?>
                             </div>
                             
                             <div class="flex flex-col gap-2 pt-4 border-t border-gray-100">

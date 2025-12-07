@@ -54,6 +54,7 @@ $pageTitle = 'Team Details';
     <title><?php echo $pageTitle; ?> - InLet Admin</title>
     <link rel="stylesheet" href="../assets/css/tailwind.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="assets/css/icon-picker.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
         body {
@@ -93,6 +94,21 @@ $pageTitle = 'Team Details';
 
         <main class="flex-1 p-6 lg:ml-64 min-h-screen">
             <div class="max-w-7xl mx-auto">
+                
+                <!-- Success/Error Messages -->
+                <?php if (isset($_SESSION['success_message'])): ?>
+                    <div class="mb-4 bg-green-50 border-l-4 border-green-500 text-green-700 p-4 rounded-lg flex items-center">
+                        <i class="fas fa-check-circle mr-2"></i>
+                        <span><?php echo $_SESSION['success_message']; unset($_SESSION['success_message']); ?></span>
+                    </div>
+                <?php endif; ?>
+                
+                <?php if (isset($_SESSION['error_message'])): ?>
+                    <div class="mb-4 bg-red-50 border-l-4 border-red-500 text-red-700 p-4 rounded-lg flex items-center">
+                        <i class="fas fa-exclamation-circle mr-2"></i>
+                        <span><?php echo $_SESSION['error_message']; unset($_SESSION['error_message']); ?></span>
+                    </div>
+                <?php endif; ?>
                 
                 <!-- Header Section -->
                 <div class="flex flex-col md:flex-row md:items-center justify-between mb-6 gap-4">
@@ -318,6 +334,10 @@ $pageTitle = 'Team Details';
                                                             <?php echo $project['end_date'] ? date('M Y', strtotime($project['end_date'])) : 'Present'; ?>
                                                         </td>
                                                         <td class="px-6 py-4 text-right">
+                                                            <button onclick="editProject(<?php echo htmlspecialchars(json_encode($project)); ?>)" 
+                                                                    class="font-medium text-blue-600 hover:underline mr-3">
+                                                                <i class="fas fa-edit mr-1"></i>Edit
+                                                            </button>
                                                             <a href="actions/delete_lecturer_item.php?type=project&id=<?php echo $project['id']; ?>&lecturer_id=<?php echo $selectedLecturerId; ?>" 
                                                                onclick="return confirm('Delete this project?')" 
                                                                class="font-medium text-red-600 hover:underline">Delete</a>
@@ -358,7 +378,11 @@ $pageTitle = 'Team Details';
                                                         <?php echo date('M Y', strtotime($edu['end_date'])); ?>
                                                     </p>
                                                 </div>
-                                                <div class="mt-3 sm:mt-0">
+                                                <div class="mt-3 sm:mt-0 space-x-2">
+                                                    <button onclick="editEducation(<?php echo htmlspecialchars(json_encode($edu)); ?>)" 
+                                                            class="text-blue-600 hover:text-blue-800 text-sm font-medium">
+                                                        <i class="fas fa-edit mr-1"></i>Edit
+                                                    </button>
                                                     <a href="actions/delete_lecturer_item.php?type=education&id=<?php echo $edu['id']; ?>&lecturer_id=<?php echo $selectedLecturerId; ?>" 
                                                        onclick="return confirm('Delete this record?')" 
                                                        class="text-red-600 hover:text-red-800 text-sm font-medium">
@@ -388,25 +412,24 @@ $pageTitle = 'Team Details';
                                         <p>No skills added yet.</p>
                                     </div>
                                 <?php else: ?>
-                                    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+                                    <div class="flex flex-wrap gap-3">
                                         <?php foreach ($skills as $skill): ?>
-                                            <div class="flex items-center justify-between p-3 border border-gray-200 rounded-lg hover:shadow-sm transition-shadow">
-                                                <div class="flex items-center">
-                                                    <?php if (!empty($skill['skill_icon'])): ?>
-                                                        <i class="<?php echo htmlspecialchars($skill['skill_icon']); ?> text-blue-500 text-xl mr-3 w-6 text-center"></i>
-                                                    <?php else: ?>
-                                                        <i class="fas fa-check-circle text-blue-500 text-xl mr-3 w-6 text-center"></i>
-                                                    <?php endif; ?>
-                                                    <div>
-                                                        <p class="font-medium text-gray-900"><?php echo htmlspecialchars($skill['skill_name']); ?></p>
-                                                        <p class="text-xs text-gray-500"><?php echo htmlspecialchars($skill['category']); ?></p>
-                                                    </div>
+                                            <div class="group relative inline-flex items-center">
+                                                <span class="px-4 py-2 bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-full text-sm font-medium shadow-sm">
+                                                    <?php echo htmlspecialchars($skill['skill_name']); ?>
+                                                    <span class="ml-1 text-xs opacity-75">(<?php echo htmlspecialchars($skill['category']); ?>)</span>
+                                                </span>
+                                                <div class="ml-2 flex items-center space-x-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                                                    <button onclick="editSkill(<?php echo htmlspecialchars(json_encode($skill)); ?>)" 
+                                                            class="text-gray-400 hover:text-blue-500 p-1">
+                                                        <i class="fas fa-edit"></i>
+                                                    </button>
+                                                    <a href="actions/delete_lecturer_item.php?type=skill&id=<?php echo $skill['id']; ?>&lecturer_id=<?php echo $selectedLecturerId; ?>" 
+                                                       onclick="return confirm('Delete this skill?')" 
+                                                       class="text-gray-400 hover:text-red-500 p-1">
+                                                        <i class="fas fa-times"></i>
+                                                    </a>
                                                 </div>
-                                                <a href="actions/delete_lecturer_item.php?type=skill&id=<?php echo $skill['id']; ?>&lecturer_id=<?php echo $selectedLecturerId; ?>" 
-                                                   onclick="return confirm('Delete this skill?')" 
-                                                   class="text-gray-400 hover:text-red-500">
-                                                    <i class="fas fa-times"></i>
-                                                </a>
                                             </div>
                                         <?php endforeach; ?>
                                     </div>
@@ -437,11 +460,17 @@ $pageTitle = 'Team Details';
                                                     <i class="fas fa-dot-circle text-blue-500 mt-1 mr-3 text-xs"></i>
                                                     <span class="text-gray-700"><?php echo nl2br(htmlspecialchars($interest['interest_text'])); ?></span>
                                                 </div>
-                                                <a href="actions/delete_lecturer_item.php?type=interest&id=<?php echo $interest['id']; ?>&lecturer_id=<?php echo $selectedLecturerId; ?>" 
-                                                   onclick="return confirm('Delete this interest?')" 
-                                                   class="text-gray-400 hover:text-red-500 ml-2">
-                                                    <i class="fas fa-trash"></i>
-                                                </a>
+                                                <div class="flex items-center space-x-2 ml-2">
+                                                    <button onclick="editInterest(<?php echo htmlspecialchars(json_encode($interest)); ?>)" 
+                                                            class="text-gray-400 hover:text-blue-500">
+                                                        <i class="fas fa-edit"></i>
+                                                    </button>
+                                                    <a href="actions/delete_lecturer_item.php?type=interest&id=<?php echo $interest['id']; ?>&lecturer_id=<?php echo $selectedLecturerId; ?>" 
+                                                       onclick="return confirm('Delete this interest?')" 
+                                                       class="text-gray-400 hover:text-red-500">
+                                                        <i class="fas fa-trash"></i>
+                                                    </a>
+                                                </div>
                                             </li>
                                         <?php endforeach; ?>
                                     </ul>
@@ -479,7 +508,11 @@ $pageTitle = 'Team Details';
                                                         <?php endif; ?>
                                                     </div>
                                                 </div>
-                                                <div class="mt-2 sm:mt-0 flex-shrink-0">
+                                                <div class="mt-2 sm:mt-0 flex-shrink-0 space-x-2">
+                                                    <button onclick="editPublication(<?php echo htmlspecialchars(json_encode($pub)); ?>)" 
+                                                            class="text-blue-600 hover:text-blue-800 text-sm">
+                                                        <i class="fas fa-edit"></i>
+                                                    </button>
                                                     <a href="actions/delete_lecturer_item.php?type=publication&id=<?php echo $pub['id']; ?>&lecturer_id=<?php echo $selectedLecturerId; ?>" 
                                                        onclick="return confirm('Delete this publication?')" 
                                                        class="text-red-600 hover:text-red-800 text-sm">
@@ -607,16 +640,12 @@ $pageTitle = 'Team Details';
                 <div class="space-y-4">
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-1">Skill Name *</label>
-                        <input type="text" name="skill_name" required class="w-full bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5">
+                        <input type="text" name="skill_name" required class="w-full bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5" placeholder="e.g. Python, JavaScript, Project Management">
                     </div>
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-1">Category *</label>
-                        <input type="text" name="category" required class="w-full bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5" placeholder="e.g. Programming">
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Icon Class</label>
-                        <input type="text" name="skill_icon" class="w-full bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5" placeholder="fab fa-python">
-                        <p class="text-xs text-gray-500 mt-1">Font Awesome class name</p>
+                        <input type="text" name="category" required class="w-full bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5" placeholder="e.g. Programming, Design, Management">
+                        <p class="text-xs text-gray-500 mt-1">Skills will be grouped by category</p>
                     </div>
                 </div>
                 <div class="flex justify-end gap-2 mt-6 pt-4 border-t">
@@ -687,6 +716,195 @@ $pageTitle = 'Team Details';
         </div>
     </div>
 
+    <!-- EDIT MODALS -->
+    
+    <!-- Edit Project Modal -->
+    <div id="editProjectModal" class="fixed inset-0 bg-gray-900 bg-opacity-50 hidden overflow-y-auto h-full w-full z-50 flex items-center justify-center backdrop-blur-sm">
+        <div class="relative p-5 border w-full max-w-2xl shadow-lg rounded-xl bg-white">
+            <div class="flex justify-between items-center pb-4 border-b">
+                <h3 class="text-xl font-bold text-gray-900">Edit Project</h3>
+                <button onclick="closeModal('editProjectModal')" class="text-gray-400 hover:text-gray-600">
+                    <i class="fas fa-times text-xl"></i>
+                </button>
+            </div>
+            <form action="actions/update_lecturer_project.php" method="POST" class="mt-4">
+                <input type="hidden" name="lecturer_id" value="<?php echo $selectedLecturerId; ?>">
+                <input type="hidden" name="project_id" id="edit_project_id">
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Project Title *</label>
+                        <input type="text" name="title" id="edit_project_title" required class="w-full bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Category</label>
+                        <input type="text" name="category" id="edit_project_category" class="w-full bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Description *</label>
+                        <textarea name="description" id="edit_project_description" rows="3" required class="w-full bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5"></textarea>
+                    </div>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Start Date *</label>
+                            <input type="date" name="start_date" id="edit_project_start_date" required class="w-full bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">End Date</label>
+                            <input type="date" name="end_date" id="edit_project_end_date" class="w-full bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5">
+                        </div>
+                    </div>
+                </div>
+                <div class="flex justify-end gap-2 mt-6 pt-4 border-t">
+                    <button type="button" onclick="closeModal('editProjectModal')" class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50">Cancel</button>
+                    <button type="submit" class="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700">Update Project</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Edit Education Modal -->
+    <div id="editEducationModal" class="fixed inset-0 bg-gray-900 bg-opacity-50 hidden overflow-y-auto h-full w-full z-50 flex items-center justify-center backdrop-blur-sm">
+        <div class="relative p-5 border w-full max-w-2xl shadow-lg rounded-xl bg-white">
+            <div class="flex justify-between items-center pb-4 border-b">
+                <h3 class="text-xl font-bold text-gray-900">Edit Education</h3>
+                <button onclick="closeModal('editEducationModal')" class="text-gray-400 hover:text-gray-600">
+                    <i class="fas fa-times text-xl"></i>
+                </button>
+            </div>
+            <form action="actions/update_lecturer_education.php" method="POST" class="mt-4">
+                <input type="hidden" name="lecturer_id" value="<?php echo $selectedLecturerId; ?>">
+                <input type="hidden" name="education_id" id="edit_education_id">
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Institution *</label>
+                        <input type="text" name="institution" id="edit_education_institution" required class="w-full bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5">
+                    </div>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Degree *</label>
+                            <input type="text" name="degree" id="edit_education_degree" required class="w-full bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Field of Study *</label>
+                            <input type="text" name="field_of_study" id="edit_education_field" required class="w-full bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5">
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Description</label>
+                        <textarea name="description" id="edit_education_description" rows="3" class="w-full bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5"></textarea>
+                    </div>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Start Date *</label>
+                            <input type="date" name="start_date" id="edit_education_start_date" required class="w-full bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">End Date *</label>
+                            <input type="date" name="end_date" id="edit_education_end_date" required class="w-full bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5">
+                        </div>
+                    </div>
+                </div>
+                <div class="flex justify-end gap-2 mt-6 pt-4 border-t">
+                    <button type="button" onclick="closeModal('editEducationModal')" class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50">Cancel</button>
+                    <button type="submit" class="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700">Update Education</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Edit Skill Modal -->
+    <div id="editSkillModal" class="fixed inset-0 bg-gray-900 bg-opacity-50 hidden overflow-y-auto h-full w-full z-50 flex items-center justify-center backdrop-blur-sm">
+        <div class="relative p-5 border w-full max-w-md shadow-lg rounded-xl bg-white">
+            <div class="flex justify-between items-center pb-4 border-b">
+                <h3 class="text-xl font-bold text-gray-900">Edit Skill</h3>
+                <button onclick="closeModal('editSkillModal')" class="text-gray-400 hover:text-gray-600">
+                    <i class="fas fa-times text-xl"></i>
+                </button>
+            </div>
+            <form action="actions/update_lecturer_skill.php" method="POST" class="mt-4">
+                <input type="hidden" name="lecturer_id" value="<?php echo $selectedLecturerId; ?>">
+                <input type="hidden" name="skill_id" id="edit_skill_id">
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Skill Name *</label>
+                        <input type="text" name="skill_name" id="edit_skill_name" required class="w-full bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Category *</label>
+                        <input type="text" name="category" id="edit_skill_category" required class="w-full bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5">
+                        <p class="text-xs text-gray-500 mt-1">Skills will be grouped by category</p>
+                    </div>
+                </div>
+                <div class="flex justify-end gap-2 mt-6 pt-4 border-t">
+                    <button type="button" onclick="closeModal('editSkillModal')" class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50">Cancel</button>
+                    <button type="submit" class="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700">Update Skill</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Edit Interest Modal -->
+    <div id="editInterestModal" class="fixed inset-0 bg-gray-900 bg-opacity-50 hidden overflow-y-auto h-full w-full z-50 flex items-center justify-center backdrop-blur-sm">
+        <div class="relative p-5 border w-full max-w-md shadow-lg rounded-xl bg-white">
+            <div class="flex justify-between items-center pb-4 border-b">
+                <h3 class="text-xl font-bold text-gray-900">Edit Interest</h3>
+                <button onclick="closeModal('editInterestModal')" class="text-gray-400 hover:text-gray-600">
+                    <i class="fas fa-times text-xl"></i>
+                </button>
+            </div>
+            <form action="actions/update_lecturer_interest.php" method="POST" class="mt-4">
+                <input type="hidden" name="lecturer_id" value="<?php echo $selectedLecturerId; ?>">
+                <input type="hidden" name="interest_id" id="edit_interest_id">
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Interest *</label>
+                        <textarea name="interest_text" id="edit_interest_text" rows="3" required class="w-full bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5"></textarea>
+                    </div>
+                </div>
+                <div class="flex justify-end gap-2 mt-6 pt-4 border-t">
+                    <button type="button" onclick="closeModal('editInterestModal')" class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50">Cancel</button>
+                    <button type="submit" class="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700">Update Interest</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Edit Publication Modal -->
+    <div id="editPublicationModal" class="fixed inset-0 bg-gray-900 bg-opacity-50 hidden overflow-y-auto h-full w-full z-50 flex items-center justify-center backdrop-blur-sm">
+        <div class="relative p-5 border w-full max-w-lg shadow-lg rounded-xl bg-white">
+            <div class="flex justify-between items-center pb-4 border-b">
+                <h3 class="text-xl font-bold text-gray-900">Edit Publication</h3>
+                <button onclick="closeModal('editPublicationModal')" class="text-gray-400 hover:text-gray-600">
+                    <i class="fas fa-times text-xl"></i>
+                </button>
+            </div>
+            <form action="actions/update_lecturer_publication.php" method="POST" class="mt-4">
+                <input type="hidden" name="lecturer_id" value="<?php echo $selectedLecturerId; ?>">
+                <input type="hidden" name="publication_id" id="edit_publication_id">
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Title *</label>
+                        <input type="text" name="title" id="edit_publication_title" required class="w-full bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5">
+                    </div>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Year *</label>
+                            <input type="number" name="year" id="edit_publication_year" required class="w-full bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">URL</label>
+                            <input type="url" name="url" id="edit_publication_url" class="w-full bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5">
+                        </div>
+                    </div>
+                </div>
+                <div class="flex justify-end gap-2 mt-6 pt-4 border-t">
+                    <button type="button" onclick="closeModal('editPublicationModal')" class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50">Cancel</button>
+                    <button type="submit" class="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700">Update Publication</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
     <script src="assets/js/admin.js"></script>
     <script>
         function showTab(tabId, btn) {
@@ -723,6 +941,53 @@ $pageTitle = 'Team Details';
             modal.classList.add('hidden');
             modal.classList.remove('flex');
             document.body.style.overflow = 'auto';
+        }
+
+        // Edit Project
+        function editProject(project) {
+            document.getElementById('edit_project_id').value = project.id;
+            document.getElementById('edit_project_title').value = project.title;
+            document.getElementById('edit_project_category').value = project.category || '';
+            document.getElementById('edit_project_description').value = project.description || '';
+            document.getElementById('edit_project_start_date').value = project.start_date;
+            document.getElementById('edit_project_end_date').value = project.end_date || '';
+            openModal('editProjectModal');
+        }
+
+        // Edit Education
+        function editEducation(education) {
+            document.getElementById('edit_education_id').value = education.id;
+            document.getElementById('edit_education_institution').value = education.institution;
+            document.getElementById('edit_education_degree').value = education.degree;
+            document.getElementById('edit_education_field').value = education.field_of_study;
+            document.getElementById('edit_education_description').value = education.description || '';
+            document.getElementById('edit_education_start_date').value = education.start_date;
+            document.getElementById('edit_education_end_date').value = education.end_date;
+            openModal('editEducationModal');
+        }
+
+        // Edit Skill
+        function editSkill(skill) {
+            document.getElementById('edit_skill_id').value = skill.id;
+            document.getElementById('edit_skill_name').value = skill.skill_name;
+            document.getElementById('edit_skill_category').value = skill.category;
+            openModal('editSkillModal');
+        }
+
+        // Edit Interest
+        function editInterest(interest) {
+            document.getElementById('edit_interest_id').value = interest.id;
+            document.getElementById('edit_interest_text').value = interest.interest_text;
+            openModal('editInterestModal');
+        }
+
+        // Edit Publication
+        function editPublication(publication) {
+            document.getElementById('edit_publication_id').value = publication.id;
+            document.getElementById('edit_publication_title').value = publication.title;
+            document.getElementById('edit_publication_year').value = publication.year;
+            document.getElementById('edit_publication_url').value = publication.url || '';
+            openModal('editPublicationModal');
         }
     </script>
 </body>

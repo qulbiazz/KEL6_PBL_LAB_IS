@@ -78,9 +78,16 @@
                                                 height="192"
                                                 class="w-full h-48 object-cover transform group-hover:scale-110 transition-transform duration-500">
                                             <div class="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                                            <?php if (!empty($product['year'])): ?>
+                                                <div class="absolute top-3 right-3">
+                                                    <span class="px-3 py-1 bg-blue-600 text-white text-xs font-semibold rounded-full shadow-lg">
+                                                        <?php echo htmlspecialchars($product['year']); ?>
+                                                    </span>
+                                                </div>
+                                            <?php endif; ?>
                                         </div>
                                         <div class="p-6 flex flex-col flex-grow">
-                                            <h3 class="text-xl font-bold mb-3 text-gray-800 line-clamp-2 min-h-[3.5rem]"><?php echo htmlspecialchars($product['name']); ?></h3>
+                                            <h3 class="text-xl font-bold text-gray-800 line-clamp-2 min-h-[3.5rem]"><?php echo htmlspecialchars($product['name']); ?></h3>
                                             <p class="text-gray-600 mb-4 flex-grow line-clamp-3"><?php echo htmlspecialchars($product['description']); ?></p>
                                             <a href="index.php?page=product-detail&id=<?php echo $product['id']; ?>"
                                                 class="inline-flex items-center text-blue-600 hover:text-blue-700 font-semibold mt-auto group/link"
@@ -100,13 +107,22 @@
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                     <?php foreach ($products as $product): ?>
                         <article class="bg-white rounded-lg overflow-hidden shadow-md hover:shadow-xl transition flex flex-col h-full">
-                            <img src="uploads/products/<?php echo htmlspecialchars($product['image']); ?>" 
-                                 alt="Produk <?php echo htmlspecialchars($product['name']); ?> - INLET Polinema" 
-                                 loading="lazy"
-                                 decoding="async"
-                                 width="400"
-                                 height="192"
-                                 class="w-full h-48 object-cover">
+                            <div class="relative">
+                                <img src="uploads/products/<?php echo htmlspecialchars($product['image']); ?>" 
+                                     alt="Produk <?php echo htmlspecialchars($product['name']); ?> - INLET Polinema" 
+                                     loading="lazy"
+                                     decoding="async"
+                                     width="400"
+                                     height="192"
+                                     class="w-full h-48 object-cover">
+                                <?php if (!empty($product['year'])): ?>
+                                    <div class="absolute top-3 right-3">
+                                        <span class="px-3 py-1 bg-blue-600 text-white text-xs font-semibold rounded-full shadow-lg">
+                                            <?php echo htmlspecialchars($product['year']); ?>
+                                        </span>
+                                    </div>
+                                <?php endif; ?>
+                            </div>
                             <div class="p-6 flex flex-col flex-grow">
                                 <h3 class="text-xl font-bold mb-2 text-gray-800"><?php echo htmlspecialchars($product['name']); ?></h3>
                                 <p class="text-gray-600 mb-4 flex-grow"><?php echo htmlspecialchars($product['description']); ?></p>
@@ -156,79 +172,148 @@
                 <p class="text-gray-600">Meet the experts behind InLet</p>
             </header>
 
-            <!-- Team Slider -->
-            <div class="relative">
-                <div class="splide team-slider" role="region" aria-label="Team members carousel">
-                    <div class="splide__track">
-                        <ul class="splide__list" role="list">
-                            <?php foreach ($team as $member): ?>
-                                <li class="splide__slide" role="listitem">
-                                    <article class="bg-white rounded-lg overflow-hidden shadow-md hover:shadow-xl transition h-full flex flex-col" itemscope itemtype="https://schema.org/Person">
-                                        <!-- Profile Image -->
-                                        <div class="relative overflow-hidden">
-                                            <img src="uploads/team/<?php echo htmlspecialchars($member['photo']); ?>"
-                                                alt="Foto profil <?php echo htmlspecialchars($member['name']); ?> - <?php echo htmlspecialchars($member['position']); ?> di INLET Politeknik Negeri Malang"
-                                                class="w-full h-64 object-cover"
-                                                loading="lazy"
-                                                width="400"
-                                                height="256"
-                                                itemprop="image">
-                                            <div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 hover:opacity-100 transition-opacity duration-300">
-                                                <div class="absolute bottom-4 left-0 right-0 text-center">
-                                                    <a href="index.php?page=lecturer-detail&id=<?php echo $member['id']; ?>"
-                                                        class="inline-block bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-semibold transition"
-                                                        aria-label="Lihat profil lengkap <?php echo htmlspecialchars($member['name']); ?>">
-                                                        View Profile
-                                                    </a>
+            <!-- Team Display -->
+            <?php if (count($team) <= 4): ?>
+                <!-- Grid layout for 4 or fewer members -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-<?php echo min(count($team), 4); ?> gap-6">
+                    <?php foreach ($team as $member): ?>
+                        <article class="bg-white rounded-lg overflow-hidden shadow-md hover:shadow-xl transition flex flex-col" itemscope itemtype="https://schema.org/Person">
+                            <!-- Profile Image -->
+                            <div class="relative overflow-hidden">
+                                <img src="uploads/team/<?php echo htmlspecialchars($member['photo']); ?>"
+                                    alt="Foto profil <?php echo htmlspecialchars($member['name']); ?> - <?php echo htmlspecialchars($member['position']); ?> di INLET Politeknik Negeri Malang"
+                                    class="w-full h-64 object-cover"
+                                    loading="lazy"
+                                    width="400"
+                                    height="256"
+                                    itemprop="image">
+                                <div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 hover:opacity-100 transition-opacity duration-300">
+                                    <div class="absolute bottom-4 left-0 right-0 text-center">
+                                        <a href="index.php?page=lecturer-detail&id=<?php echo $member['id']; ?>"
+                                            class="inline-block bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-semibold transition"
+                                            aria-label="Lihat profil lengkap <?php echo htmlspecialchars($member['name']); ?>">
+                                            View Profile
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Member Info -->
+                            <div class="p-6 text-center flex-1 flex flex-col justify-between">
+                                <div>
+                                    <h3 class="text-xl font-bold mb-1 text-gray-800" itemprop="name">
+                                        <?php echo htmlspecialchars($member['name']); ?>
+                                    </h3>
+                                    <p class="text-blue-600 mb-3" itemprop="jobTitle">
+                                        <?php echo htmlspecialchars($member['position']); ?>
+                                    </p>
+                                    <meta itemprop="worksFor" content="INLET - Politeknik Negeri Malang">
+                                </div>
+
+                                <nav class="flex justify-center space-x-2 mt-4" aria-label="Social links for <?php echo htmlspecialchars($member['name']); ?>">
+                                    <a href="index.php?page=lecturer-detail&id=<?php echo $member['id']; ?>"
+                                        class="text-gray-600 hover:text-blue-600 transition p-2 min-w-[44px] min-h-[44px] flex items-center justify-center"
+                                        aria-label="Profil <?php echo htmlspecialchars($member['name']); ?>">
+                                        <i class="fas fa-user text-xl" aria-hidden="true"></i>
+                                    </a>
+                                    <?php if ($member['linkedin']): ?>
+                                        <a href="<?php echo htmlspecialchars($member['linkedin']); ?>"
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            class="text-gray-600 hover:text-blue-600 transition p-2 min-w-[44px] min-h-[44px] flex items-center justify-center"
+                                            itemprop="sameAs"
+                                            aria-label="LinkedIn <?php echo htmlspecialchars($member['name']); ?>">
+                                            <i class="fab fa-linkedin text-xl" aria-hidden="true"></i>
+                                        </a>
+                                    <?php endif; ?>
+                                    <?php if ($member['email']): ?>
+                                        <a href="mailto:<?php echo htmlspecialchars($member['email']); ?>"
+                                            class="text-gray-600 hover:text-red-600 transition p-2 min-w-[44px] min-h-[44px] flex items-center justify-center"
+                                            itemprop="email"
+                                            aria-label="Email <?php echo htmlspecialchars($member['name']); ?>">
+                                            <i class="fas fa-envelope text-xl" aria-hidden="true"></i>
+                                        </a>
+                                    <?php endif; ?>
+                                </nav>
+                            </div>
+                        </article>
+                    <?php endforeach; ?>
+                </div>
+            <?php else: ?>
+                <!-- Slider for more than 4 members -->
+                <div class="relative">
+                    <div class="splide team-slider" role="region" aria-label="Team members carousel" data-team-count="<?php echo count($team); ?>">
+                        <div class="splide__track">
+                            <ul class="splide__list" role="list">
+                                <?php foreach ($team as $member): ?>
+                                    <li class="splide__slide" role="listitem">
+                                        <article class="bg-white rounded-lg overflow-hidden shadow-md hover:shadow-xl transition h-full flex flex-col" itemscope itemtype="https://schema.org/Person">
+                                            <!-- Profile Image -->
+                                            <div class="relative overflow-hidden">
+                                                <img src="uploads/team/<?php echo htmlspecialchars($member['photo']); ?>"
+                                                    alt="Foto profil <?php echo htmlspecialchars($member['name']); ?> - <?php echo htmlspecialchars($member['position']); ?> di INLET Politeknik Negeri Malang"
+                                                    class="w-full h-64 object-cover"
+                                                    loading="lazy"
+                                                    width="400"
+                                                    height="256"
+                                                    itemprop="image">
+                                                <div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 hover:opacity-100 transition-opacity duration-300">
+                                                    <div class="absolute bottom-4 left-0 right-0 text-center">
+                                                        <a href="index.php?page=lecturer-detail&id=<?php echo $member['id']; ?>"
+                                                            class="inline-block bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-semibold transition"
+                                                            aria-label="Lihat profil lengkap <?php echo htmlspecialchars($member['name']); ?>">
+                                                            View Profile
+                                                        </a>
+                                                    </div>
                                                 </div>
                                             </div>
-                                        </div>
 
-                                        <!-- Member Info -->
-                                        <div class="p-6 text-center flex-1 flex flex-col justify-between">
-                                            <div>
-                                                <h3 class="text-xl font-bold mb-1 text-gray-800" itemprop="name">
-                                                    <?php echo htmlspecialchars($member['name']); ?>
-                                                </h3>
-                                                <p class="text-blue-600 mb-3" itemprop="jobTitle">
-                                                    <?php echo htmlspecialchars($member['position']); ?>
-                                                </p>
-                                                <meta itemprop="worksFor" content="INLET - Politeknik Negeri Malang">
-                                            </div>
+                                            <!-- Member Info -->
+                                            <div class="p-6 text-center flex-1 flex flex-col justify-between">
+                                                <div>
+                                                    <h3 class="text-xl font-bold mb-1 text-gray-800" itemprop="name">
+                                                        <?php echo htmlspecialchars($member['name']); ?>
+                                                    </h3>
+                                                    <p class="text-blue-600 mb-3" itemprop="jobTitle">
+                                                        <?php echo htmlspecialchars($member['position']); ?>
+                                                    </p>
+                                                    <meta itemprop="worksFor" content="INLET - Politeknik Negeri Malang">
+                                                </div>
 
-                                            <nav class="flex justify-center space-x-2 mt-4" aria-label="Social links for <?php echo htmlspecialchars($member['name']); ?>">
-                                                <a href="index.php?page=lecturer-detail&id=<?php echo $member['id']; ?>"
-                                                    class="text-gray-600 hover:text-blue-600 transition p-2 min-w-[44px] min-h-[44px] flex items-center justify-center"
-                                                    aria-label="Profil <?php echo htmlspecialchars($member['name']); ?>">
-                                                    <i class="fas fa-user text-xl" aria-hidden="true"></i>
-                                                </a>
-                                                <?php if ($member['linkedin']): ?>
-                                                    <a href="<?php echo htmlspecialchars($member['linkedin']); ?>"
-                                                        target="_blank"
-                                                        rel="noopener noreferrer"
+                                                <nav class="flex justify-center space-x-2 mt-4" aria-label="Social links for <?php echo htmlspecialchars($member['name']); ?>">
+                                                    <a href="index.php?page=lecturer-detail&id=<?php echo $member['id']; ?>"
                                                         class="text-gray-600 hover:text-blue-600 transition p-2 min-w-[44px] min-h-[44px] flex items-center justify-center"
-                                                        itemprop="sameAs"
-                                                        aria-label="LinkedIn <?php echo htmlspecialchars($member['name']); ?>">
-                                                        <i class="fab fa-linkedin text-xl" aria-hidden="true"></i>
+                                                        aria-label="Profil <?php echo htmlspecialchars($member['name']); ?>">
+                                                        <i class="fas fa-user text-xl" aria-hidden="true"></i>
                                                     </a>
-                                                <?php endif; ?>
-                                                <?php if ($member['email']): ?>
-                                                    <a href="mailto:<?php echo htmlspecialchars($member['email']); ?>"
-                                                        class="text-gray-600 hover:text-red-600 transition p-2 min-w-[44px] min-h-[44px] flex items-center justify-center"
-                                                        itemprop="email"
-                                                        aria-label="Email <?php echo htmlspecialchars($member['name']); ?>">
-                                                        <i class="fas fa-envelope text-xl" aria-hidden="true"></i>
-                                                    </a>
-                                                <?php endif; ?>
-                                            </nav>
-                                        </div>
-                                    </article>
-                                </li>
-                            <?php endforeach; ?>
-                        </ul>
+                                                    <?php if ($member['linkedin']): ?>
+                                                        <a href="<?php echo htmlspecialchars($member['linkedin']); ?>"
+                                                            target="_blank"
+                                                            rel="noopener noreferrer"
+                                                            class="text-gray-600 hover:text-blue-600 transition p-2 min-w-[44px] min-h-[44px] flex items-center justify-center"
+                                                            itemprop="sameAs"
+                                                            aria-label="LinkedIn <?php echo htmlspecialchars($member['name']); ?>">
+                                                            <i class="fab fa-linkedin text-xl" aria-hidden="true"></i>
+                                                        </a>
+                                                    <?php endif; ?>
+                                                    <?php if ($member['email']): ?>
+                                                        <a href="mailto:<?php echo htmlspecialchars($member['email']); ?>"
+                                                            class="text-gray-600 hover:text-red-600 transition p-2 min-w-[44px] min-h-[44px] flex items-center justify-center"
+                                                            itemprop="email"
+                                                            aria-label="Email <?php echo htmlspecialchars($member['name']); ?>">
+                                                            <i class="fas fa-envelope text-xl" aria-hidden="true"></i>
+                                                        </a>
+                                                    <?php endif; ?>
+                                                </nav>
+                                            </div>
+                                        </article>
+                                    </li>
+                                <?php endforeach; ?>
+                            </ul>
+                        </div>
                     </div>
                 </div>
-            </div>
+            <?php endif; ?>
         </div>
     </section>
 
@@ -262,7 +347,7 @@
                                                 <i class="far fa-calendar mr-2" aria-hidden="true"></i>
                                                 <time datetime="<?php echo date('Y-m-d', strtotime($item['published_at'])); ?>" itemprop="datePublished"><?php echo date('F d, Y', strtotime($item['published_at'])); ?></time>
                                             </div>
-                                            <h3 class="text-xl font-bold mb-3 text-gray-800 line-clamp-2 min-h-[3.5rem]" itemprop="headline"><?php echo htmlspecialchars($item['title']); ?></h3>
+                                            <h3 class="text-xl font-bold text-gray-800 line-clamp-2 min-h-[3.5rem]" itemprop="headline"><?php echo htmlspecialchars($item['title']); ?></h3>
                                             <p class="text-gray-600 mb-4 flex-grow line-clamp-3" itemprop="description"><?php echo substr(htmlspecialchars($item['content']), 0, 120); ?>...</p>
                                             <meta itemprop="author" content="INLET Politeknik Negeri Malang">
                                             <a href="index.php?page=news-detail&id=<?php echo $item['id']; ?>"

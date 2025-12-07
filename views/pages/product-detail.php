@@ -46,20 +46,38 @@
                             </p>
                         </div>
 
-                        <div class="bg-gray-50 p-6 rounded-lg">
+                        <div class="bg-gray-50 p-6 rounded-lg mb-6">
                             <h3 class="text-xl font-bold text-gray-800 mb-3">Product Information</h3>
                             <div class="space-y-2">
+                                <?php if (!empty($product['year'])): ?>
+                                <div class="flex items-center">
+                                    <i class="fas fa-calendar-alt text-blue-600 mr-3"></i>
+                                    <span class="text-gray-700">Year: <strong><?php echo htmlspecialchars($product['year']); ?></strong></span>
+                                </div>
+                                <?php endif; ?>
                                 <div class="flex items-center">
                                     <i class="fas fa-calendar text-blue-600 mr-3"></i>
                                     <span class="text-gray-700">Added: <?php echo date('F d, Y', strtotime($product['created_at'])); ?></span>
                                 </div>
                             </div>
                         </div>
+                        
+                        <?php if (!empty($product['demo_link'])): ?>
+                        <div class="mb-6">
+                            <a href="<?php echo htmlspecialchars($product['demo_link']); ?>" 
+                               target="_blank" 
+                               rel="noopener noreferrer"
+                               class="inline-flex items-center justify-center w-full bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white px-6 py-3 rounded-lg font-semibold transition-all shadow-lg hover:shadow-xl transform hover:-translate-y-0.5">
+                                <i class="fas fa-external-link-alt mr-2"></i>
+                                View Live Demo
+                            </a>
+                        </div>
+                        <?php endif; ?>
                     </div>
                 </div>
 
                 <div class="text-center">
-                    <a href="index.php#products" class="inline-block bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 rounded-lg transition">
+                    <a href="index.php#products" class="inline-block bg-gray-600 hover:bg-gray-700 text-white px-8 py-3 rounded-lg transition">
                         <i class="fas fa-arrow-left mr-2"></i>Back to Products
                     </a>
                 </div>

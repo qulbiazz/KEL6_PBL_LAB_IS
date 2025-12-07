@@ -295,4 +295,115 @@ class LecturerDetailModel
         
         return $stmt->execute();
     }
+
+    /**
+     * Update project
+     */
+    public function updateProject($project_id, $member_id, $data)
+    {
+        $query = "UPDATE lecturer_projects SET 
+                 title = :title,
+                 category = :category,
+                 description = :description,
+                 start_date = :start_date,
+                 end_date = :end_date
+                 WHERE id = :project_id AND team_member_id = :member_id";
+        
+        $stmt = $this->conn->prepare($query);
+        $stmt->bindParam(':project_id', $project_id);
+        $stmt->bindParam(':member_id', $member_id);
+        $stmt->bindParam(':title', $data['title']);
+        $stmt->bindParam(':category', $data['category']);
+        $stmt->bindParam(':description', $data['description']);
+        $stmt->bindParam(':start_date', $data['start_date']);
+        $stmt->bindParam(':end_date', $data['end_date']);
+        
+        return $stmt->execute();
+    }
+
+    /**
+     * Update education
+     */
+    public function updateEducation($education_id, $member_id, $data)
+    {
+        $query = "UPDATE lecturer_education SET 
+                 institution = :institution,
+                 degree = :degree,
+                 field_of_study = :field_of_study,
+                 description = :description,
+                 start_date = :start_date,
+                 end_date = :end_date
+                 WHERE id = :education_id AND team_member_id = :member_id";
+        
+        $stmt = $this->conn->prepare($query);
+        $stmt->bindParam(':education_id', $education_id);
+        $stmt->bindParam(':member_id', $member_id);
+        $stmt->bindParam(':institution', $data['institution']);
+        $stmt->bindParam(':degree', $data['degree']);
+        $stmt->bindParam(':field_of_study', $data['field_of_study']);
+        $stmt->bindParam(':description', $data['description']);
+        $stmt->bindParam(':start_date', $data['start_date']);
+        $stmt->bindParam(':end_date', $data['end_date']);
+        
+        return $stmt->execute();
+    }
+
+    /**
+     * Update skill
+     */
+    public function updateSkill($skill_id, $member_id, $data)
+    {
+        $query = "UPDATE lecturer_skills SET 
+                 skill_name = :skill_name,
+                 category = :category,
+                 skill_icon = :skill_icon
+                 WHERE id = :skill_id AND team_member_id = :member_id";
+        
+        $stmt = $this->conn->prepare($query);
+        $stmt->bindParam(':skill_id', $skill_id);
+        $stmt->bindParam(':member_id', $member_id);
+        $stmt->bindParam(':skill_name', $data['skill_name']);
+        $stmt->bindParam(':category', $data['category']);
+        $stmt->bindParam(':skill_icon', $data['skill_icon']);
+        
+        return $stmt->execute();
+    }
+
+    /**
+     * Update interest
+     */
+    public function updateInterest($interest_id, $member_id, $data)
+    {
+        $query = "UPDATE lecturer_interests SET 
+                 interest_text = :interest_text
+                 WHERE id = :interest_id AND team_member_id = :member_id";
+        
+        $stmt = $this->conn->prepare($query);
+        $stmt->bindParam(':interest_id', $interest_id);
+        $stmt->bindParam(':member_id', $member_id);
+        $stmt->bindParam(':interest_text', $data['interest_text']);
+        
+        return $stmt->execute();
+    }
+
+    /**
+     * Update publication
+     */
+    public function updatePublication($publication_id, $member_id, $data)
+    {
+        $query = "UPDATE lecturer_publications SET 
+                 title = :title,
+                 year = :year,
+                 url = :url
+                 WHERE id = :publication_id AND team_member_id = :member_id";
+        
+        $stmt = $this->conn->prepare($query);
+        $stmt->bindParam(':publication_id', $publication_id);
+        $stmt->bindParam(':member_id', $member_id);
+        $stmt->bindParam(':title', $data['title']);
+        $stmt->bindParam(':year', $data['year']);
+        $stmt->bindParam(':url', $data['url']);
+        
+        return $stmt->execute();
+    }
 }

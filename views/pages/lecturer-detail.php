@@ -280,18 +280,11 @@
                                 <?php echo htmlspecialchars($category); ?>
                             </h3>
 
-                            <div class="flex flex-wrap gap-6">
+                            <div class="flex flex-wrap gap-3">
                                 <?php foreach ($skills as $skill): ?>
-                                    <div class="text-center">
-                                        <?php if (!empty($skill['skill_icon'])): ?>
-                                            <div class="w-16 h-16 mx-auto mb-2 text-5xl text-gray-600 flex items-center justify-center">
-                                                <i class="<?php echo htmlspecialchars($skill['skill_icon']); ?>"></i>
-                                            </div>
-                                        <?php endif; ?>
-                                        <p class="text-sm text-gray-700 font-medium">
-                                            <?php echo htmlspecialchars($skill['skill_name']); ?>
-                                        </p>
-                                    </div>
+                                    <span class="px-4 py-2 bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-full text-sm font-medium shadow-sm hover:shadow-md transition-shadow">
+                                        <?php echo htmlspecialchars($skill['skill_name']); ?>
+                                    </span>
                                 <?php endforeach; ?>
                             </div>
                         </div>
