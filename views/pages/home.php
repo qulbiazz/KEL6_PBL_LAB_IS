@@ -441,7 +441,7 @@
     </section>
 
     <!-- Divider -->
-    <div class="h-px bg-gradient-to-r from-transparent via-gray-300 to-transparent"></div>
+    <!-- <div class="h-px bg-gradient-to-r from-transparent via-gray-300 to-transparent"></div> -->
 
     <!-- Research Activity Section -->
     <section id="research" class="py-20 bg-white" aria-labelledby="research-heading">
