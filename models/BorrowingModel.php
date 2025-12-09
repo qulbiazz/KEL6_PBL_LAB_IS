@@ -466,6 +466,42 @@ class BorrowingModel
     }
 
     /**
+     * Restore equipment/room availability without changing borrowing status
+     * Used when rejecting borrowings - items are returned but status stays 'rejected'
+     */
+    public function restoreItemsOnly($id)
+    {
+        try {
+            $this->conn->beginTransaction();
+            
+            // Get borrowing details
+            $borrowing = $this->getBorrowingById($id);
+            if (!$borrowing) {
+                throw new Exception("Borrowing not found");
+            }
+            
+            if ($borrowing['type'] === 'equipment') {
+                // Restore equipment quantities
+                $query = "UPDATE equipment e
+                         SET available_quantity = available_quantity + be.quantity
+                         FROM borrowing_equipment be
+                         WHERE be.borrowing_id = :id AND be.equipment_id = e.id";
+                $stmt = $this->conn->prepare($query);
+                $stmt->bindParam(':id', $id);
+                $stmt->execute();
+            }
+            // Note: Room availability is managed by date-based checks, no need to restore
+            
+            $this->conn->commit();
+            return true;
+        } catch (Exception $e) {
+            $this->conn->rollBack();
+            error_log("Error restoring items: " . $e->getMessage());
+            return false;
+        }
+    }
+
+    /**
      * Update borrowing details
      */
     public function updateBorrowing($id, $data)

@@ -57,6 +57,9 @@ if (isset($_GET['reject'])) {
     $adminNotes = $_GET['notes'] ?? 'Maaf, peminjaman Anda tidak dapat disetujui.';
     
     if ($borrowingModel->updateApprovalStatus($id, 'rejected', $adminNotes)) {
+        // Restore items (equipment/room) without changing borrowing status
+        $borrowingModel->restoreItemsOnly($id);
+        
         // Send email notification to borrower
         try {
             error_log("Rejection: Getting borrowing data for ID: {$id}");
@@ -151,7 +154,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_notification_e
     }
 }
 
-// Get filters
+// Get filters (for front-end only)
 $filterType = $_GET['type'] ?? '';
 $filterStatus = $_GET['status'] ?? '';
 
@@ -160,9 +163,9 @@ $perPage = 10;
 $page = isset($_GET['page']) ? max(1, intval($_GET['page'])) : 1;
 $offset = ($page - 1) * $perPage;
 
-// Fetch borrowings with filters
-$borrowings = $borrowingModel->getAllBorrowings($filterType, $filterStatus, $perPage, $offset);
-$totalBorrowings = $borrowingModel->countBorrowings($filterType, $filterStatus);
+// Fetch ALL borrowings without filter (filter will be done in front-end)
+$borrowings = $borrowingModel->getAllBorrowings('', '', 1000, 0); // Get all data
+$totalBorrowings = count($borrowings);
 $totalPages = ceil($totalBorrowings / $perPage);
 
 // Count by status
@@ -344,32 +347,33 @@ $notificationEmail = $settings['borrowing_notification_email'] ?? 'inlet@polinem
                 <h3 class="text-base md:text-lg font-semibold text-gray-800 mb-4">
                     <i class="fas fa-filter mr-2"></i>Filter Data
                 </h3>
-                <form method="GET" action="" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 md:gap-4">
-                    <input type="hidden" name="page" value="1">
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 md:gap-4">
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-2">Jenis</label>
-                        <select name="type" class="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        <select id="filterType" onchange="applyFilters()" class="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
                             <option value="">Semua Jenis</option>
-                            <option value="equipment" <?php echo $filterType === 'equipment' ? 'selected' : ''; ?>>Alat</option>
-                            <option value="room" <?php echo $filterType === 'room' ? 'selected' : ''; ?>>Ruang</option>
+                            <option value="equipment">Alat</option>
+                            <option value="room">Ruang</option>
                         </select>
                     </div>
                     
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-2">Status</label>
-                        <select name="status" class="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        <select id="filterStatus" onchange="applyFilters()" class="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
                             <option value="">Semua Status</option>
-                            <option value="active" <?php echo $filterStatus === 'active' ? 'selected' : ''; ?>>Sedang Dipinjam</option>
-                            <option value="returned" <?php echo $filterStatus === 'returned' ? 'selected' : ''; ?>>Sudah Dikembalikan</option>
+                            <option value="pending">Menunggu Persetujuan</option>
+                            <option value="approved">Disetujui</option>
+                            <option value="rejected">Ditolak</option>
+                            <option value="returned">Sudah Dikembalikan</option>
                         </select>
                     </div>
                     
-                    <div class="sm:col-span-2 lg:col-span-1 flex items-end">
-                        <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg transition text-sm md:text-base">
-                            <i class="fas fa-search mr-2"></i>Terapkan Filter
+                    <div class="sm:col-span-2 lg:col-span-1 flex items-end gap-2">
+                        <button onclick="clearFilters()" class="flex-1 bg-gray-500 hover:bg-gray-600 text-white font-semibold py-2 px-4 rounded-lg transition text-sm md:text-base">
+                            <i class="fas fa-times mr-2"></i>Clear
                         </button>
                     </div>
-                </form>
+                </div>
             </div>
 
             <!-- TABLE -->
@@ -402,15 +406,26 @@ $notificationEmail = $settings['borrowing_notification_email'] ?? 'inlet@polinem
 
                         <tbody class="bg-white divide-y divide-gray-200">
                             <?php if (empty($borrowings)): ?>
-                                <tr>
-                                    <td colspan="8" class="px-6 py-8 text-center text-gray-500">
+                                <tr class="borrowing-empty">
+                                    <td colspan="9" class="px-6 py-8 text-center text-gray-500">
                                         <i class="fas fa-inbox text-4xl mb-2"></i>
                                         <p>Tidak ada data peminjaman</p>
                                     </td>
                                 </tr>
                             <?php else: ?>
-                                <?php foreach ($borrowings as $borrow): ?>
-                                    <tr class="hover:bg-gray-50">
+                                <?php foreach ($borrowings as $borrow): 
+                                    // Determine display status for filtering
+                                    $displayStatus = $borrow['status'] ?? '';
+                                    if ($displayStatus === 'returned') {
+                                        $filterStatus = 'returned';
+                                    } elseif ($displayStatus === 'active') {
+                                        $approvalStatus = $borrow['approval_status'] ?? 'pending';
+                                        $filterStatus = $approvalStatus; // approved, rejected, or pending
+                                    } else {
+                                        $filterStatus = 'pending';
+                                    }
+                                ?>
+                                    <tr class="borrowing-row hover:bg-gray-50" data-type="<?php echo htmlspecialchars($borrow['borrowing_type'] ?? ''); ?>" data-status="<?php echo htmlspecialchars($filterStatus); ?>">
                                         <td class="px-4 py-3">
                                             <div class="text-sm font-medium text-gray-900 truncate max-w-[130px]" title="<?php echo htmlspecialchars($borrow['borrower_name'] ?? '-'); ?>">
                                                 <?php echo htmlspecialchars($borrow['borrower_name'] ?? '-'); ?></div>
@@ -545,13 +560,24 @@ $notificationEmail = $settings['borrowing_notification_email'] ?? 'inlet@polinem
                 <!-- Mobile Cards -->
                 <div class="lg:hidden divide-y divide-gray-200">
                     <?php if (empty($borrowings)): ?>
-                        <div class="p-8 text-center text-gray-500">
+                        <div class="borrowing-empty p-8 text-center text-gray-500">
                             <i class="fas fa-inbox text-4xl mb-2"></i>
                             <p>Tidak ada data peminjaman</p>
                         </div>
                     <?php else: ?>
-                        <?php foreach ($borrowings as $borrow): ?>
-                            <div class="p-4 hover:bg-gray-50">
+                        <?php foreach ($borrowings as $borrow): 
+                            // Determine display status for filtering
+                            $displayStatus = $borrow['status'] ?? '';
+                            if ($displayStatus === 'returned') {
+                                $filterStatus = 'returned';
+                            } elseif ($displayStatus === 'active') {
+                                $approvalStatus = $borrow['approval_status'] ?? 'pending';
+                                $filterStatus = $approvalStatus; // approved, rejected, or pending
+                            } else {
+                                $filterStatus = 'pending';
+                            }
+                        ?>
+                            <div class="borrowing-row p-4 hover:bg-gray-50" data-type="<?php echo htmlspecialchars($borrow['borrowing_type'] ?? ''); ?>" data-status="<?php echo htmlspecialchars($filterStatus); ?>">
                                 <div class="flex items-start justify-between gap-2 mb-3">
                                     <div class="flex-1 min-w-0">
                                         <h3 class="text-sm font-semibold text-gray-900 truncate">
@@ -901,6 +927,50 @@ $notificationEmail = $settings['borrowing_notification_email'] ?? 'inlet@polinem
             
             // Don't prevent default - let form submit
         });
+
+        // Front-end filter function
+        function applyFilters() {
+            const filterType = document.getElementById('filterType').value;
+            const filterStatus = document.getElementById('filterStatus').value;
+            const rows = document.querySelectorAll('.borrowing-row');
+            
+            console.log('Filter applied:', { filterType, filterStatus });
+            
+            let visibleCount = 0;
+            rows.forEach(row => {
+                const rowType = row.getAttribute('data-type');
+                const rowStatus = row.getAttribute('data-status');
+                
+                console.log('Row data:', { rowType, rowStatus });
+                
+                const typeMatch = !filterType || rowType === filterType;
+                const statusMatch = !filterStatus || rowStatus === filterStatus;
+                
+                if (typeMatch && statusMatch) {
+                    row.style.display = '';
+                    visibleCount++;
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+            
+            console.log('Visible rows:', visibleCount);
+            
+            // Update empty state
+            const emptyRows = document.querySelectorAll('.borrowing-empty');
+            emptyRows.forEach(emptyRow => {
+                if (emptyRow) {
+                    emptyRow.style.display = visibleCount === 0 ? '' : 'none';
+                }
+            });
+        }
+
+        // Clear filter function
+        function clearFilters() {
+            document.getElementById('filterType').value = '';
+            document.getElementById('filterStatus').value = '';
+            applyFilters();
+        }
     </script>
 
     <script src="assets/js/admin.js"></script>

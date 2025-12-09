@@ -37,7 +37,7 @@ class EquipmentModel
             $query .= " WHERE is_active = true";
         }
         
-        $query .= " ORDER BY display_order ASC, name ASC";
+        $query .= " ORDER BY created_at DESC, name ASC";
 
         $stmt = $this->conn->prepare($query);
         $stmt->execute();
@@ -49,7 +49,7 @@ class EquipmentModel
     {
         $query = "SELECT * FROM $this->table 
                   WHERE is_active = true AND available_quantity > 0
-                  ORDER BY display_order ASC, name ASC";
+                  ORDER BY created_at DESC, name ASC";
 
         $stmt = $this->conn->prepare($query);
         $stmt->execute();
@@ -61,6 +61,15 @@ class EquipmentModel
     {
         $stmt = $this->conn->prepare("SELECT * FROM $this->table WHERE id = :id LIMIT 1");
         $stmt->bindParam(':id', $id);
+        $stmt->execute();
+        return $stmt->fetch(PDO::FETCH_ASSOC);
+    }
+
+    // READ - Get by Name (untuk validasi duplikat)
+    public function getEquipmentByName($name)
+    {
+        $stmt = $this->conn->prepare("SELECT * FROM $this->table WHERE LOWER(name) = LOWER(:name) LIMIT 1");
+        $stmt->bindParam(':name', $name);
         $stmt->execute();
         return $stmt->fetch(PDO::FETCH_ASSOC);
     }

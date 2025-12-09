@@ -232,13 +232,19 @@ $programs = $studentModel->getProgramStudies();
                                             </span>
                                         </td>
                                         <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                                            <button onclick="openEditModal(<?= htmlspecialchars(json_encode($student)) ?>)" class="text-blue-600 hover:text-blue-900 mr-3 transition duration-150">
+                                            <button onclick="openEditModal(<?= htmlspecialchars(json_encode($student)) ?>)" class="text-blue-600 hover:text-blue-900 mr-3 transition duration-150" title="Edit">
                                                 <i class="fas fa-edit"></i>
                                             </button>
-                                            <button onclick="toggleActive(<?= $student['id'] ?>)" class="text-yellow-600 hover:text-yellow-900 mr-3 transition duration-150">
-                                                <i class="fas fa-toggle-on"></i>
-                                            </button>
-                                            <button onclick="deleteStudent(<?= $student['id'] ?>, '<?= htmlspecialchars($student['name']) ?>')" class="text-red-600 hover:text-red-900 transition duration-150">
+                                            <?php if ($student['is_active'] === 't' || $student['is_active'] === true): ?>
+                                                <button onclick="toggleActive(<?= $student['id'] ?>)" class="text-orange-600 hover:text-orange-900 mr-3 transition duration-150" title="Nonaktifkan">
+                                                    <i class="fas fa-toggle-on"></i>
+                                                </button>
+                                            <?php else: ?>
+                                                <button onclick="toggleActive(<?= $student['id'] ?>)" class="text-green-600 hover:text-green-900 mr-3 transition duration-150" title="Aktifkan">
+                                                    <i class="fas fa-toggle-off"></i>
+                                                </button>
+                                            <?php endif; ?>
+                                            <button onclick="deleteStudent(<?= $student['id'] ?>, '<?= htmlspecialchars($student['name']) ?>')" class="text-red-600 hover:text-red-900 transition duration-150" title="Hapus">
                                                 <i class="fas fa-trash"></i>
                                             </button>
                                         </td>
@@ -278,13 +284,19 @@ $programs = $studentModel->getProgramStudies();
                                 </div>
 
                                 <div class="flex items-center justify-end space-x-3">
-                                    <button onclick="openEditModal(<?= htmlspecialchars(json_encode($student)) ?>)" class="text-blue-600 hover:text-blue-900">
+                                    <button onclick="openEditModal(<?= htmlspecialchars(json_encode($student)) ?>)" class="text-blue-600 hover:text-blue-900" title="Edit">
                                         <i class="fas fa-edit"></i>
                                     </button>
-                                    <button onclick="toggleActive(<?= $student['id'] ?>)" class="text-yellow-600 hover:text-yellow-900">
-                                        <i class="fas fa-toggle-on"></i>
-                                    </button>
-                                    <button onclick="deleteStudent(<?= $student['id'] ?>, '<?= htmlspecialchars($student['name']) ?>')" class="text-red-600 hover:text-red-900">
+                                    <?php if ($student['is_active'] === 't' || $student['is_active'] === true): ?>
+                                        <button onclick="toggleActive(<?= $student['id'] ?>)" class="text-orange-600 hover:text-orange-900" title="Nonaktifkan">
+                                            <i class="fas fa-toggle-on"></i>
+                                        </button>
+                                    <?php else: ?>
+                                        <button onclick="toggleActive(<?= $student['id'] ?>)" class="text-green-600 hover:text-green-900" title="Aktifkan">
+                                            <i class="fas fa-toggle-off"></i>
+                                        </button>
+                                    <?php endif; ?>
+                                    <button onclick="deleteStudent(<?= $student['id'] ?>, '<?= htmlspecialchars($student['name']) ?>')" class="text-red-600 hover:text-red-900" title="Hapus">
                                         <i class="fas fa-trash"></i>
                                     </button>
                                 </div>
@@ -331,8 +343,15 @@ $programs = $studentModel->getProgramStudies();
                 </div>
 
                 <div class="mb-4">
-                    <label class="block text-gray-700 text-sm font-medium mb-2">Program Studi</label>
-                    <input type="text" id="program_study" name="program_study" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                    <label class="block text-gray-700 text-sm font-medium mb-2">Program Studi <span class="text-red-500">*</span></label>
+                    <select id="program_study" name="program_study" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" required>
+                        <option value="">Pilih Program Studi</option>
+                        <option value="D-IV Teknik Informatika">D-IV Teknik Informatika</option>
+                        <option value="D-IV Sistem Informasi Bisnis">D-IV Sistem Informasi Bisnis</option>
+                        <option value="D-III Teknologi Informasi">D-III Teknologi Informasi</option>
+                        <option value="S-2 Rekayasa Teknologi Informasi">S-2 Rekayasa Teknologi Informasi</option>
+                        <option value="D-II Pengembangan Piranti Lunak Situs">D-II Pengembangan Piranti Lunak Situs</option>
+                    </select>
                 </div>
 
                 <div class="mb-4">
@@ -386,7 +405,11 @@ $programs = $studentModel->getProgramStudies();
             document.getElementById('name').value = student.name;
             document.getElementById('email').value = student.email || '';
             document.getElementById('phone').value = student.phone || '';
-            document.getElementById('program_study').value = student.program_study || '';
+            
+            // Set dropdown value for program_study
+            const programSelect = document.getElementById('program_study');
+            programSelect.value = student.program_study || '';
+            
             document.getElementById('semester').value = student.semester;
             document.getElementById('is_active').checked = student.is_active === 't' || student.is_active === true;
             document.getElementById('studentModal').classList.remove('hidden');

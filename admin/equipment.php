@@ -18,43 +18,56 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $action = $_POST['action'];
         
         if ($action === 'add') {
-            $data = [
-                'name' => $_POST['name'],
-                'description' => $_POST['description'] ?? '',
-                'quantity' => $_POST['quantity'],
-                'available_quantity' => $_POST['quantity'], // Initially same as quantity
-                'display_order' => $_POST['display_order'] ?? 999
-            ];
-            
-            if ($equipmentModel->createEquipment($data)) {
-                $success = 'Alat berhasil ditambahkan!';
+            // Check if equipment name already exists
+            $existingEquipment = $equipmentModel->getEquipmentByName($_POST['name']);
+            if ($existingEquipment) {
+                $error = 'Alat dengan nama tersebut sudah ada!';
             } else {
-                $error = 'Gagal menambahkan alat!';
+                $data = [
+                    'name' => $_POST['name'],
+                    'description' => $_POST['description'] ?? '',
+                    'quantity' => $_POST['quantity'],
+                    'available_quantity' => $_POST['quantity'], // Initially same as quantity
+                    'display_order' => 999
+                ];
+                
+                if ($equipmentModel->createEquipment($data)) {
+                    $success = 'Alat berhasil ditambahkan!';
+                } else {
+                    $error = 'Gagal menambahkan alat!';
+                }
             }
         } elseif ($action === 'edit') {
             $id = $_POST['id'];
-            $data = [
-                'name' => $_POST['name'],
-                'description' => $_POST['description'] ?? '',
-                'quantity' => $_POST['quantity'],
-                'available_quantity' => $_POST['available_quantity'],
-                'display_order' => $_POST['display_order'] ?? 999,
-                'is_active' => isset($_POST['is_active']) ? true : false
-            ];
             
-            if ($equipmentModel->updateEquipment($id, $data)) {
-                $success = 'Alat berhasil diupdate!';
+            // Check if equipment name already exists (except current equipment)
+            $existingEquipment = $equipmentModel->getEquipmentByName($_POST['name']);
+            if ($existingEquipment && $existingEquipment['id'] != $id) {
+                $error = 'Alat dengan nama tersebut sudah ada!';
             } else {
-                $error = 'Gagal mengupdate alat!';
+                $data = [
+                    'name' => $_POST['name'],
+                    'description' => $_POST['description'] ?? '',
+                    'quantity' => $_POST['quantity'],
+                    'available_quantity' => $_POST['available_quantity'],
+                    'display_order' => 999,
+                    'is_active' => isset($_POST['is_active']) ? true : false
+                ];
+                
+                if ($equipmentModel->updateEquipment($id, $data)) {
+                    $success = 'Alat berhasil diupdate!';
+                } else {
+                    $error = 'Gagal mengupdate alat!';
+                }
             }
         }
     }
 }
 
-// Handle delete
+// Handle delete (hard delete)
 if (isset($_GET['delete'])) {
     $id = $_GET['delete'];
-    if ($equipmentModel->deleteEquipment($id)) {
+    if ($equipmentModel->permanentDeleteEquipment($id)) {
         $success = 'Alat berhasil dihapus!';
     } else {
         $error = 'Gagal menghapus alat!';
@@ -227,12 +240,6 @@ $total_borrowed = $total_quantity - $total_available;
                                     </div>
                                 </div>
                                 
-                                <div class="flex justify-center mb-4">
-                                    <span class="px-3 py-1 rounded-full text-xs font-semibold bg-gray-100 text-gray-700">
-                                        Urutan: #<?php echo $equipment['display_order']; ?>
-                                    </span>
-                                </div>
-                                
                                 <div class="flex flex-col gap-2 pt-4 border-t border-gray-100">
                                     <button onclick='showEditModal(<?php echo json_encode($equipment); ?>)' class="w-full bg-blue-50 hover:bg-blue-100 text-blue-700 px-4 py-2 rounded-lg text-sm font-medium transition-colors flex items-center justify-center">
                                         <i class="fas fa-edit mr-2"></i> Edit Alat
@@ -308,12 +315,6 @@ $total_borrowed = $total_quantity - $total_available;
                         class="w-full px-4 py-2.5 bg-gray-50 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
                 </div>
                 
-                <div class="mb-4">
-                    <label class="block text-sm font-medium text-gray-700 mb-2">Urutan Tampilan</label>
-                    <input type="number" id="equipmentOrder" name="display_order" min="1" value="999"
-                        class="w-full px-4 py-2.5 bg-gray-50 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
-                </div>
-                
                 <div id="activeCheckDiv" class="mb-4 hidden">
                     <label class="flex items-center cursor-pointer">
                         <input type="checkbox" id="equipmentActive" name="is_active" class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500">
@@ -344,7 +345,6 @@ $total_borrowed = $total_quantity - $total_available;
             document.getElementById('equipmentName').value = '';
             document.getElementById('equipmentDescription').value = '';
             document.getElementById('equipmentQuantity').value = '1';
-            document.getElementById('equipmentOrder').value = '999';
             document.getElementById('availableQuantityDiv').classList.add('hidden');
             document.getElementById('activeCheckDiv').classList.add('hidden');
             document.getElementById('equipmentModal').classList.remove('hidden');
@@ -358,7 +358,6 @@ $total_borrowed = $total_quantity - $total_available;
             document.getElementById('equipmentDescription').value = equipment.description || '';
             document.getElementById('equipmentQuantity').value = equipment.quantity;
             document.getElementById('equipmentAvailable').value = equipment.available_quantity;
-            document.getElementById('equipmentOrder').value = equipment.display_order;
             document.getElementById('equipmentActive').checked = equipment.is_active;
             document.getElementById('availableQuantityDiv').classList.remove('hidden');
             document.getElementById('activeCheckDiv').classList.remove('hidden');

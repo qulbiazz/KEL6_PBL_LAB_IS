@@ -61,9 +61,10 @@ class StudentModel
             $query = "SELECT * FROM $this->table WHERE 1=1";
             $params = [];
 
-            if (!empty($filters['is_active'])) {
+            if (isset($filters['is_active']) && $filters['is_active'] !== '') {
+                $isActiveValue = ($filters['is_active'] === 'true') ? 't' : 'f';
                 $query .= " AND is_active = :is_active";
-                $params[':is_active'] = $filters['is_active'] === 'true';
+                $params[':is_active'] = $isActiveValue;
             }
 
             if (!empty($filters['search'])) {
