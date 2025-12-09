@@ -42,11 +42,11 @@
         <div class="container mx-auto px-6 md:px-8 lg:px-12">
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
                 <?php foreach ($cards as $card): ?>
-                    <article class="text-center p-6 rounded-lg hover:shadow-lg transition">
+                    <article class="text-center p-6 rounded-lg transition">
                         <div class="text-5xl mb-4" aria-hidden="true">
                             <i class="<?php echo htmlspecialchars($card['icon']); ?> text-blue-600"></i>
                         </div>
-                        <h3 class="text-3xl font-bold mb-2 text-gray-800"><?php echo htmlspecialchars($card['value']); ?></h3>
+                        <h3 class="text-3xl font-bold mb-2 text-gray-800 counter" data-count="<?php echo htmlspecialchars($card['value']); ?>">0</h3>
                         <p class="text-gray-600"><?php echo htmlspecialchars($card['label']); ?></p>
                     </article>
                 <?php endforeach; ?>
@@ -801,5 +801,79 @@
                     this.classList.remove('border-red-300');
                 });
             });
+        });
+    </script>
+
+    <script>
+        // Count-up animation for statistics
+        document.addEventListener('DOMContentLoaded', function() {
+            const counters = document.querySelectorAll('.counter');
+            const speed = 200; // Animation speed
+            let hasAnimated = false;
+
+            const animateCounter = (counter) => {
+                const target = counter.getAttribute('data-count');
+                const isNumberOnly = /^\d+$/.test(target);
+                
+                if (isNumberOnly) {
+                    const targetNum = +target;
+                    const increment = targetNum / speed;
+                    let current = 0;
+
+                    const updateCounter = () => {
+                        current += increment;
+                        if (current < targetNum) {
+                            counter.textContent = Math.ceil(current);
+                            requestAnimationFrame(updateCounter);
+                        } else {
+                            counter.textContent = target;
+                        }
+                    };
+                    updateCounter();
+                } else {
+                    // For non-numeric values like "50+" 
+                    const match = target.match(/^(\d+)(.*)$/);
+                    if (match) {
+                        const targetNum = +match[1];
+                        const suffix = match[2];
+                        const increment = targetNum / speed;
+                        let current = 0;
+
+                        const updateCounter = () => {
+                            current += increment;
+                            if (current < targetNum) {
+                                counter.textContent = Math.ceil(current) + suffix;
+                                requestAnimationFrame(updateCounter);
+                            } else {
+                                counter.textContent = target;
+                            }
+                        };
+                        updateCounter();
+                    } else {
+                        counter.textContent = target;
+                    }
+                }
+            };
+
+            // Use Intersection Observer for scroll trigger
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting && !hasAnimated) {
+                        hasAnimated = true;
+                        counters.forEach(counter => {
+                            animateCounter(counter);
+                        });
+                        observer.disconnect();
+                    }
+                });
+            }, {
+                threshold: 0.5
+            });
+
+            // Observe the statistics section
+            const statsSection = document.querySelector('section[aria-label="Statistik INLET"]');
+            if (statsSection) {
+                observer.observe(statsSection);
+            }
         });
     </script>

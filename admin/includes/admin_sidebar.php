@@ -95,12 +95,14 @@
                 Buku Tamu
             </a>
 
-            <!-- Site Settings -->
+        </nav>
+        
+        <!-- Site Settings - Fixed at bottom -->
+        <div class="mt-8 pt-4 border-t border-gray-800">
             <a href="site-settings.php" class="flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors <?php echo basename($_SERVER['PHP_SELF']) == 'site-settings.php' ? 'bg-blue-600 text-white' : 'text-gray-300 hover:bg-gray-800 hover:text-white'; ?>">
                 <i class="fas fa-cog w-6 text-center mr-2"></i>
                 Site Settings
             </a>
-
-        </nav>
+        </div>
     </div>
 </aside>

@@ -51,6 +51,20 @@ $recent_news = $conn->query("SELECT * FROM news ORDER BY created_at DESC LIMIT 5
             transform: translateY(-5px);
             box-shadow: 0 10px 20px rgba(0,0,0,0.1);
         }
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 6px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: #f1f5f9;
+            border-radius: 10px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 10px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
     </style>
 </head>
 <body class="bg-gray-50 text-gray-800">
@@ -131,7 +145,8 @@ $recent_news = $conn->query("SELECT * FROM news ORDER BY created_at DESC LIMIT 5
                             <i class="fas fa-chart-line mr-2 text-blue-600"></i>
                             Visitor Analytics
                         </h2>
-                        <button class="text-gray-400 hover:text-blue-600 transition-colors">
+                        <button class="text-gray-400 hover:text-blue-600 transition-colors"
+                                onclick="location.reload()" title="Refresh Data">
                             <i class="fas fa-sync-alt"></i>
                         </button>
                     </div>
@@ -174,7 +189,7 @@ $recent_news = $conn->query("SELECT * FROM news ORDER BY created_at DESC LIMIT 5
                         <?php if (!empty($visitorStats['countries'])): ?>
                         <div>
                             <h3 class="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-4">Top Locations</h3>
-                            <div class="space-y-4">
+                            <div class="space-y-4 max-h-[400px] overflow-y-auto pr-2 custom-scrollbar">
                                 <?php foreach ($visitorStats['countries'] as $country): ?>
                                 <div class="group">
                                     <div class="flex items-center justify-between mb-1">
