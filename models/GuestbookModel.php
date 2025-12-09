@@ -1,4 +1,8 @@
 <?php
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
+use PhpOffice\PhpSpreadsheet\Style\Fill;
+use PhpOffice\PhpSpreadsheet\Style\Alignment;
 /**
  * GuestbookModel.php
  * Model untuk mengelola data buku tamu
@@ -338,53 +342,80 @@ class GuestbookModel {
      * @param array $filters - Filter options
      * @return string|false - Filename or false on error
      */
-    public function exportToCSV($filters = []) {
-        try {
-            $data = $this->getAll($filters, 10000, 0); // Get all data
-            
-            if (empty($data)) {
-                return false;
-            }
+    public function exportToExcel($filters = []) {
+    try {
+        $data = $this->getAll($filters, 10000, 0);
 
-            $filename = 'guestbook_export_' . date('Y-m-d_His') . '.csv';
-            $filepath = __DIR__ . '/../uploads/exports/' . $filename;
-            
-            // Create directory if not exists
-            if (!file_exists(dirname($filepath))) {
-                mkdir(dirname($filepath), 0777, true);
-            }
-
-            $file = fopen($filepath, 'w');
-            
-            // Add BOM for UTF-8
-            fprintf($file, chr(0xEF).chr(0xBB).chr(0xBF));
-            
-            // Header CSV
-            fputcsv($file, ['No', 'Tanggal', 'Nama', 'Institusi', 'Email', 'Telepon', 'Pesan']);
-            
-            // Data rows
-            $no = 1;
-            foreach ($data as $row) {
-                fputcsv($file, [
-                    $no++,
-                    $row['formatted_date'],
-                    $row['name'],
-                    $row['institution'],
-                    $row['email'],
-                    $row['phone'],
-                    $row['message']
-                ]);
-            }
-            
-            fclose($file);
-            
-            return $filename;
-            
-        } catch(Exception $e) {
-            error_log("Error exporting guestbook to CSV: " . $e->getMessage());
+        if (empty($data)) {
             return false;
         }
+
+        $spreadsheet = new Spreadsheet();
+        $sheet = $spreadsheet->getActiveSheet();
+
+        // Header Excel
+        $headers = ['No', 'Tanggal', 'Nama', 'Institusi', 'Email', 'Telepon', 'Pesan'];
+        $sheet->fromArray($headers, null, 'A1');
+
+        // Styling Header
+        $sheet->getStyle('A1:G1')->applyFromArray([
+            'font' => [
+                'bold' => true,
+                'color' => ['rgb' => 'FFFFFF'],
+                'size' => 12
+            ],
+            'alignment' => [
+                'horizontal' => Alignment::HORIZONTAL_CENTER,
+                'vertical'   => Alignment::VERTICAL_CENTER
+            ],
+            'fill' => [
+                'fillType' => Fill::FILL_SOLID,
+                'color' => ['rgb' => '4F81BD']
+            ]
+        ]);
+
+        // Data rows
+        $rowNum = 2;
+        $no = 1;
+
+        foreach ($data as $row) {
+            $sheet->fromArray([
+                $no++,
+                $row['formatted_date'],
+                $row['name'],
+                $row['institution'],
+                $row['email'],
+                $row['phone'],
+                $row['message']
+            ], null, 'A' . $rowNum);
+
+            $rowNum++;
+        }
+
+        // Auto width for all columns
+        foreach (range('A', 'G') as $col) {
+            $sheet->getColumnDimension($col)->setAutoSize(true);
+        }
+
+        // File path & create directory if needed
+        $filename = 'guestbook_export_' . date('Y-m-d_His') . '.xlsx';
+        $filepath = __DIR__ . '/../uploads/exports/' . $filename;
+
+        if (!file_exists(dirname($filepath))) {
+            mkdir(dirname($filepath), 0777, true);
+        }
+
+        // Save file
+        $writer = new Xlsx($spreadsheet);
+        $writer->save($filepath);
+
+        return $filename;
+
+    } catch (Exception $e) {
+        error_log("Error exporting guestbook to Excel: " . $e->getMessage());
+        return false;
     }
+}
 
     /**
      * Get unique institutions for filter dropdown
