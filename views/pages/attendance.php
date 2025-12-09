@@ -1,4 +1,7 @@
 <?php
+// Load composer autoloader for dependencies
+require_once __DIR__ . '/../../vendor/autoload.php';
+
 // Load students for dropdown
 require_once __DIR__ . '/../../models/StudentModel.php';
 $studentModel = new StudentModel($conn);
