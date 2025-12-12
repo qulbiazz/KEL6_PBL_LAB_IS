@@ -2,11 +2,11 @@
     <section class="relative h-screen overflow-y-hidden -mt-16 md:-mt-20" aria-label="Banner utama INLET">
         <div class="carousel-container relative w-full h-full" role="region" aria-roledescription="carousel">
             <?php foreach ($banners as $index => $banner): ?>
-                <div class="carousel-slide <?php echo $index === 0 ? 'active' : ''; ?> absolute w-full h-full transition-opacity duration-500" 
-                     style="background-image: url('uploads/banners/<?php echo htmlspecialchars($banner['image']); ?>')"
-                     role="group" 
-                     aria-roledescription="slide"
-                     aria-label="Slide <?php echo $index + 1; ?> of <?php echo count($banners); ?>">
+                <div class="carousel-slide <?php echo $index === 0 ? 'active' : ''; ?> absolute w-full h-full transition-opacity duration-500"
+                    style="background-image: url('uploads/banners/<?php echo htmlspecialchars($banner['image']); ?>')"
+                    role="group"
+                    aria-roledescription="slide"
+                    aria-label="Slide <?php echo $index + 1; ?> of <?php echo count($banners); ?>">
                     <div class="absolute inset-0 bg-black bg-opacity-50"></div>
                     <div class="relative z-10 container mx-auto px-6 md:px-8 lg:px-24 h-full flex items-center pt-16 md:pt-20">
                         <div class="text-white max-w-2xl banner-content">
@@ -16,9 +16,9 @@
                             </h1>
                             <p class="text-base md:text-xl mb-6 md:mb-8 banner-description opacity-0"><?php echo htmlspecialchars($banner['description']); ?></p>
                             <?php if ($banner['button_text'] && $banner['button_link']): ?>
-                                <a href="<?php echo htmlspecialchars($banner['button_link']); ?>" 
-                                   class="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 rounded-lg inline-block transition banner-button opacity-0 transform translate-y-4"
-                                   role="button">
+                                <a href="<?php echo htmlspecialchars($banner['button_link']); ?>"
+                                    class="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 rounded-lg inline-block transition banner-button opacity-0 transform translate-y-4"
+                                    role="button">
                                     <?php echo htmlspecialchars($banner['button_text']); ?>
                                 </a>
                             <?php endif; ?>
@@ -108,13 +108,13 @@
                     <?php foreach ($products as $product): ?>
                         <article class="bg-white rounded-lg overflow-hidden shadow-md hover:shadow-xl transition flex flex-col h-full">
                             <div class="relative">
-                                <img src="uploads/products/<?php echo htmlspecialchars($product['image']); ?>" 
-                                     alt="Produk <?php echo htmlspecialchars($product['name']); ?> - INLET Polinema" 
-                                     loading="lazy"
-                                     decoding="async"
-                                     width="400"
-                                     height="192"
-                                     class="w-full h-48 object-cover">
+                                <img src="uploads/products/<?php echo htmlspecialchars($product['image']); ?>"
+                                    alt="Produk <?php echo htmlspecialchars($product['name']); ?> - INLET Polinema"
+                                    loading="lazy"
+                                    decoding="async"
+                                    width="400"
+                                    height="192"
+                                    class="w-full h-48 object-cover">
                                 <?php if (!empty($product['year'])): ?>
                                     <div class="absolute top-3 right-3">
                                         <span class="px-3 py-1 bg-blue-600 text-white text-xs font-semibold rounded-full shadow-lg">
@@ -126,9 +126,9 @@
                             <div class="p-6 flex flex-col flex-grow">
                                 <h3 class="text-xl font-bold mb-2 text-gray-800"><?php echo htmlspecialchars($product['name']); ?></h3>
                                 <p class="text-gray-600 mb-4 flex-grow"><?php echo htmlspecialchars($product['description']); ?></p>
-                                <a href="index.php?page=product-detail&id=<?php echo $product['id']; ?>" 
-                                   class="text-blue-600 hover:text-blue-700 font-semibold mt-auto"
-                                   aria-label="Pelajari lebih lanjut tentang <?php echo htmlspecialchars($product['name']); ?>">
+                                <a href="index.php?page=product-detail&id=<?php echo $product['id']; ?>"
+                                    class="text-blue-600 hover:text-blue-700 font-semibold mt-auto"
+                                    aria-label="Pelajari lebih lanjut tentang <?php echo htmlspecialchars($product['name']); ?>">
                                     Learn More <i class="fas fa-arrow-right ml-1" aria-hidden="true"></i>
                                 </a>
                             </div>
@@ -136,6 +136,14 @@
                     <?php endforeach; ?>
                 </div>
             <?php endif; ?>
+
+            <!-- View All Button -->
+            <div class="text-center mt-10">
+                <a href="index.php?page=products" class="inline-flex items-center gap-2 px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg transition-colors shadow-lg hover:shadow-xl">
+                    <span>View All Products</span>
+                    <i class="fas fa-arrow-right"></i>
+                </a>
+            </div>
         </div>
     </section>
 
@@ -369,8 +377,8 @@
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8" role="list" aria-label="News articles">
                     <?php foreach ($news as $item): ?>
                         <article class="bg-white rounded-lg overflow-hidden shadow-md hover:shadow-xl transition flex flex-col h-full" role="listitem" itemscope itemtype="https://schema.org/NewsArticle">
-                            <img src="uploads/news/<?php echo htmlspecialchars($item['image']); ?>" 
-                                alt="Berita: <?php echo htmlspecialchars($item['title']); ?>" 
+                            <img src="uploads/news/<?php echo htmlspecialchars($item['image']); ?>"
+                                alt="Berita: <?php echo htmlspecialchars($item['title']); ?>"
                                 class="w-full h-48 object-cover"
                                 loading="lazy"
                                 width="400"
@@ -378,13 +386,13 @@
                                 itemprop="image">
                             <div class="p-6 flex flex-col flex-grow">
                                 <div class="text-sm text-gray-500 mb-2">
-                                    <i class="far fa-calendar" aria-hidden="true"></i> 
+                                    <i class="far fa-calendar" aria-hidden="true"></i>
                                     <time datetime="<?php echo date('Y-m-d', strtotime($item['published_at'])); ?>" itemprop="datePublished"><?php echo date('F d, Y', strtotime($item['published_at'])); ?></time>
                                 </div>
                                 <h3 class="text-xl font-bold mb-2 text-gray-800" itemprop="headline"><?php echo htmlspecialchars($item['title']); ?></h3>
                                 <p class="text-gray-600 mb-4 flex-grow" itemprop="description"><?php echo substr(htmlspecialchars($item['content']), 0, 100); ?>...</p>
                                 <meta itemprop="author" content="INLET Politeknik Negeri Malang">
-                                <a href="index.php?page=news-detail&id=<?php echo $item['id']; ?>" 
+                                <a href="index.php?page=news-detail&id=<?php echo $item['id']; ?>"
                                     class="text-blue-600 hover:text-blue-700 font-semibold mt-auto"
                                     itemprop="url"
                                     aria-label="Baca selengkapnya: <?php echo htmlspecialchars($item['title']); ?>">
@@ -395,6 +403,14 @@
                     <?php endforeach; ?>
                 </div>
             <?php endif; ?>
+
+            <!-- View All Button -->
+            <div class="text-center mt-10">
+                <a href="index.php?page=news" class="inline-flex items-center gap-2 px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg transition-colors shadow-lg hover:shadow-xl">
+                    <span>View All News</span>
+                    <i class="fas fa-arrow-right"></i>
+                </a>
+            </div>
         </div>
     </section>
 
@@ -405,23 +421,53 @@
                 <h2 id="gallery-heading" class="text-4xl font-bold text-gray-800 mb-4" itemprop="name">Gallery</h2>
                 <p class="text-gray-600" itemprop="description">Moments captured at InLet</p>
             </header>
-            
+
             <!-- Uniform Grid Layout -->
-            <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4" role="list" aria-label="Photo gallery">
-                <?php foreach ($gallery as $index => $item): ?>
-                    <figure class="group relative overflow-hidden rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-500 cursor-pointer aspect-square" role="listitem" itemprop="image" itemscope itemtype="https://schema.org/ImageObject">
-                        <!-- Image -->
-                        <img src="uploads/gallery/<?php echo htmlspecialchars($item['image']); ?>"
-                            alt="Galeri INLET: <?php echo htmlspecialchars($item['caption']); ?> - Dokumentasi kegiatan Lab INLET Politeknik Negeri Malang"
-                            class="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-700 ease-out"
-                            loading="lazy"
-                            width="400"
-                            height="400"
-                            itemprop="contentUrl">
-                        
+            <div id="galleryGrid" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4" role="list" aria-label="Photo gallery">
+                <?php
+                $initialCount = 4;
+                $totalItems = count($gallery);
+                foreach ($gallery as $index => $item):
+                    $isHidden = $index >= $initialCount;
+                ?>
+                    <figure class="gallery-item group relative overflow-hidden rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-500 cursor-pointer aspect-square <?php echo $isHidden ? 'hidden gallery-hidden' : ''; ?>"
+                        role="listitem"
+                        itemprop="image"
+                        itemscope
+                        itemtype="https://schema.org/ImageObject"
+                        onclick="openLightbox(<?php echo $index; ?>)"
+                        data-src="uploads/gallery/<?php echo htmlspecialchars($item['image']); ?>"
+                        data-caption="<?php echo htmlspecialchars($item['caption']); ?>"
+                        data-index="<?php echo $index; ?>">
+                        <!-- Image - Use placeholder for hidden items -->
+                        <?php if ($isHidden): ?>
+                            <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 400'%3E%3Crect fill='%23e5e7eb' width='400' height='400'/%3E%3C/svg%3E"
+                                data-src="uploads/gallery/<?php echo htmlspecialchars($item['image']); ?>"
+                                alt="Galeri INLET: <?php echo htmlspecialchars($item['caption']); ?> - Dokumentasi kegiatan Lab INLET Politeknik Negeri Malang"
+                                class="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-700 ease-out gallery-lazy"
+                                width="400"
+                                height="400"
+                                itemprop="contentUrl">
+                        <?php else: ?>
+                            <img src="uploads/gallery/<?php echo htmlspecialchars($item['image']); ?>"
+                                alt="Galeri INLET: <?php echo htmlspecialchars($item['caption']); ?> - Dokumentasi kegiatan Lab INLET Politeknik Negeri Malang"
+                                class="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-700 ease-out"
+                                loading="lazy"
+                                width="400"
+                                height="400"
+                                itemprop="contentUrl">
+                        <?php endif; ?>
+
                         <!-- Gradient Overlay on Hover -->
                         <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-all duration-500"></div>
-                        
+
+                        <!-- Zoom Icon on Hover -->
+                        <div class="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300 pointer-events-none">
+                            <div class="w-14 h-14 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center border-2 border-white/50 transform scale-75 group-hover:scale-100 transition-transform duration-300">
+                                <i class="fas fa-search-plus text-white text-xl"></i>
+                            </div>
+                        </div>
+
                         <!-- Caption - Show on Hover -->
                         <figcaption class="absolute inset-x-0 bottom-0 p-4 translate-y-full group-hover:translate-y-0 transition-transform duration-500 ease-out">
                             <div class="flex items-center gap-2 mb-2">
@@ -430,13 +476,24 @@
                             </div>
                             <h3 class="text-white font-bold text-lg leading-tight line-clamp-2" itemprop="caption"><?php echo htmlspecialchars($item['caption']); ?></h3>
                         </figcaption>
-                        
+
                         <!-- Corner Accent -->
                         <div class="absolute top-3 right-3 w-8 h-8 border-t-2 border-r-2 border-white/0 group-hover:border-white/50 transition-all duration-500 rounded-tr-lg"></div>
                         <div class="absolute bottom-3 left-3 w-8 h-8 border-b-2 border-l-2 border-white/0 group-hover:border-white/50 transition-all duration-500 rounded-bl-lg"></div>
                     </figure>
                 <?php endforeach; ?>
             </div>
+
+            <!-- Load More Button -->
+            <?php if ($totalItems > $initialCount): ?>
+                <div id="galleryLoadMore" class="text-center mt-8">
+                    <button onclick="loadMoreGallery()" class="inline-flex items-center gap-2 px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg transition-colors shadow-lg hover:shadow-xl">
+                        <span>View More</span>
+                        <span id="galleryRemainingCount" class="bg-white/20 px-2 py-0.5 rounded text-sm"><?php echo $totalItems - $initialCount; ?></span>
+                        <i class="fas fa-chevron-down"></i>
+                    </button>
+                </div>
+            <?php endif; ?>
         </div>
     </section>
 
@@ -495,8 +552,8 @@
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-8" role="list" aria-label="Research publications">
                     <?php foreach ($research as $activity): ?>
                         <article class="bg-white rounded-lg overflow-hidden shadow-md hover:shadow-xl transition flex flex-col h-full" role="listitem" itemscope itemtype="https://schema.org/ScholarlyArticle">
-                            <img src="uploads/research/<?php echo htmlspecialchars($activity['image']); ?>" 
-                                alt="Riset: <?php echo htmlspecialchars($activity['title']); ?>" 
+                            <img src="uploads/research/<?php echo htmlspecialchars($activity['image']); ?>"
+                                alt="Riset: <?php echo htmlspecialchars($activity['title']); ?>"
                                 class="w-full h-48 object-cover"
                                 loading="lazy"
                                 width="400"
@@ -506,11 +563,11 @@
                                 <h3 class="text-xl font-bold mb-2 text-gray-800" itemprop="headline"><?php echo htmlspecialchars($activity['title']); ?></h3>
                                 <p class="text-gray-600 mb-4 flex-grow" itemprop="description"><?php echo htmlspecialchars($activity['description']); ?></p>
                                 <div class="text-sm text-gray-500 mb-4">
-                                    <i class="far fa-calendar" aria-hidden="true"></i> 
+                                    <i class="far fa-calendar" aria-hidden="true"></i>
                                     <time datetime="<?php echo date('Y-m', strtotime($activity['created_at'])); ?>" itemprop="datePublished"><?php echo date('F Y', strtotime($activity['created_at'])); ?></time>
                                 </div>
                                 <meta itemprop="author" content="INLET Politeknik Negeri Malang">
-                                <a href="index.php?page=research-detail&id=<?php echo $activity['id']; ?>" 
+                                <a href="index.php?page=research-detail&id=<?php echo $activity['id']; ?>"
                                     class="text-blue-600 hover:text-blue-700 font-semibold mt-auto"
                                     itemprop="url"
                                     aria-label="Baca selengkapnya: <?php echo htmlspecialchars($activity['title']); ?>">
@@ -521,6 +578,14 @@
                     <?php endforeach; ?>
                 </div>
             <?php endif; ?>
+
+            <!-- View All Button -->
+            <div class="text-center mt-10">
+                <a href="index.php?page=research" class="inline-flex items-center gap-2 px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg transition-colors shadow-lg hover:shadow-xl">
+                    <span>View All Research</span>
+                    <i class="fas fa-arrow-right"></i>
+                </a>
+            </div>
         </div>
     </section>
 
@@ -814,7 +879,7 @@
             const animateCounter = (counter) => {
                 const target = counter.getAttribute('data-count');
                 const isNumberOnly = /^\d+$/.test(target);
-                
+
                 if (isNumberOnly) {
                     const targetNum = +target;
                     const increment = targetNum / speed;
@@ -877,3 +942,32 @@
             }
         });
     </script>
+
+    <!-- Gallery Lightbox Modal -->
+    <div id="galleryLightbox" class="fixed inset-0 z-50 hidden bg-black/95 backdrop-blur-sm" onclick="closeLightbox(event)">
+        <!-- Close Button -->
+        <button onclick="closeLightbox(event)" class="absolute top-4 right-4 z-50 text-white/80 hover:text-white transition-colors p-2" aria-label="Tutup lightbox">
+            <i class="fas fa-times text-3xl"></i>
+        </button>
+
+        <!-- Image Counter -->
+        <div class="absolute top-4 left-4 text-white/80 text-sm font-medium">
+            <span id="lightboxCounter"></span>
+        </div>
+
+        <!-- Navigation Arrows -->
+        <button onclick="navigateHomeLightbox(-1, event)" class="absolute left-4 top-1/2 -translate-y-1/2 text-white/80 hover:text-white transition-colors p-4 z-50" aria-label="Gambar sebelumnya">
+            <i class="fas fa-chevron-left text-3xl"></i>
+        </button>
+        <button onclick="navigateHomeLightbox(1, event)" class="absolute right-4 top-1/2 -translate-y-1/2 text-white/80 hover:text-white transition-colors p-4 z-50" aria-label="Gambar selanjutnya">
+            <i class="fas fa-chevron-right text-3xl"></i>
+        </button>
+
+        <!-- Image Container -->
+        <div class="flex items-center justify-center h-full p-16" onclick="event.stopPropagation()">
+            <div class="max-w-6xl max-h-full text-center">
+                <img id="lightboxImage" src="" alt="" class="max-w-full max-h-[80vh] object-contain rounded-lg shadow-2xl mx-auto">
+                <p id="lightboxCaption" class="text-white text-center mt-4 text-lg font-medium"></p>
+            </div>
+        </div>
+    </div>

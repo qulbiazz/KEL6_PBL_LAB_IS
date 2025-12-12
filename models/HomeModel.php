@@ -23,7 +23,7 @@ class HomeModel
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
-    public function getProducts($limit = 6)
+    public function getProducts($limit = 3)
     {
         $stmt = $this->conn->prepare("SELECT * FROM products WHERE is_active = true ORDER BY created_at DESC LIMIT :limit");
         $stmt->bindValue(':limit', $limit, PDO::PARAM_INT);
@@ -45,7 +45,7 @@ class HomeModel
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
-    public function getNews($limit = 6)
+    public function getNews($limit = 3)
     {
         $stmt = $this->conn->prepare("SELECT * FROM news WHERE is_active = true ORDER BY published_at DESC LIMIT :limit");
         $stmt->bindValue(':limit', $limit, PDO::PARAM_INT);
@@ -53,7 +53,7 @@ class HomeModel
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
-    public function getGallery($limit = 8)
+    public function getGallery($limit = 12)
     {
         $stmt = $this->conn->prepare("SELECT * FROM gallery WHERE is_active = true ORDER BY created_at DESC LIMIT :limit");
         $stmt->bindValue(':limit', $limit, PDO::PARAM_INT);

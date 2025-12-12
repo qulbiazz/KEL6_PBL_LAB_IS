@@ -28,7 +28,7 @@
                     <ul class="space-y-2 list-none p-0 m-0 bg-transparent">
                         <?php
                         $quickLinks = $siteSettingsModel->getSetting('quick_links');
-                        
+
                         // Default links if none configured
                         if (empty($quickLinks)) {
                             $quickLinks = [
@@ -38,16 +38,16 @@
                                 ['label' => 'Research', 'url' => 'index.php#research']
                             ];
                         }
-                        
+
                         foreach ($quickLinks as $link):
                             if (!empty($link['label']) && !empty($link['url'])):
                         ?>
-                            <li>
-                                <a href="<?php echo htmlspecialchars($link['url']); ?>" 
-                                   class="text-gray-400 hover:text-white transition duration-200">
-                                    <?php echo htmlspecialchars($link['label']); ?>
-                                </a>
-                            </li>
+                                <li>
+                                    <a href="<?php echo htmlspecialchars($link['url']); ?>"
+                                        class="text-gray-400 hover:text-white transition duration-200">
+                                        <?php echo htmlspecialchars($link['label']); ?>
+                                    </a>
+                                </li>
                         <?php
                             endif;
                         endforeach;
@@ -116,7 +116,7 @@
             </div>
 
             <div class="border-t border-gray-700 mt-8 pt-8 text-center text-gray-400">
-                <?php 
+                <?php
                 $copyrightText = '';
                 if (!empty($siteSettings['footer_copyright'])) {
                     $copyrightText = $siteSettings['footer_copyright'];
@@ -163,7 +163,7 @@
     </button>
 
     <script src="assets/js/carousel.js"></script>
-    <script src="assets/js/main.js"></script>
+    <script src="assets/js/main.js?v=<?php echo time(); ?>"></script>
     <script src="https://cdn.jsdelivr.net/npm/@splidejs/splide@4.1.4/dist/js/splide.min.js"></script>
     <script src="assets/js/splide-sliders.js"></script>
     </body>

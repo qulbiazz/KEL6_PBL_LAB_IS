@@ -91,6 +91,30 @@ switch ($page) {
         $view = 'pages/home';
         break;
 
+    case 'products':
+        require_once 'models/ProductModel.php';
+        $productModel = new ProductModel($conn);
+        $products = $productModel->getAllProducts();
+        $pageTitle = 'All Products - InLet';
+        $view = 'pages/products';
+        break;
+
+    case 'news':
+        require_once 'models/NewsModel.php';
+        $newsModel = new NewsModel($conn);
+        $allNews = $newsModel->getAllNews();
+        $pageTitle = 'All News - InLet';
+        $view = 'pages/news';
+        break;
+
+    case 'research':
+        require_once 'models/ResearchModel.php';
+        $researchModel = new ResearchModel($conn);
+        $allResearch = $researchModel->getAllResearch();
+        $pageTitle = 'Research Activities - InLet';
+        $view = 'pages/research';
+        break;
+
     case 'about':
         // Load about page settings from database
         $stmt = $conn->prepare("SELECT * FROM about_settings WHERE is_active = true LIMIT 1");
