@@ -2,13 +2,14 @@
 <div id="sidebar-overlay" class="fixed inset-0 bg-black bg-opacity-50 z-40 lg:hidden hidden"></div>
 
 <!-- Sidebar -->
-<aside id="admin-sidebar" class="bg-gray-900 text-white w-64 fixed top-16 bottom-0 left-0 z-40 transform -translate-x-full lg:translate-x-0 transition-transform duration-300 ease-in-out overflow-y-auto border-r border-gray-800 custom-scrollbar">
-    <div class="p-4">
-        <!-- Close button for mobile -->
-        <button id="sidebar-close" class="lg:hidden absolute top-4 right-4 text-gray-400 hover:text-white">
-            <i class="fas fa-times text-xl"></i>
-        </button>
+<aside id="admin-sidebar" class="bg-gray-900 text-white w-64 fixed top-16 bottom-0 left-0 z-40 transform -translate-x-full lg:translate-x-0 transition-transform duration-300 ease-in-out border-r border-gray-800 flex flex-col">
+    <!-- Close button for mobile -->
+    <button id="sidebar-close" class="lg:hidden absolute top-4 right-4 text-gray-400 hover:text-white z-10">
+        <i class="fas fa-times text-xl"></i>
+    </button>
 
+    <!-- Scrollable navigation area -->
+    <div class="flex-1 overflow-y-auto custom-scrollbar p-4">
         <nav class="space-y-1 mt-2">
             <!-- Dashboard -->
             <a href="dashboard.php" class="flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors <?php echo basename($_SERVER['PHP_SELF']) == 'dashboard.php' ? 'bg-blue-600 text-white' : 'text-gray-300 hover:bg-gray-800 hover:text-white'; ?>">
@@ -96,13 +97,13 @@
             </a>
 
         </nav>
-        
-        <!-- Site Settings - Fixed at bottom -->
-        <div class="mt-8 pt-4 border-t border-gray-800">
-            <a href="site-settings.php" class="flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors <?php echo basename($_SERVER['PHP_SELF']) == 'site-settings.php' ? 'bg-blue-600 text-white' : 'text-gray-300 hover:bg-gray-800 hover:text-white'; ?>">
-                <i class="fas fa-cog w-6 text-center mr-2"></i>
-                Site Settings
-            </a>
-        </div>
+    </div>
+
+    <!-- Site Settings - Fixed at bottom -->
+    <div class="flex-shrink-0 p-4 border-t border-gray-800 bg-gray-900">
+        <a href="site-settings.php" class="flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors <?php echo basename($_SERVER['PHP_SELF']) == 'site-settings.php' ? 'bg-blue-600 text-white' : 'text-gray-300 hover:bg-gray-800 hover:text-white'; ?>">
+            <i class="fas fa-cog w-6 text-center mr-2"></i>
+            Site Settings
+        </a>
     </div>
 </aside>
