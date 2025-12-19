@@ -1,0 +1,23 @@
+# robots.txt for INLET Website
+# Copy this file to root directory as robots.txt
+
+User-agent: *
+Allow: /
+
+# Sitemap location (update with your actual domain)
+Sitemap: https://your-domain.com/sitemap.xml
+
+# Disallow admin and sensitive directories
+Disallow: /admin/
+Disallow: /config/
+Disallow: /database/
+Disallow: /models/
+Disallow: /includes/
+Disallow: /uploads/private/
+
+# Allow assets
+Allow: /assets/
+Allow: /uploads/public/
+
+# Crawl-delay
+Crawl-delay: 10

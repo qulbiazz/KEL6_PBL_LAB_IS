@@ -1,3 +1,37 @@
+# Environment & Configuration
+.env
+.env.local
+.env.*.local
+.env.example
+config/database.php.backup
+
+# Database exports (sensitive data)
+database/exports/
+database/backups/
+
+# Node modules & dependencies
+node_modules/
+package-lock.json
+vendor/
+composer.lock
+
+# Build & Compiled CSS/JS
+assets/css/tailwind.css
+assets/css/*.min.css
+assets/js/*.min.js
+dist/
+build/
+
+# Uploads Directory
+uploads/*
+!uploads/.gitkeep
+!uploads/*/.gitkeep
+
+# Logs
+error.log
+*.log
+logs/
+
 # Byte-compiled / optimized / compiled files
 __pycache__/
 *.py[cod]
@@ -5,13 +39,16 @@ __pycache__/
 
 #file pdf
 *.pdf
+!INLET_LAPORAN_AKHIR.pdf
 
 #file .md
 *.md
 
+/instruction
+
 test_placeholders.html
 
-#image files except inlet_logo.png
+#image files
 *.png
 *.jpg
 *.jpeg
@@ -19,4 +56,43 @@ test_placeholders.html
 *.bmp
 *.tiff
 !inlet_logo.png
+!inlet_logo_only.png
+!DIAGRAM_ER_INLET.png
+!placeholder*.png
+!placeholder*.jpg
 
+# IDE & Editor
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Logs
+*.log
+error_log
+debug.log
+
+# Cache
+cache/
+tmp/
+temp/
+
+#Database
+*.sqlite
+*.sql
+!inlet_DB_final.sql
+
+database/migrations/
+
+export_database.*
+
+# SEO Files (auto-generated or server-specific)
+sitemap.xml
+sitemap.php
+robots.txt
+.htaccess
+
+test_email.php
+test_borrowing_email.php
