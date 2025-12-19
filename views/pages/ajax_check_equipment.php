@@ -1,5 +1,5 @@
 <?php
-// Disable all caching aggressively
+// Disable all caching
 header('Content-Type: application/json');
 header_remove('Cache-Control');
 header('Cache-Control: no-store, no-cache, must-revalidate, max-age=0');

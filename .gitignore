@@ -39,6 +39,7 @@ __pycache__/
 
 #file pdf
 *.pdf
+!INLET_LAPORAN_AKHIR.pdf
 
 #file .md
 *.md
@@ -47,7 +48,7 @@ __pycache__/
 
 test_placeholders.html
 
-#image files except inlet_logo.png, inlet_logo_only.png and placeholders
+#image files
 *.png
 *.jpg
 *.jpeg
@@ -56,6 +57,7 @@ test_placeholders.html
 *.tiff
 !inlet_logo.png
 !inlet_logo_only.png
+!DIAGRAM_ER_INLET.png
 !placeholder*.png
 !placeholder*.jpg
 
@@ -80,6 +82,7 @@ temp/
 #Database
 *.sqlite
 *.sql
+!inlet_DB_final.sql
 
 database/migrations/
 

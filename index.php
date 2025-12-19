@@ -2,7 +2,7 @@
 // Load configuration
 require_once 'config/config.php';
 
-// Start session with custom lifetime
+// Start session
 ini_set('session.gc_maxlifetime', Config::sessionLifetime());
 session_start();
 

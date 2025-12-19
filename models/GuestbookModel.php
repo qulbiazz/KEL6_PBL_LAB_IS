@@ -6,9 +6,6 @@ use PhpOffice\PhpSpreadsheet\Style\Alignment;
 /**
  * GuestbookModel.php
  * Model untuk mengelola data buku tamu
- * 
- * Created: 2025-11-28
- * Author: Inlet Lab Team
  */
 
 class GuestbookModel {
@@ -21,11 +18,6 @@ class GuestbookModel {
 
     /**
      * Create new guestbook entry
-     * 
-     * @param array $data - Data guestbook (name, institution, email, phone, message)
-     * @param string $ip_address - IP address pengunjung
-     * @param string $user_agent - Browser user agent
-     * @return array - Result array dengan success status dan message
      */
     public function create($data, $ip_address = null, $user_agent = null) {
         try {
